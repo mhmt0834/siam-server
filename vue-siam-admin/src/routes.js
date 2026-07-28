@@ -106,11 +106,11 @@ let routes = [
   {
     path: '/',
     component: Home,
-    name: '数据中心',
+    name: '经营概览',
     iconCls: 'el-icon-house',
     leaf: true,//只有一个节点
     children: [
-      { path: '/statisticGraph', component: statisticGraph, name: '数据中心' },//实时数据
+      { path: '/statisticGraph', component: statisticGraph, name: '经营概览' },//实时数据
     ]
   },
   {
@@ -128,6 +128,7 @@ let routes = [
       },
       {
         path: '/purchasedMemberList', component: purchasedMemberList, name: '已购买用户',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/purchasedMemberList', component: purchasedMemberList, name: '已购买用户' },
@@ -135,6 +136,7 @@ let routes = [
       },
       {
         path: '/unPurchasedMemberList', component: unPurchasedMemberList, name: '未购买用户',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/unPurchasedMemberList', component: unPurchasedMemberList, name: '未购买用户' },
@@ -192,18 +194,19 @@ let routes = [
   {
     path: '/',
     component: Home,
-    name: '商家中心',
+    name: '门店管理',
     iconCls: 'el-icon-house',
     children: [
       {
-        path: '/shopList', component: shopList, name: '已入驻商家',
+        path: '/shopList', component: shopList, name: '门店资料',
         leaf: true,//只有一个节点
         children: [
-          { path: '/shopList', component: shopList, name: '已入驻商家' },
+          { path: '/shopList', component: shopList, name: '门店资料' },
         ]
       },
       {
         path: '/shopListOfApplySettled', component: shopListOfApplySettled, name: '申请开店商家',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/shopListOfApplySettled', component: shopListOfApplySettled, name: '申请开店商家' },
@@ -211,6 +214,7 @@ let routes = [
       },
       {
         path: '/merchantWithdrawRecord', component: merchantWithdrawRecord, name: '申请提现商家',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/merchantWithdrawRecord', component: merchantWithdrawRecord, name: '申请提现商家' },
@@ -218,6 +222,7 @@ let routes = [
       },
       {
         path: '/shopListOfApplyChangeData', component: shopListOfApplyChangeData, name: '申请变更资料商家',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/shopListOfApplyChangeData', component: shopListOfApplyChangeData, name: '申请变更资料商家' },
@@ -247,6 +252,7 @@ let routes = [
       // },
       {
         path: '/advertisementList', component: advertisementList, name: '海报',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/advertisementList', component: advertisementList, name: '海报' },
@@ -268,6 +274,7 @@ let routes = [
       },      
       {
         path: '/vipRechargeDenomination', component: vipRechargeDenomination, name: '会员充值面额',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/vipRechargeDenomination', component: vipRechargeDenomination, name: '会员充值面额' },
@@ -277,6 +284,7 @@ let routes = [
       //{ path: '/memberWithdrawRecord', component: memberWithdrawRecord, name: '佣金提现列表' },
       {
         path: '/paperworkPushList', component: paperworkPushList, name: '文案推送',
+        hidden: true,
         leaf: true,//只有一个节点
         children: [
           { path: '/paperworkPushList', component: paperworkPushList, name: '文案推送' },
@@ -289,6 +297,7 @@ let routes = [
     path: '/',
     component: Home,
     name: '财务报表',
+    hidden: true,
     iconCls: 'el-icon-user',
     children: [
       {
@@ -325,6 +334,7 @@ let routes = [
     path: '/',
     component: Home,
     name: '配送管理',
+    hidden: true,
     iconCls: 'el-icon-house',
     children: [
       {
@@ -347,7 +357,7 @@ let routes = [
   {
     path: '/',
     component: Home,
-    name: '系统配置',
+    name: '系统设置',
     iconCls: 'el-icon-setting',
     children: [
       {
@@ -365,6 +375,7 @@ let routes = [
     path: '/',
     component: Home,
     name: '商城管理',
+    hidden: true,
     iconCls: 'el-icon-house',
     children: [
       {

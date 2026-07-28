@@ -544,7 +544,7 @@
   }
 
   .total-icon {
-    color: #409EFF;
+    color: #111111;
     width: 60px;
     height: 60px;
   }

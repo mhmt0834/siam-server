@@ -15,7 +15,7 @@
 											@tap="parseEventDynamicCode($event, chil.goodsStatus == 4 ? '' : 'commodityDetailTap')"
 											:data-id="chil.goodsId">
 											<image
-												:src="chil.mainImage ? chil.mainImage : '/static/assets/images/load-image.png'"
+												:src="chil.mainImage ? chil.mainImage : '/static/assets/common/load-image.png'"
 												mode="aspectFill" class="commodity-image"></image>
 											<view class="sell-out" v-if="chil.goodsStatus == 4">售罄</view>
 											<view class="commodity-name-english-view">
@@ -67,7 +67,7 @@
 											@tap="parseEventDynamicCode($event, chil.goodsStatus == 4 ? '' : 'commodityDetailTap')"
 											:data-id="chil.goodsId">
 											<image
-												:src="chil.mainImage ? chil.mainImage : '/static/assets/images/load-image.png'"
+												:src="chil.mainImage ? chil.mainImage : '/static/assets/common/load-image.png'"
 												mode="aspectFill" class="commodity-image"></image>
 											<view class="sell-out" v-if="chil.goodsStatus == 4">售罄</view>
 											<view class="commodity-name-english-view">
@@ -199,7 +199,7 @@
 					name: ''
 				},
 				themeVars:{
-					primaryColor: '#004ca0'
+					primaryColor: '#4A2605'
 				}
 			};
 		},
@@ -1638,11 +1638,11 @@
 	}
 
 	.main-active-class {
-		background-color: var(--sidebar-selected-border-color, #004ca0);
-		background-color: var(--van-tree-select-nav-background, #004ca0);
+		background-color: var(--sidebar-selected-border-color, #4A2605);
+		background-color: var(--van-tree-select-nav-background, #4A2605);
 	}
 
 	.van-sidebar-item--selected {
-		background-color: var(--sidebar-selected-border-color, #004ca0);
+		background-color: var(--sidebar-selected-border-color, #4A2605);
 	}
 </style>

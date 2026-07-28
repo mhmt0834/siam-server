@@ -25,9 +25,9 @@ module.exports = {
     rootPath: '',
     name: 'siam-admin',
     http:{
-      baseUrl: 'https://api.show.siamit.cn/siam-server/', // production
-      baseUrl4Test: 'https://api.show.siamit.cn/siam-server/', // production_test
-      developmentBaseUrl: 'https://api.show.siamit.cn/siam-server' // development
+      baseUrl: 'http://127.0.0.1:9200/siam-server/', // production
+      baseUrl4Test: 'http://127.0.0.1:9200/siam-server/', // production_test
+      developmentBaseUrl: 'http://127.0.0.1:9200/siam-server' // development
 
       // baseUrl: 'http://localhost:9200/siam-server', // production
       // baseUrl4Test: 'http://localhost:9200/siam-server', // production_test

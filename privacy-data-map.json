@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "merchantConfirmedAt": "",
+  "features": [
+    {
+      "id": "wechat_login",
+      "name": "微信登录",
+      "enabled": true,
+      "data": ["微信 OpenID", "用户昵称和头像（用户主动提供时）"],
+      "purpose": "账号登录、识别用户和展示个人资料",
+      "privacyDeclarationRequired": true,
+      "merchantConfirmed": false
+    },
+    {
+      "id": "phone_login",
+      "name": "手机号登录",
+      "enabled": true,
+      "data": ["手机号码", "短信验证码"],
+      "purpose": "登录、订单联系和账号安全",
+      "privacyDeclarationRequired": true,
+      "merchantConfirmed": false
+    },
+    {
+      "id": "location_and_address",
+      "name": "定位与收货地址",
+      "enabled": true,
+      "data": ["位置信息", "收货人姓名", "手机号码", "收货地址"],
+      "purpose": "门店定位、配送范围判断和履约",
+      "privacyDeclarationRequired": true,
+      "merchantConfirmed": false
+    },
+    {
+      "id": "order",
+      "name": "下单与订单记录",
+      "enabled": true,
+      "data": ["商品信息", "订单金额", "备注", "履约方式"],
+      "purpose": "生成订单、备餐、配送和售后",
+      "privacyDeclarationRequired": true,
+      "merchantConfirmed": false
+    },
+    {
+      "id": "wechat_pay",
+      "name": "微信支付",
+      "enabled": false,
+      "data": ["支付订单号", "支付状态"],
+      "purpose": "在线收款和退款",
+      "privacyDeclarationRequired": true,
+      "merchantConfirmed": false
+    }
+  ]
+}

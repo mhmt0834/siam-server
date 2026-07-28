@@ -75,13 +75,6 @@
 					{{ data.detail }}
 				</view>
 			</view>
-			<navigator class="navigator-class" :url="'../../mine/share/index/index?inviterId=' + userInfo.id">
-				<view class="invite-wrapper">
-					<image
-						:src="'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/share-invite/share_mine.png?v=' + timestamp"
-						mode="aspectFill" class="invite-image"></image>
-				</view>
-			</navigator>
 		</scroll-view>
 		<view class="shopping-cart-detail">
 			<view class="content-fullReductionRuleName">

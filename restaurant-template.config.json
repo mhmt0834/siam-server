@@ -1,0 +1,32 @@
+{
+  "templateBrand": "玉KING智能点餐",
+  "templateBrandEn": "YUKING INTELLIGENT",
+  "theme": {
+    "primary": "#111111",
+    "accent": "#B89555",
+    "background": "#F5F5F3",
+    "surface": "#FFFFFF"
+  },
+  "restaurant": {
+    "name": "品牌门店",
+    "slogan": "认真做好每一餐",
+    "logo": "",
+    "phone": "",
+    "address": ""
+  },
+  "features": {
+    "singleStore": true,
+    "selfPickup": true,
+    "delivery": true,
+    "onlinePayment": false,
+    "pointsMall": false
+  },
+  "release": {
+    "dcloudAppId": "__UNI__CB4B2E0",
+    "appId": "",
+    "apiBaseUrl": "",
+    "requestDomain": "",
+    "mapKey": "",
+    "wechatPayEnabled": false
+  }
+}

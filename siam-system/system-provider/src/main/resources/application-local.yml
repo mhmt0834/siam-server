@@ -127,6 +127,7 @@ spring:
   boot:
     admin:
       client:
+        enabled: false
         #连接监控服务端的地址，也就是actuator的服务端的运行ip 端口
         url: http://127.0.0.1:9100
         username: admin
@@ -260,6 +261,8 @@ management:
       application: ${spring.application.name}
   # 禁止Actuator监控以下组件连接
   health:
+    mail:
+      enabled: false
     rabbit:
       enabled: false
     mongo:

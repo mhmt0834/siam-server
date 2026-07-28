@@ -1376,7 +1376,7 @@
     height: 148px;
   }
   .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
+    border-color: #111111;
   }
   .avatar-uploader-icon {
     font-size: 28px;

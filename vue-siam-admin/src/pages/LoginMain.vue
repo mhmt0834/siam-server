@@ -1,107 +1,72 @@
 <template>
   <div class="login-content">
-    <!-- <img class="loginLogo" src="../assets/qiuzhidaoLoginLogo.png"> -->
-    <div class="login-center" style="margin-top:90px;">
+    <div class="brand-signature">
+      <div class="brand-name">{{ brand.name }}</div>
+      <div class="brand-en">{{ brand.nameEn }}</div>
+    </div>
+    <div class="login-center">
       <transition name="fade" mode="out-in">
         <router-view></router-view>
       </transition>
     </div>
-    <!-- <div class="login-footer">
-         <p class="corCompanyTitle">合作单位</p>
-         <div class="login-footer-inner">
-           <div class="login-footer-inner2">
-              <img class="corCompany" src="../assets/corCompany2.png">
-              <img class="corCompany" src="../assets/corCompany3.png">
-            </div>
-         </div>
-         <div class="readyNumber">
-           <img class="police" src="../assets/police.png">
-           <a class="readyNumberText" href="javascript:void(0);">浙ICP备16047515号-4 &copy; 2019</a>
-         </div>
-    </div> -->
+    <div class="login-footnote">SMART RESTAURANT OPERATING SYSTEM</div>
   </div>
 </template>
 
 <script>
-  
+  import BrandConfig from '../config/brand'
+
+  export default {
+    data() {
+      return {
+        brand: BrandConfig
+      }
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
   .login-content {
     height:100%;
     overflow: auto;
-    background: url('../assets/loginBg2.png') no-repeat top;
-    // background-size: 100%;
-    background-color: rgb(10, 121, 249);
+    background:
+      radial-gradient(circle at 18% 20%, rgba(184, 149, 85, 0.18), transparent 28%),
+      radial-gradient(circle at 82% 78%, rgba(255, 255, 255, 0.08), transparent 24%),
+      #0b0b0b;
     width: 100%;
     position: relative;
-    // height: 100%;
-    .loginLogo{
-      width: 280px;
-      height: 100px;
-      display: block;
-      margin: 0 auto;
-      margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 48px 24px;
+    .brand-signature {
+      margin-bottom: 34px;
+      color: #fff;
+      text-align: center;
+      .brand-name {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 5px;
+      }
+      .brand-en {
+        margin-top: 10px;
+        color: #b89555;
+        font-size: 11px;
+        letter-spacing: 8px;
+      }
     }
     .login-center {
-       margin: 10px auto 0;
+      margin: 0 auto;
       text-align: center;
     }
-    .login-footer{
-      width: 100%;
-      height: 200px;
-      // height: 20%;
-      // position: absolute;
-
-      // bottom: 0;
-      // background-color: rgb(7, 84, 174);
-    }
-    .login-footer-inner{
-      width: 800px;
-      height: 140px;
-      position: relative;
-      margin: 14px auto 0;
-      // border: 1px solid red;
-      overflow: hidden;
-    }
-    .login-footer-inner2{
-      width: 1600px;
-      height: 140px;
+    .login-footnote {
       position: absolute;
-      left: 0;
-      animation: slide 10s infinite linear;
+      bottom: 28px;
+      color: rgba(255, 255, 255, 0.28);
+      font-size: 10px;
+      letter-spacing: 4px;
     }
-    .corCompanyTitle{
-      text-align: center;
-      color: white;
-      font-size: 16px;
-      margin-top: 14px;
-    }
-    .corCompany{
-      display: block;
-      float: left;
-      width: 800px;
-    }
-     @keyframes slide {
-       0%{left: 0}
-       50%{left:-400px;}
-       100%{left:-800px;}
-     }
-  }
-  .readyNumber{
-    margin-top: 100px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-  .readyNumberText{
-    color: #ffffff;
-    font-size: 14px;
-  }
-  .police{
-    width: 16px;
-    height: 16px;
-    margin-right: 4px;
   }
 </style>

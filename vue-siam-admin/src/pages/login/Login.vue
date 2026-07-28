@@ -1,7 +1,9 @@
 <template>
     <section>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="0px" class="login-container">
-            <div class="title"><span>调度后台登录</span></div>
+            <div class="console-tag">OPERATIONS CONSOLE</div>
+            <div class="title"><span>{{ brand.consoleName }}</span></div>
+            <div class="subtitle">高效管理门店、商品与订单</div>
             <el-form-item prop="name">
                 <el-input prefix-icon="el-icon-myuser" type="text" v-model="ruleForm.name" @keyup.enter.native="handleSubmit" auto-complete="off" placeholder="账号"></el-input>
             </el-form-item>
@@ -27,10 +29,13 @@
 </template>
 
 <script>
+  import BrandConfig from '../../config/brand'
+
   //import NProgress from 'nprogress'
   export default {
     data() {
       return {
+        brand: BrandConfig,
         logining: false,
         ruleForm: {
           name: '',
@@ -136,24 +141,49 @@
   
       .login-container {
         display: inline-block;
-        /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
-        -webkit-border-radius: 5px;
-        border-radius: 5px;
-        -moz-border-radius: 5px;
+        -webkit-border-radius: 18px;
+        border-radius: 18px;
+        -moz-border-radius: 18px;
         background-clip: padding-box;
-        // margin: 180px auto;
         width: 340px;
-        // height:390px;
-        padding: 70px 110px 0;
+        padding: 46px 58px 30px;
         background: #fff;
-        border: 1px solid #eaeaea;
-        // box-shadow: 0 0 25px #cac6c6;
+        border: 1px solid rgba(255, 255, 255, 0.36);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+        .console-tag {
+          margin-bottom: 14px;
+          color: #b89555;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 4px;
+        }
         .title {
-          margin-bottom: 20px;
+          margin-bottom: 10px;
           text-align: center;
-          color: #0A79F9;
-          font-size: 30px;
+          color: #111;
+          font-size: 28px;
+          font-weight: 700;
           line-height: 30px;
+        }
+        .subtitle {
+          margin-bottom: 30px;
+          color: #999;
+          font-size: 13px;
+          letter-spacing: 1px;
+        }
+        /deep/ .el-input__inner {
+          height: 46px;
+          border-color: #e6e6e2;
+          border-radius: 10px;
+          background: #fafaf8;
+        }
+        /deep/ .el-button--primary {
+          height: 46px;
+          border-color: #111;
+          border-radius: 10px;
+          background: #111;
+          font-weight: 700;
+          letter-spacing: 4px;
         }
         .handelButton {
           text-align: center;
@@ -174,10 +204,10 @@
             color: #A4ABB2;
           }
           .blueColor:hover {
-            color: #0A79F9;
+            color: #111111;
           }
           .blue {
-            color: #409EFF;
+            color: #111111;
           }
         }
       }

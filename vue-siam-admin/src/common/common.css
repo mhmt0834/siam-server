@@ -74,3 +74,36 @@ html, body {
   line-height: 0;
 }
 .ellipsis {overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+
+/* 玉KING 智能点餐：通用后台主题 */
+.el-button--primary {
+  background: #00bfae !important;
+  border-color: #00bfae !important;
+}
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background: #00a99a !important;
+  border-color: #00a99a !important;
+}
+.el-button--text,
+.el-tabs__item.is-active,
+.el-tabs__item:hover,
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  color: #008f82 !important;
+}
+.el-tabs__active-bar,
+.el-switch.is-checked .el-switch__core,
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: #00bfae !important;
+  border-color: #00bfae !important;
+}
+.el-input__inner:focus,
+.el-textarea__inner:focus,
+.el-select .el-input.is-focus .el-input__inner {
+  border-color: #00bfae !important;
+}
+.el-card,
+.el-dialog {
+  border-radius: 16px !important;
+}

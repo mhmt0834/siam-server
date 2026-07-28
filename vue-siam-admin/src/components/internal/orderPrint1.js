@@ -67,7 +67,7 @@ const install = function(Vue) {
                         that = this;             
                     },
                     speckText(str) {
-                        // 你有新的暹罗点餐订单，请注意查收！
+                        // 你有新的玉KING智能点餐订单，请注意查收！
                         // var url= "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=6&text=" + encodeURI(str); 
                         // var url = "order_tip.mp3";
                         var url = "https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/file/order_tip.mp3";
@@ -147,7 +147,7 @@ const install = function(Vue) {
                                         '"shoppingWay": "配送方式：'+ (order.shoppingWay == 1 ? '自取' : '配送') +'", '+
                                         '"nickname": "'+ order.contactRealname + (order.contactSex == 0 ? '' : (order.contactSex == 1 ? '(先生)' : '(女士)')) +'", '+
                                         '"mobile": '+ order.contactPhone +', '+
-                                        '"logo": '+ 'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/logo.jpg' +', '+
+                                        '"logo": "", '+
                                         '"actualPrice": '+ order.actualPrice +', '+
                                         '"contactStreet": '+ order.contactStreet +', '+
                                         '"contactStreet": " '+ (order.shoppingWay == 1 ? '' : ('配送地址：'+order.contactStreet)) +'", '+

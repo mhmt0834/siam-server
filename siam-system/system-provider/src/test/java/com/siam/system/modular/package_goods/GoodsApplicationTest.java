@@ -246,8 +246,8 @@ public class GoodsApplicationTest {
      */
     @Test
     public void testSubscribeMessage() throws IOException {
-        String appkey = "wx2e1a8193d3ed12fe";
-        String secret = "2774e3a86dc30fbf1ac63d81b56f2291";
+        String appkey = System.getenv("WECHAT_APP_ID");
+        String secret = System.getenv("WECHAT_APP_SECRET");
         //获取access_token
         HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appkey + "&secret=" + secret);
         HttpResponse httpResponseGetToken = new DefaultHttpClient().execute(httpGet);
@@ -307,8 +307,8 @@ public class GoodsApplicationTest {
      */
     @Test
     public void testPublicPlatformMessage() throws IOException {
-        String appkey = "wxd28950054b3c01ff";
-        String secret = "d0054fc133b5dffae28050e33a5e1873";
+        String appkey = System.getenv("WECHAT_OPEN_APP_ID");
+        String secret = System.getenv("WECHAT_OPEN_APP_SECRET");
         //获取access_token
         HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appkey + "&secret=" + secret);
         HttpResponse httpResponseGetToken = new DefaultHttpClient().execute(httpGet);
@@ -353,8 +353,8 @@ public class GoodsApplicationTest {
      */
     @Test
     public void testPublicPlatformOpenId() throws IOException {
-        String appkey = "wxd28950054b3c01ff";
-        String secret = "d0054fc133b5dffae28050e33a5e1873";
+        String appkey = System.getenv("WECHAT_OPEN_APP_ID");
+        String secret = System.getenv("WECHAT_OPEN_APP_SECRET");
         //获取access_token
         HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appkey + "&secret=" + secret);
         HttpResponse httpResponseGetToken = new DefaultHttpClient().execute(httpGet);

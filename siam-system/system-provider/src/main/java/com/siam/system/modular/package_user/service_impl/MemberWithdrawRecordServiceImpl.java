@@ -223,7 +223,7 @@ public class MemberWithdrawRecordServiceImpl extends ServiceImpl<MemberWithdrawR
             transfersDto.setAmount(memberWithdrawRecord.getWithdrawAmount().doubleValue());
             transfersDto.setRe_user_name(dbMember.getRealName());
             transfersDto.setPartner_trade_no(orderNo);
-            transfersDto.setDesc("暹罗外卖-用户提现到账");
+            transfersDto.setDesc("玉KING智能点餐-用户提现到账");
             boolean isPaySuccess = wxPayService.payToBalance(transfersDto);
             if(!isPaySuccess){
                 throw new StoneCustomerException("打款失败，请联系管理员");
@@ -275,7 +275,7 @@ public class MemberWithdrawRecordServiceImpl extends ServiceImpl<MemberWithdrawR
             transfersDto.setAmount(dbMemberWithdrawRecord.getWithdrawAmount().doubleValue());
             transfersDto.setRe_user_name(dbMember.getRealName());
             transfersDto.setPartner_trade_no(orderNo);
-            transfersDto.setDesc("暹罗外卖-用户提现到账");
+            transfersDto.setDesc("玉KING智能点餐-用户提现到账");
             boolean isPaySuccess = wxPayService.payToBalance(transfersDto);
             if(!isPaySuccess){
                 throw new StoneCustomerException("打款失败，请联系管理员");

@@ -1,9 +1,11 @@
 <template>
 	<view class="container">
-		<image
-			:src="'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mypage_top.jpg?v=' + appVersion"
-			class="index-bg-class" mode="widthFix"></image>
-		<view class="userinfo" :style="'margin-top:' + (statusBarHeight + 30) + 'rpx;'">
+		<view class="mine-brand-hero">
+			<view class="mine-brand-en">{{ brand.nameEn }}</view>
+			<view class="mine-brand-name">{{ brand.name }}</view>
+			<view class="mine-brand-slogan">{{ brand.slogan }}</view>
+		</view>
+		<view class="userinfo">
 			<block v-if="!data.id">
 				<button @tap="getUserProfile" :plain="true" class="userinfo-button"
 					style="margin: 0; width: 100%; padding: inherit">
@@ -23,14 +25,6 @@
 							</image>
 							<view class="userinfo-nickname">
 								<view class="nickname-class">{{ data.username }}</view>
-								<view class="vip-class">
-									<!-- <text class="{{data.type!=1?'is-vip-class':'not-vip-class'}}">{{data.typeVipText}}</text> -->
-									<!-- <text decode="true">&nbsp;&nbsp;</text> -->
-									<view class="vip-image-view">
-										<image :src="item + '?v=' + appVersion" mode="widthFix" class="is-vip-image"
-											v-for="(item, index) in isVipImages" :key="index"></image>
-									</view>
-								</view>
 								<view>
 									<text :decode="true">NO:&nbsp;&nbsp;{{ data.vipNo }}</text>
 								</view>
@@ -41,7 +35,7 @@
 				</navigator>
 			</block>
 			<view id="content_info" v-if="data.id">
-				<view class="mine-blocking-view">
+				<view class="mine-blocking-view" v-if="false">
 					<view class="mine-blocking">
 						<navigator class="mine-navigator" url="../share/reward/reward">
 							<view class="number-tip theme-color">{{ data.inviteRewardAmount }}</view>
@@ -86,7 +80,7 @@
 					</view>
 					<swiper :current="currentTab" class="swiper-box" duration="300" @change="bindSlideChange"
 						style="height: 78px">
-						<swiper-item class="swiper-items">
+						<swiper-item class="swiper-items" v-if="false">
 							<view class="mine-blocking">
 								<navigator class="order-navigator"
 									:url="'../../order/index/index?currentTab=' + currentTab + '&modeType=' + item.modeType + '&currentOrderTab=' + item.modeId"
@@ -107,7 +101,7 @@
 							</view>
 						</swiper-item>
 					</swiper>
-					<navigator class="navigator-class" url="../collect/index/index">
+					<navigator class="navigator-class" url="../collect/index/index" v-if="false">
 						<view class="navigator-view">
 							<view>我的收藏</view>
 							<van-icon name="arrow" />
@@ -123,19 +117,10 @@
 							</view>
 						</navigator>
 						<view class="view-line"></view>
-						<navigator class="navigator-class" url="../security/index/index">
+						<navigator class="navigator-class" url="../userinfo/userinfo">
 							<view class="navigator-view">
-								<view>账号安全</view>
+								<view>个人资料</view>
 								<van-icon name="arrow" />
-							</view>
-						</navigator>
-						<!-- 分享 -->
-						<view class="view-line"></view>
-						<navigator class="navigator-class" :url="'../../mine/share/index/index?inviterId=' + data.id">
-							<view class="invite-wrapper">
-								<image
-									:src="'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/share-invite/share_mine.png?v=' + timestamp"
-									mode="widthFix" class="invite-image"></image>
 							</view>
 						</navigator>
 					</view>
@@ -152,28 +137,25 @@
 	import toastService from '../../../utils/toast.service';
 	import dateHelper from '../../../utils/date-helper';
 	import systemStatus from '../../../utils/system-status';
+	import BrandConfig from '../../../utils/brand-config';
 	//获取应用实例
 	let app = null;
 	export default {
 		data() {
 			return {
+				brand: BrandConfig,
 				userInfo: {},
 				hasUserInfo: false,
 				canIUse: uni.canIUse('button.open-type.getUserInfo'),
 				couponsNum: 0,
 				tabList: [{
-						modeId: 0,
-						modeName: '外卖订单'
-					},
-					{
-						modeId: 1,
-						modeName: '商城订单'
-					}
-				],
+					modeId: 0,
+					modeName: '点餐订单'
+				}],
 				shopOrderTabList: [{
 						modeId: 1,
 						modeType: 'waitPayment',
-						modeName: '待付款',
+						modeName: '待确认',
 						icon: 'pending-payment'
 					},
 					{
@@ -425,32 +407,55 @@
 	}
 
 	.container {
-		height: 100%;
+		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
 		box-sizing: border-box;
-		background: white;
+		background: #f5f5f3;
 	}
 
-	.index-bg-class {
+	.mine-brand-hero {
+		box-sizing: border-box;
 		width: 100%;
+		padding: 120rpx 40rpx 110rpx;
+		background: #4A2605;
+		color: #fff;
+	}
+
+	.mine-brand-en {
+		color: #F5C89A;
+		font-size: 18rpx;
+		letter-spacing: 7rpx;
+	}
+
+	.mine-brand-name {
+		margin-top: 18rpx;
+		font-size: 48rpx;
+		font-weight: 900;
+	}
+
+	.mine-brand-slogan {
+		margin-top: 18rpx;
+		color: rgba(255, 255, 255, .68);
+		font-size: 24rpx;
 	}
 
 	.userinfo {
 		width: 100%;
-		position: absolute;
-		top: 0;
-		/* margin-top: 50px; */
-		width: 100%;
+		position: relative;
+		box-sizing: border-box;
+		background: #f5f5f3;
 	}
 
 	.notlogin {
 		display: flex;
 		align-items: center;
+		margin: 0 20rpx 20rpx;
 		padding: 40rpx 20rpx;
-		border-radius: 5rpx;
+		border-radius: 16rpx;
+		background: #fff;
+		color: #111;
 	}
 
 	.notlogin button {
@@ -556,9 +561,10 @@
 	}
 
 	.navigator-userinfo {
-		/* width: 100%; */
+		margin: 0 20rpx 20rpx;
 		padding: 40rpx 20rpx;
-		border-radius: 5rpx;
+		border-radius: 16rpx;
+		background: #4A2605;
 	}
 
 	.navigator-box {

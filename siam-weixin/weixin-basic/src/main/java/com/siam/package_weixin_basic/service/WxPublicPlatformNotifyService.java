@@ -10,6 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,17 +23,22 @@ import java.util.Map;
 @Service
 public class WxPublicPlatformNotifyService {
 
-    public static final String jpOpenId = "ocYTLtxbT_Hlidv4MjZRSVhgqa8I";
+    @Value("${wxPublicPlatform.appId:}")
+    private String appid;
 
-    public static final String tkOpenId = "ocYTLtzWLOUUwczetzDFoAXaOWNM";
+    @Value("${wxPublicPlatform.secret:}")
+    private String secret;
 
-    public static final String tkOpenId_mall = "ocYTLt4kCynv9cGA-kjIdTwyoDHU";
+    public static final String jpOpenId = System.getenv("WECHAT_NOTIFY_ADMIN_OPEN_ID");
+
+    public static final String tkOpenId = System.getenv("WECHAT_NOTIFY_MERCHANT_OPEN_ID");
+
+    public static final String tkOpenId_mall = System.getenv("WECHAT_NOTIFY_MALL_OPEN_ID");
 
     /**
      * 给商家发送新订单通知
      */
     public void sendNewOrderMessageForMerchant(String openId, String title, String goodsName, Date createTime, String deliveryAddress, String contacts, String amountDescription, String remark){
-        String appid = "wx2e1a8193d3ed12fe"; //小程序appid
         String access_token = this.getAccessToken();
 
         Map data = new HashMap();
@@ -95,7 +101,6 @@ public class WxPublicPlatformNotifyService {
      * 给商家发送订单取消通知
      */
     public void sendOrderCancelMessageForMerchant(String openId, String title, String orderDescription, String orderAmount, String refundAmount, Date cancelTime, String contacts, String remark){
-        String appid = "wx2e1a8193d3ed12fe"; //小程序appid
         String access_token = this.getAccessToken();
 
         Map data = new HashMap();
@@ -154,7 +159,6 @@ public class WxPublicPlatformNotifyService {
      * 给商家发送订单退款提醒
      */
     public void sendOrderRefundMessageForMerchant(String openId, String title, String goodsName, Date createTime, String orderDescription, String contacts, String refundReason, String remark){
-        String appid = "wx2e1a8193d3ed12fe"; //小程序appid
         String access_token = this.getAccessToken();
 
         Map data = new HashMap();
@@ -213,7 +217,6 @@ public class WxPublicPlatformNotifyService {
      * 给管理员发送程序错误提醒/设备故障提醒
      */
     public void sendFatalErrorMessage(String openId, String title, String functionLocation, String errorCode, Date createTime, String remark){
-        String appid = "wx2e1a8193d3ed12fe"; //小程序appid
         String access_token = this.getAccessToken();
 
         Map data = new HashMap();
@@ -263,8 +266,9 @@ public class WxPublicPlatformNotifyService {
      * 获取access_token
      */
     private String getAccessToken() {
-        String appid = "wxd28950054b3c01ff";
-        String secret = "d0054fc133b5dffae28050e33a5e1873";
+        if (appid == null || appid.isEmpty() || secret == null || secret.isEmpty()) {
+            throw new IllegalStateException("wxPublicPlatform AppID and AppSecret are required on the server.");
+        }
         //获取access_token
         String access_token = "";
         try {

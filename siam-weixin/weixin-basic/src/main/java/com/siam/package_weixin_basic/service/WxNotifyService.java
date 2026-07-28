@@ -10,6 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,6 +23,12 @@ import java.util.Map;
 @Slf4j
 @Service
 public class WxNotifyService {
+
+    @Value("${wxlogin.appId:}")
+    private String appid;
+
+    @Value("${wxlogin.secret:}")
+    private String secret;
 
     String miniprogram_state = "formal";
 
@@ -270,8 +277,9 @@ public class WxNotifyService {
      * 获取access_token
      */
     private String getAccessToken() {
-        String appid = "wx2e1a8193d3ed12fe";
-        String secret = "2774e3a86dc30fbf1ac63d81b56f2291";
+        if (appid == null || appid.isEmpty() || secret == null || secret.isEmpty()) {
+            throw new IllegalStateException("wxlogin AppID and AppSecret are required on the server.");
+        }
         //获取access_token
         String access_token = "";
         try {

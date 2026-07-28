@@ -19,7 +19,7 @@
 					</view>
 				</view>
 				<van-empty v-if="!isLoading&&tips.length == 0" description="没有搜索到地址">
-					<van-button type="primary" size="small" color="#004ca0" class="bottom-button" v-if="!userLocation"
+					<van-button type="primary" size="small" color="#4A2605" class="bottom-button" v-if="!userLocation"
 						@tap="openSettingInfo">位置授权</van-button>
 				</van-empty>
 				<view class="loading_box" v-if="isLoading&&tips.length==0">

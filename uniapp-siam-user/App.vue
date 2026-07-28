@@ -671,13 +671,13 @@
 
 	/* 主题颜色 */
 	.active {
-		color: #004ca0;
-		border-bottom: 4rpx solid #004ca0;
+		color: #4A2605;
+		border-bottom: 4rpx solid #4A2605;
 		/* transition: 0.5s; */
 	}
 
 	.active_ {
-		color: #004ca0;
+		color: #4A2605;
 		border-bottom: 4rpx solid white;
 		/* transition: 0.5s; */
 	}
@@ -687,35 +687,73 @@
 	}
 
 	.theme-bg {
-		background: #004ca0;
+		background: #4A2605;
 		color: white;
 		border: none;
 	}
 
 	.theme-color {
-		color: #004ca0;
+		color: #4A2605;
 	}
 
 	.theme-border {
-		border: 0.5rpx solid #004ca0;
+		border: 0.5rpx solid #4A2605;
 	}
 
 	/* 是字体颜色加边框的宽度和实心颜色 */
 	.theme-color-border {
-		color: #004ca0;
-		border: 0.5rpx solid #004ca0;
+		color: #4A2605;
+		border: 0.5rpx solid #4A2605;
 	}
 
 	/* 只是边框颜色 */
 	.theme-border-color {
-		border-color: #004ca0;
+		border-color: #4A2605;
+	}
+
+	/* 价格强调色 */
+	.price-accent {
+		color: #F05A2A;
+		font-weight: 700;
+	}
+
+	/* 暖色背景 */
+	.page-bg-warm {
+		background: #F8F6F2;
+	}
+
+	/* 深棕大圆角按钮 */
+	.btn-primary-lg {
+		background: #4A2605;
+		color: #FFF9F2;
+		border: none;
+		border-radius: 50rpx;
+		font-size: 32rpx;
+		font-weight: 700;
+		padding: 26rpx 0;
+		text-align: center;
+	}
+
+	/* 深棕圆形加号按钮 */
+	.btn-add-circle {
+		width: 48rpx;
+		height: 48rpx;
+		border-radius: 50%;
+		background: #4A2605;
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 32rpx;
+		font-weight: 500;
+		line-height: 1;
 	}
 
 	/* 选择地址radio公共样式 */
 	.radio-active {
-		background: #004ca0;
+		background: #4A2605;
 		background: white;
-		color: #004ca0;
+		color: #4A2605;
 		transition: 0.5s;
 	}
 
@@ -732,9 +770,9 @@
 
 	/*radio选中后样式  */
 	radio-group .wx-radio-input.wx-radio-input-checked {
-		border-color: 1rpx solid #004ca0;
+		border-color: 1rpx solid #4A2605;
 		border-radius: 50%;
-		background: #004ca0 !important;
+		background: #4A2605 !important;
 	}
 
 	/* checkBox复选框公共样式 */
@@ -747,15 +785,15 @@
 	checkbox .wx-checkbox-input.wx-checkbox-input-checked {
 		border-radius: 50%;
 		color: #ffffff;
-		border-color: 1rpx solid #004ca0;
-		background-color: #004ca0;
+		border-color: 1rpx solid #4A2605;
+		background-color: #4A2605;
 	}
 
 	checkbox .wx-checkbox-input.wx-checkbox-input-checked::before {
 		border-radius: 50%;
 		color: #ffffff;
-		border-color: 1rpx solid #004ca0;
-		background-color: #004ca0;
+		border-color: 1rpx solid #4A2605;
+		background-color: #4A2605;
 	}
 
 	radio .wx-radio-input {
@@ -766,15 +804,15 @@
 	radio .wx-radio-input.wx-radio-input-checked {
 		color: #ffffff;
 		border-radius: 50%;
-		border: 1rpx solid #004ca0 !important;
-		background: #004ca0 !important;
+		border: 1rpx solid #4A2605 !important;
+		background: #4A2605 !important;
 	}
 
 	radio .wx-radio-input.wx-radio-input-checked::before {
 		color: #ffffff;
 		border-radius: 50%;
-		border: 1rpx solid #004ca0 !important;
-		background: #004ca0 !important;
+		border: 1rpx solid #4A2605 !important;
+		background: #4A2605 !important;
 	}
 
 	radio {
@@ -793,25 +831,25 @@
 	}
 
 	.add-reduce-input {
-		color: #004ca0;
+		color: #4A2605;
 	}
 
 	.reduce-class {
-		border: 1rpx solid #004ca0;
+		border: 1rpx solid #4A2605;
 	}
 
 	/*加号和减号*/
 	.stepper text {
 		text-align: center;
-		border: 1rpx solid #004ca0;
+		border: 1rpx solid #4A2605;
 		border-radius: 50%;
 	}
 
 	/* 加号样式 */
 	.add-class {
-		background: #004ca0;
+		background: #4A2605;
 		color: white;
-		border: 1rpx solid #004ca0;
+		border: 1rpx solid #4A2605;
 	}
 
 	.car_reduce_add {
@@ -826,7 +864,7 @@
 
 	/* 减号样式 */
 	.reduce-class {
-		color: #004ca0;
+		color: #4A2605;
 	}
 
 	/*数值*/
@@ -885,7 +923,7 @@
 	}
 
 	.password_dialog_row.theme-border {
-		border: 1rpx solid #004ca0;
+		border: 1rpx solid #4A2605;
 	}
 
 	.password_dialog_row .password_dialog_item_input {
@@ -1018,7 +1056,7 @@
 	}
 
 	.loading_box_class {
-		color: #004ca0;
+		color: #4A2605;
 	}
 
 	.more_box {
@@ -1038,16 +1076,16 @@
 	}
 
 	uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked {
-		border: 2rpx solid #004ca0 !important;
-		background: #004ca0;
-		border-color: #004ca0;
+		border: 2rpx solid #4A2605 !important;
+		background: #4A2605;
+		border-color: #4A2605;
 	}
 
 	uni-checkbox .uni-checkbox-input svg {
-		background: #004ca0;
+		background: #4A2605;
 		border-radius: 50%;
 		height: 100%;
-		border: 5px solid #004ca0;
+		border: 5px solid #4A2605;
 		color: #ffffff !important;
 	}
 

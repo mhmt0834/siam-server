@@ -46,7 +46,7 @@ public class PrintUtils implements Printable {
         g2d.drawImage(writeQrCodeContent(),50, 225,100,100, null);
         g2d.drawString("♥扫码关注官方微信 周周有福利♥", 50, 225);
         g2d.drawString("-------------------------------------", 7, 30);
-        g2d.drawString("暹罗外卖", 50, 225);
+        g2d.drawString("玉KING智能点餐", 50, 225);
         return PAGE_EXISTS;
     }
 

@@ -25,6 +25,7 @@
 ### uniapp ###
 node_modules/
 unpackage/
+/archive/
 
 ### IntelliJ IDEA ###
 .idea
@@ -49,3 +50,13 @@ application-prod.yml
 application-siamcloud-test.yml
 application-siamcloud-show.yml
 application-siamcloud-prod.yml
+siam-system/system-provider/src/main/resources/application-local.yml
+
+### Secrets and release credentials ###
+.env
+.env.local
+deploy/.env
+*.key
+*.pem
+*.p12
+*.pfx

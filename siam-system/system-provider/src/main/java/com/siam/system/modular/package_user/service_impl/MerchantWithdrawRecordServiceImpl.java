@@ -214,7 +214,7 @@ public class MerchantWithdrawRecordServiceImpl extends ServiceImpl<MerchantWithd
             transfersDto.setAmount(dbMerchantWithdrawRecord.getWithdrawAmount().doubleValue());
             transfersDto.setRe_user_name(dbMerchant.getRealName());
             transfersDto.setPartner_trade_no(orderNo);
-            transfersDto.setDesc("暹罗外卖-商家提现到账");
+            transfersDto.setDesc("玉KING智能点餐-商家提现到账");
             boolean isPaySuccess = wxPayService.payToBalance(transfersDto);
             if(!isPaySuccess){
                 throw new StoneCustomerException("打款失败，请联系管理员");

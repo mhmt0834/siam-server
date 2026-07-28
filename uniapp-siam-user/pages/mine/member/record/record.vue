@@ -13,7 +13,7 @@
             </view>
         </view>
 		<van-empty v-if="list.length <= 0" description="暂无充值记录">
-			<van-button type="primary" size="small" color="#004ca0" @bindTap="goToDrink">去兑换</van-button>
+			<van-button type="primary" size="small" color="#4A2605" @bindTap="goToDrink">去兑换</van-button>
 		</van-empty>
     </view>
 </template>

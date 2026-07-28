@@ -2,7 +2,8 @@
 	<el-row class="container">
 		<el-col :span="24" class="header">
 			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
-				{{collapsed?'':sysName}}
+				<span class="brand-monogram">玉</span>
+				<span v-if="!collapsed" class="brand-console-name">{{sysName}}</span>
 			</el-col>
 			<el-col :span="10">
 				<div class="tools" @click.prevent="collapse">
@@ -12,7 +13,7 @@
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
 					<span class="el-dropdown-link userinfo-inner">
-            			<img :src="this.sysUserAvatar" /> 
+						<span class="avatar-monogram">YK</span>
             			{{sysUserName}}
 					</span>
 					<el-dropdown-menu slot="dropdown">
@@ -113,6 +114,8 @@
 </template>
 
 <script>
+	import BrandConfig from '../config/brand'
+
 	export default {
 		data() {
 			var checkPassword = (rule, value, callback) => {
@@ -128,10 +131,11 @@
                 }
             };
 			return {
-				sysName:'暹罗点餐-调度中心',
+				brand: BrandConfig,
+				sysName: BrandConfig.name,
 				collapsed:false,
 				sysUserName: '',
-				sysUserAvatar: 'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/system/logo.png',
+				sysUserAvatar: '',
 				form: {
 					name: '',
 					region: '',
@@ -277,42 +281,69 @@
 		bottom: 0px;
 		width: 100%;
 		.header {
-			height: 48px;
-			line-height: 48px;
-			background: white;
-			color:black;
+			height: 60px;
+			line-height: 60px;
+			background: #ffffff;
+			color:#111111;
+			border-bottom: 1px solid #edf0f2;
+			box-shadow: 0 8px 24px rgba(20, 36, 40, 0.06);
 			.userinfo {
 				text-align: right;
 				padding-right: 35px;
 				float: right;
 				.userinfo-inner {
 					cursor: pointer;
-					color:#fff;
-					img {
-						width: 40px;
-						height: 40px;
-						border-radius: 20px;
-						margin: 10px 0px 10px 10px;
+					color:#111111;
+					.avatar-monogram {
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+						width: 30px;
+						height: 30px;
+						margin-left: 12px;
+						border: 1px solid #c8f1ec;
+						border-radius: 50%;
+						background: #e7faf7;
+						color: #008f82;
+						font-size: 11px;
+						font-weight: 700;
+						letter-spacing: 1px;
 						float: right;
 					}
 				}
 			}
 			.logo {
-				//width:230px;
-				height:48px;
-				font-size: 22px;
-				padding-left:20px;
-				padding-right:20px;
-				border-color: rgba(238,241,146,0.3);
+				display: flex;
+				align-items: center;
+				height:60px;
+				box-sizing: border-box;
+				font-size: 15px;
+				padding-left:14px;
+				padding-right:14px;
+				border-color: #edf0f2;
 				border-right-width: 1px;
 				border-right-style: solid;
-				img {
-					width: 40px;
-					float: left;
-					margin: 10px 10px 10px 18px;
+				.brand-monogram {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					flex: 0 0 34px;
+					width: 34px;
+					height: 34px;
+					margin-right: 10px;
+					border-radius: 10px;
+					background: #00bfae;
+					color: #fff;
+					font-weight: 900;
+				}
+				.brand-console-name {
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					font-weight: 700;
 				}
 				.txt {
-					color:#fff;
+					color:#111111;
 				}
 			}
 			.logo-width{
@@ -325,8 +356,8 @@
 			.tools{
 				padding: 0px 23px;
 				width:14px;
-				height: 48px;
-				line-height: 48px;
+				height: 60px;
+				line-height: 60px;
 				cursor: pointer;
 			}
 		}
@@ -334,7 +365,7 @@
 			display: flex;
 			// background: #324057;
 			position: absolute;
-			top: 48px; //决定头部的高度
+				top: 60px; //决定头部的高度
 			bottom: 0px;
 			overflow: hidden;
 			aside {
@@ -343,10 +374,12 @@
 				// position: absolute;
 				// top: 0px;
 				// bottom: 0px;
-				.el-menu{
-					height: 100%;
-					overflow: auto;
-				}
+					.el-menu{
+						height: 100%;
+						overflow: auto;
+						border-right: none;
+						background: #ffffff;
+					}
 				.collapsed{
 					width:60px;
 					.item{
@@ -371,8 +404,8 @@
 				flex:0 0 230px;
 				width: 230px;
 			}
-			.content-container {
-				// background: #f1f2f7;
+				.content-container {
+					background: #f4f7f8;
 				flex:1;
 				// position: absolute;
 				// right: 0px;
@@ -380,7 +413,7 @@
 				// bottom: 0px;
 				// left: 230px;
 				overflow-y: scroll;
-				padding: 20px;
+					padding: 24px;
 				.breadcrumb-container {
 					//margin-bottom: 15px;
 					.title {
@@ -392,12 +425,14 @@
 						float: right;
 					}
 				}
-				.content-wrapper {
-					background-color: #fff;
-					box-sizing: border-box;
+					.content-wrapper {
+						background-color: #fff;
+						box-sizing: border-box;
+						border-radius: 14px;
+						box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+					}
 				}
 			}
-		}
 		.changePassword {
 			.changePassform {
 				margin: 0 auto;
@@ -407,6 +442,22 @@
 				}
 			}
 		}
-		
-	}
+
+		}
+		/deep/ .el-menu-item,
+		/deep/ .el-submenu__title {
+			color: #536166;
+		}
+		/deep/ .el-menu-item:focus,
+		/deep/ .el-menu-item:hover,
+		/deep/ .el-submenu__title:hover {
+			color: #111111;
+			background: #eefaf8;
+		}
+		/deep/ .el-menu-item.is-active {
+			color: #008f82;
+			background: #e7faf7;
+			border-right: 3px solid #00bfae;
+			font-weight: 700;
+		}
 </style>

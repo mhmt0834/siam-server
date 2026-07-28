@@ -31,7 +31,7 @@
 //    private ApiInfo apiInfo() {
 //        return new ApiInfoBuilder()
 //                //页面标题
-//                .title("暹罗外卖接口文档")
+//                .title("玉KING智能点餐接口文档")
 //                //描述
 //                .description("")
 //                //版本号

@@ -1,7 +1,7 @@
-# 暹罗点餐_单品牌门店版本_调度后台
+# 玉KING智能点餐_通用餐饮运营后台
 
 #### Description
-暹罗点餐_单品牌门店版本_调度后台
+玉KING智能点餐_通用餐饮运营后台
 
 #### Software Architecture
 Software architecture description

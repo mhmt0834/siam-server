@@ -1,6 +1,9 @@
 <template>
 	<view class="input-phone-number">
-		<image :src="'/static/assets/logo/logo.jpg?v=' + timestamp" mode="widthFix" class="brand-icon"></image>
+		<view class="brand-wordmark">
+			<view class="brand-wordmark__en">{{ brand.nameEn }}</view>
+			<view class="brand-wordmark__name">{{ brand.name }}</view>
+		</view>
 		<view class="input-button-view">
 			<input placeholder="请输入手机号" type="number" @input="phoneKey" :focus="true" />
 			<view class="view-line"></view>
@@ -18,7 +21,7 @@
 				@tap="parseEventDynamicCode($event, disabled ? '' : 'loginTap')" hover-class="hover-class-public">
 				确定
 			</button> -->
-			<van-button type="primary" :disabled="disabled" class="confirm-btn theme-bg" color="#004ca0"
+			<van-button type="primary" :disabled="disabled" class="confirm-btn theme-bg" color="#4A2605"
 			@tap="parseEventDynamicCode($event, disabled ? '' : 'loginTap')" hover-class="hover-class-public" block>确定</van-button>
 		</view>
 	</view>
@@ -31,12 +34,14 @@
 	import utilHelper from '../../../../utils/util';
 	import dateHelper from '../../../../utils/date-helper';
 	import systemStatus from '../../../../utils/system-status';
+	import BrandConfig from '../../../../utils/brand-config';
 	var interval = null;
 	//获取应用实例
 	let app = null;
 	export default {
 		data() {
 			return {
+				brand: BrandConfig,
 				time: '获取验证码',
 				currentTime: 60,
 				disabled: true,
@@ -290,10 +295,21 @@
 		text-align: center;
 	}
 
-	.brand-icon {
-		width: 208rpx;
-		height: auto;
+	.brand-wordmark {
 		margin-top: 88rpx;
+	}
+
+	.brand-wordmark__en {
+		color: #F5C89A;
+		font-size: 20rpx;
+		letter-spacing: 8rpx;
+	}
+
+	.brand-wordmark__name {
+		margin-top: 18rpx;
+		color: #4A2605;
+		font-size: 50rpx;
+		font-weight: 900;
 	}
 
 	.input-button-view {

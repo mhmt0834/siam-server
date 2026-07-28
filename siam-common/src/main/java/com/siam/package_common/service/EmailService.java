@@ -90,7 +90,7 @@ public class EmailService {
 //            props.setProperty("mail.smtp.socketFactory.port", "465");
 //            props.put("mail.smtp.auth", "true");
 //            final String username = "siam1026@163.com";//这里就是配置文件中定义的用户名
-//            final String password = "WCQLCXYKFVJOBXCZ";
+//            final String password = "REMOVED";
 //            // 获取到邮箱会话,利用匿名内部类的方式,将发送者邮箱用户名和密码授权给jvm
 //            Session session = Session.getDefaultInstance(props, new Authenticator() {
 //                protected PasswordAuthentication getPasswordAuthentication() {

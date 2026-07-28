@@ -95,7 +95,7 @@
 					<van-loading custom-class="loading_box_class" vertical>加载中...</van-loading>
 				</view>
 				<van-empty v-if="addressList.length <= 0&&!isLoading" description="您还没有地址信息">
-					<van-button round type="primary" size="small" color="#004ca0" class="bottom-button" v-if="addressList.length > 0"
+					<van-button round type="primary" size="small" color="#4A2605" class="bottom-button" v-if="addressList.length > 0"
 						@bindTap="goToDrink">去喝一杯</van-button>
 				</van-empty>
 			</swiper-item>

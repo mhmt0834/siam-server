@@ -115,8 +115,8 @@ body {
 // 按钮
 .el-button--primary {
     color: #FFF;
-    // background-color: #409EFF;
-    // border-color: #409EFF;
+    // background-color: #111111;
+    // border-color: #111111;
 	background-color: #5facb4;
     border-color: #5facb4;
 }
@@ -203,10 +203,10 @@ body {
 // }
 // .el-radio-button__orig-radio:checked+.el-radio-button__inner {
 //     color: #FFF;
-//     background-color: #409EFF!important;
-//     border-color: #409EFF!important;
-//     -webkit-box-shadow: -1px 0 0 0 #409EFF!important;
-//     box-shadow: -1px 0 0 0 #409EFF!important;
+//     background-color: #111111!important;
+//     border-color: #111111!important;
+//     -webkit-box-shadow: -1px 0 0 0 #111111!important;
+//     box-shadow: -1px 0 0 0 #111111!important;
 // }
 
 //文字提示

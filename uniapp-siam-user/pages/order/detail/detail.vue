@@ -46,7 +46,7 @@
 				<text>退款进度</text>
 				<view class="refund-process-right">
 					<text class="theme-color">{{ order.refundStatusText }}</text>
-					<van-icon name="arrow" color="#004ca0" />
+					<van-icon name="arrow" color="#4A2605" />
 				</view>
 			</view>
 		</view>

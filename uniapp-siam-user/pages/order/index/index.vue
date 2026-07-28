@@ -24,7 +24,7 @@
 							<text class="out_of_range one_row">{{ item.modeName }}</text>
 							<view class="badge_position" v-if="item.number > 0">
 								// #ifdef APP-PLUS||H5
-								<van-badge :content="item.number > 0?item.number:''" />
+							<text class="order-count-badge" v-if="item.number > 0">{{ item.number }}</text>
 								// #endif
 								// #ifdef MP-WEIXIN||MP-ALIPAY
 								<text class="badge_num">{{item.number > 0?item.number:''}}</text>
@@ -45,7 +45,7 @@
 							<text class="out_of_range one_row" :decode="true">{{ item.modeName }}</text>
 							<view class="badge_position" v-if="item.number > 0">
 								// #ifdef APP-PLUS||H5
-								<van-badge :content="item.number > 0?item.number:''" />
+							<text class="order-count-badge" v-if="item.number > 0">{{ item.number }}</text>
 								// #endif
 								// #ifdef MP-WEIXIN||MP-ALIPAY
 								<text class="badge_num">{{item.number > 0?item.number:''}}</text>
@@ -109,7 +109,7 @@
 					v-if="!isLoading&&isEndList">没有更多啦</van-divider>
 			</scroll-view>
 			<van-empty :description="'暂无'+shopOrderTabList[currentOrderTab].modeName+'订单'" v-if="list.length <= 0">
-				<van-button type="primary" size="small" color="#004ca0" class="bottom-button" @tap="goToDrink">
+				<van-button type="primary" size="small" color="#4A2605" class="bottom-button" @tap="goToDrink">
 					{{currentTab==0?'去喝一杯':'去逛逛'}}
 				</van-button>
 			</van-empty>
@@ -172,7 +172,7 @@
 					v-if="!isMallLoading&&isEndMallList">没有更多啦</van-divider>
 			</scroll-view>
 			<van-empty :description="'暂无'+shopOrderTabList[currentOrderTab].modeName+'订单'" v-if="mallList.length <= 0">
-				<van-button type="primary" size="small" color="#004ca0" class="bottom-button" @tap="goToDrink">
+				<van-button type="primary" size="small" color="#4A2605" class="bottom-button" @tap="goToDrink">
 					{{currentTab==0?'去喝一杯':'去逛逛'}}
 				</van-button>
 			</van-empty>
@@ -790,6 +790,21 @@
 
 	.two-tab {
 		width: 20%;
+	}
+
+	.order-count-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 28rpx;
+		height: 28rpx;
+		margin-left: 6rpx;
+		padding: 0 6rpx;
+		border-radius: 14rpx;
+		background: #F05A2A;
+		color: #fff;
+		font-size: 18rpx;
+		line-height: 28rpx;
 	}
 
 	.swiper-box {

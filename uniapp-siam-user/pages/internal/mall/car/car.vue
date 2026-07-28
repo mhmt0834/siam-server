@@ -15,7 +15,7 @@
 										:checked="item.checked" :disabled="item.disable" iconColor="#FFFFFF" />
 									<view class="commdity-item">
 										<image
-											:src="item.mainImage ? item.mainImage : '/static/assets/images/load-image.png'"
+											:src="item.mainImage ? item.mainImage : '/static/assets/common/load-image.png'"
 											mode="aspectFill" class="commodity-icon"></image>
 										<view class="sell-out out-store" v-if="item.goodsStatus == 1">未上架</view>
 										<view class="sell-out out-store" v-else-if="item.goodsStatus == 3">已下架</view>

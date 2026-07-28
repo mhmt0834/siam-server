@@ -41,8 +41,8 @@
 	},
 	"compileType": "miniprogram",
 	"libVersion": "2.16.1",
-	"appid": "wx5dd1aa2db73644e9",
-	"projectname": "(server) uniapp-siam-user",
+	"appid": "",
+	"projectname": "玉KING智能点餐",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {

@@ -1,6 +1,9 @@
 <template>
 	<view class="input-phone-number">
-		<image src="/static/assets/logo/logo.jpg" mode="widthFix" class="brand-icon"></image>
+		<view class="brand-wordmark">
+			<view class="brand-wordmark__en">{{ brand.nameEn }}</view>
+			<view class="brand-wordmark__name">{{ brand.name }}</view>
+		</view>
 		<view class="tip-info-text">申请获取你的公开信息（昵称、头像等）</view>
 		<view class="input-button-view">
 			<button class="getphonenumber theme-bg" @tap="getUserProfile">微信授权</button>
@@ -10,12 +13,14 @@
 
 <script>
 	import toastService from '../../../../utils/toast.service';
+	import BrandConfig from '../../../../utils/brand-config';
 	//获取应用实例
 	let app = null;
 	var inviterId;
 	export default {
 		data() {
 			return {
+				brand: BrandConfig,
 				userInfo: '',
 				hasUserInfo: false
 			};
@@ -132,10 +137,21 @@
 		text-align: center;
 	}
 
-	.brand-icon {
-		width: 258rpx;
-		height: auto;
+	.brand-wordmark {
 		margin-top: 188rpx;
+	}
+
+	.brand-wordmark__en {
+		color: #F5C89A;
+		font-size: 20rpx;
+		letter-spacing: 8rpx;
+	}
+
+	.brand-wordmark__name {
+		margin-top: 18rpx;
+		color: #4A2605;
+		font-size: 54rpx;
+		font-weight: 900;
 	}
 
 	.tip-info-text {

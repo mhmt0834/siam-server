@@ -318,24 +318,6 @@
 					toastService.hideLoading();
 				});
 			},
-
-			getAccessToken(e) {
-				var appid = 'wx2e1a8193d3ed12fe'; //填写微信小程序appid
-				var secret = '2774e3a86dc30fbf1ac63d81b56f2291'; //填写微信小程序secret
-				var _this = this;
-				uni.request({
-					url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + appid +
-						'&secret=' + secret,
-					header: {
-						'content-type': 'application/json'
-					},
-					success: function(res) {
-						console.log(res);
-						_this.getCode(res.data.access_token);
-					}
-				});
-			},
-
 			getCode(ACCESS_TOKEN) {
 				console.log(ACCESS_TOKEN);
 				var _this = this;

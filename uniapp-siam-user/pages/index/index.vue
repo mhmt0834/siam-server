@@ -1,210 +1,221 @@
 <template>
-	<view class="page">
+	<view class="page page-bg-warm">
+		<!-- 问候语 -->
+		<view class="greeting-section">
+			<view class="greeting-title">您好，欢迎光临 👋</view>
+			<view class="greeting-subtitle">美味佳肴 · 优质服务</view>
+		</view>
 
-		<swiper :indicator-dots="indicatorDots" class="carousel-swiper" :autoplay="autoplay" :interval="interval"
-			:duration="duration" :indicator-active-color="afterColor" style="margin: 0;border-radius: 0;">
+		<!-- 搜索条 -->
+		<view class="search-bar" @tap="searchBusinessTap">
+			<view class="search-bar-inner">
+				<text class="search-icon">🔍</text>
+				<text class="search-placeholder">搜索菜品</text>
+			</view>
+		</view>
+
+		<!-- Banner轮播 -->
+		<swiper v-if="carouselUrls.length" :indicator-dots="true" class="home-banner" :autoplay="autoplay"
+			:interval="interval" :duration="duration" indicator-active-color="#4A2605" indicator-color="rgba(255,255,255,0.5)">
 			<block v-for="(item, index) in carouselUrls" :key="index">
-				<swiper-item class="carousel-swiper-item">
-					<image :src="item.imagePath" class="carousel-image" mode="aspectFill"
-						:data-imageLinkUrl="item.imageLinkUrl" @tap="carouseCommodityDetailTap" />
+				<swiper-item class="banner-item">
+					<view class="banner-card">
+						<view class="banner-text-area">
+							<view class="banner-tag">新疆风味 · 串串飘香</view>
+							<view class="banner-title">精选羊肉串</view>
+							<view class="banner-desc">肉质鲜嫩 · 香味浓郁</view>
+							<view class="banner-btn" @tap.stop="businessTap" data-index="0">立即点餐</view>
+						</view>
+						<image :src="item.imagePath" class="banner-image" mode="aspectFill" />
+					</view>
 				</swiper-item>
 			</block>
 		</swiper>
-		<view class="self_out_items">
-			<view class="self_out_item" hover-class="hover-class-public" @tap="businessTap" data-index="0">
-				<view class="self_out_items_view">
-					<image src="https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/system/selfPickup.jpg"
-						class="self_out_image" mode="widthFix"></image>
-					<view class="self_out_item_text">
-						<view class="self_out_item_title">
-							<view class="self_out_title">自提</view>
-							<view class="self_out_desc">下单免排队</view>
-						</view>
-					</view>
 
+		<!-- 四个快捷入口 -->
+		<view class="quick-entries">
+			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="0">
+				<view class="quick-entry-icon">
+					<text class="quick-entry-emoji">🍽️</text>
 				</view>
+				<text class="quick-entry-text">店内点餐</text>
 			</view>
-			<view class="self_out_item" hover-class="hover-class-public" @tap="businessTap" data-index="1">
-				<image src="https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/system/delivery.jpg"
-					class="self_out_image" mode="widthFix"></image>
-				<view class="self_out_item_text">
-					<view class="self_out_item_title">
-						<view class="self_out_title">雪王外送</view>
-						<view class="self_out_desc">甜蜜送到家</view>
-					</view>
+			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="1">
+				<view class="quick-entry-icon">
+					<text class="quick-entry-emoji">🛵</text>
+				</view>
+				<text class="quick-entry-text">外卖点餐</text>
+			</view>
+			<view class="quick-entry" hover-class="hover-class-public" @tap="isPromotionTap">
+				<view class="quick-entry-icon">
+					<text class="quick-entry-emoji">🎫</text>
+				</view>
+				<text class="quick-entry-text">优惠活动</text>
+			</view>
+			<view class="quick-entry" hover-class="hover-class-public" @tap="bindOrderInfo">
+				<view class="quick-entry-icon">
+					<text class="quick-entry-emoji">📋</text>
+				</view>
+				<text class="quick-entry-text">我的订单</text>
+			</view>
+		</view>
 
+		<!-- 推荐菜品 -->
+		<view class="section-header" v-if="recommendGoodsList && recommendGoodsList.length">
+			<view class="section-title">推荐菜品</view>
+			<view class="section-more" @tap="businessTap" data-index="0">
+				<text>查看更多</text>
+				<text class="section-arrow">›</text>
+			</view>
+		</view>
+		<view class="recommend-grid" v-if="recommendGoodsList && recommendGoodsList.length">
+			<view class="recommend-item" v-for="(item, index) in recommendGoodsList" :key="index"
+				hover-class="hover-class-public" @tap="commodityDetailTap" :data-id="item.goodsId"
+				:data-shopid="item.shopId">
+				<image :src="item.mainImage || '/static/assets/common/load-image.png'" mode="aspectFill"
+					class="recommend-image" />
+				<view class="recommend-info">
+					<view class="recommend-name out_of_range one_row">{{ item.goodsName }}</view>
+					<view class="recommend-bottom">
+						<text class="price-accent">¥{{ item.goodsPrice }}</text>
+						<view class="btn-add-circle" @tap.stop="openSpecifications" :data-goodsId="item.goodsId">＋</view>
+					</view>
 				</view>
 			</view>
 		</view>
+
+		<!-- 优惠活动 -->
+		<view class="section-header" v-if="promotionList && promotionList.length">
+			<view class="section-title">优惠活动</view>
+		</view>
+		<view class="promotion-card" v-for="(rule, index) in promotionList" :key="index"
+			v-if="promotionList && promotionList.length" @tap="businessTap" data-index="0">
+			<view class="promotion-info">
+				<view class="promotion-title">{{ rule.name }}</view>
+				<view class="promotion-desc" v-if="rule.validityPeriod">有效期至 {{ rule.validityPeriod }}</view>
+			</view>
+			<view class="promotion-btn">去使用</view>
+		</view>
+
+		<!-- 活动弹窗 -->
+		<van-action-sheet :show="isActivityDialog" @close="closeActivity" @cancel="closeActivity" title="优惠活动">
+			<view slot="desc">
+				<scroll-view style="height: 55vh" scroll-y>
+					<view class="dialog-title">优惠：</view>
+					<view class="business-discount-info">
+						<view class="business-discount" @tap="isPromotionTap">
+							<view class="theme-color-border business-discount-list" v-for="(rule, idx) in promotionList"
+								:key="idx">
+								{{ rule.name }}
+							</view>
+						</view>
+					</view>
+				</scroll-view>
+			</view>
+		</van-action-sheet>
+
+		<!-- 规格弹窗 -->
+		<van-action-sheet :show="specificationsDialog" @close="closeSpecifications" @cancel="closeSpecifications"
+			title="选择规格">
+			<view class="content">
+				<view class="goods-info-view">
+					<image :src="goodsInfo.mainImage" mode="aspectFill" class="commodity-image"></image>
+					<view>
+						<view class="goods-info-name">{{ goodsInfo.name }}</view>
+						<view class="goods-info-specListString">已选：{{ specListString }}</view>
+						<view class="goods-info-price price-accent">¥{{ priceAfter }}</view>
+					</view>
+				</view>
+				<scroll-view scroll-y style="height: 50vh">
+					<view class="commdity-name-type-view">
+						<view class="commdity-type-item" v-for="(item, key) in specList" :key="key">
+							<view class="commdity-type-name">{{ key }}</view>
+							<radio-group class="radio-group" @change="radioChange" :data-firstIndex="key">
+								<label :class="
+									'group-label theme-border ' +
+									(!item.stock ? 'disabled-group-label' : '') +
+									' ' +
+									(item.checked ? 'active theme-bg' : 'theme-color-border') +
+									' out_of_range one_row'
+								" v-for="(item, index) in item" :key="index">
+									<radio :value="index" :checked="item.checked" :disabled="!item.stock" class="radio" />
+									{{ item.name }}
+								</label>
+							</radio-group>
+						</view>
+						<view class="loading_box" v-if="specLoading&&specList.length==0">
+							<van-loading custom-class="loading_box_class" vertical>加载中...</van-loading>
+						</view>
+						<van-empty v-if="!specLoading&&specList.length <= 0" description="暂无规格"></van-empty>
+					</view>
+				</scroll-view>
+				<view slot="footer" class="position-sticky-bottom">
+					<view class="good-choice-btn theme-bg" @tap="insertShoppingCart">我选好了</view>
+				</view>
+			</view>
+		</van-action-sheet>
+
+		<!-- 底部安全区 -->
+		<view class="safe-area-bottom"></view>
 	</view>
 </template>
 
 <script>
 	import GlobalConfig from '../../utils/global-config';
+	import BrandConfig from '../../utils/brand-config';
 	import https from '../../utils/http';
 	import authService from '../../utils/auth';
 	import toastService from '../../utils/toast.service';
-	import show from '../../utils/toast.service';
-	import amapFile from '../../utils/gaode-libs/amap-wx';
-	import * as Config from '../../utils/gaode-libs/config';
-	//获取应用实例
 	let app = null;
 	export default {
 		data() {
 			return {
-				indicatorDots: false,
+				brand: BrandConfig,
 				autoplay: true,
 				interval: 5000,
 				duration: 1000,
-				//beforeColor: "white",//指示点颜色,
-				afterColor: '#f1a142',
-				//当前选中的指示点颜色
-				previousmargin: '60px',
-				//前边距
-				nextmargin: '60px',
-				//后边距
-				opacity: 0.4,
-				extClass: 'weui-dialog-ext-index',
-				scrollTop: false,
-				noDataTip: '../../assets/common/no-data.png',
-				shopList: [],
-				isActivityDialog: false,
-				statusBarHeight: 0,
-				dialogShow: false,
-				maskClosable: false,
-				regeoInfo: {
-					name: '',
-					address: '',
-					location: ''
-				},
-				dialogvisible: false,
-				recommendGoodsList: '',
 				carouselUrls: [],
-				shopIndex: 0,
-				shopAdditionalVo: {
-					promotionList: []
-				},
-				rule: {
-					name: ''
-				},
-				reducedDeliveryPrice: 0,
-				isLoading: true
+				recommendGoodsList: [],
+				promotionList: [],
+				isActivityDialog: false,
+				isLoading: true,
+				// 规格弹窗相关
+				specificationsDialog: false,
+				specLoading: false,
+				goodsId: '',
+				goodsInfo: { mainImage: '', name: '' },
+				specList: [],
+				specListString: '',
+				priceAfter: '',
 			};
 		},
-		onLoad: function() {
+		onLoad: function () {
 			app = getApp();
-			this.statusBarHeight = app.globalData.systemInfoSync.statusBarHeight * 2;
 			this.getCarouselList();
-
+			this.getRecommendGoods();
+			this.getPromotionList();
 		},
-		onShow: function() {
-			//判断是否显示新用户弹窗
+		onShow: function () {
 			this.getRegeoInit();
 		},
 		onPullDownRefresh() {
 			this.getCarouselList();
-			this.getRegeoInit();
-
-			setTimeout((outtime) => {
-				// 停止下拉动作
+			this.getRecommendGoods();
+			this.getPromotionList();
+			setTimeout(() => {
 				uni.stopPullDownRefresh();
-				// 隐藏导航栏加载框
 				uni.hideNavigationBarLoading();
-
-				clearTimeout(outtime);
 			}, 1000);
 		},
-		onHide() {
-			this.dialogShow = false;
-			this.maskClosable = true;
-		},
 		methods: {
-			// position 为关闭时点击的位置
-			beforeClose(position) {
-				switch (position) {
-					case 'left':
-					case 'cell':
-					case 'outside':
-						return true;
-					case 'right':
-						return new Promise((resolve) => {
-							showConfirmDialog({
-									title: '确定删除吗？',
-								})
-								.then(() => resolve(true))
-								.catch(() => resolve(false));
-						});
-				}
-			},
-			getRegeo() {
-				var _this = this;
-				var key = Config.key();
-				var myAmapFun = new amapFile.AMapWX({
-					key: key
-				});
-				myAmapFun.getRegeo({
-					success: function(getRegeo) {
-						console.log(getRegeo);
-						if (!app.globalData.deliveryAndSelfTaking.regeoInfo) {
-							_this.regeoInfo = getRegeo[0].regeocodeData.pois[0];
-							app.globalData.deliveryAndSelfTaking.location = getRegeo[0].longitude +
-								',' +
-								getRegeo[0].latitude;
-							app.globalData.deliveryAndSelfTaking.regeoInfo = getRegeo[0].regeocodeData
-								.pois[0];
-							app.globalData.deliveryAndSelfTaking.regeoInfo.isAutoLocation = true;
-						} else {
-							app.globalData.deliveryAndSelfTaking.location = app.globalData
-								.deliveryAndSelfTaking.location;
-							app.globalData.deliveryAndSelfTaking.regeoInfo.isAutoLocation = true;
-							_this.regeoInfo = app.globalData.deliveryAndSelfTaking.regeoInfo;
-
-						}
-					},
-					fail: function(info) {
-						// wx.showModal({title:info.errMsg})
-					}
-				});
-			},
 			getRegeoInit() {
-				var _this = this;
-				console.log(app.globalData.deliveryAndSelfTaking.location)
 				var addressInfo = app.globalData.deliveryAndSelfTaking.initRegeoInfo;
-
-				_this.regeoInfo = addressInfo;
 				app.globalData.deliveryAndSelfTaking.regeoInfo = addressInfo;
 				app.globalData.deliveryAndSelfTaking.location = addressInfo.location;
 			},
-			shoppingAddressTap() {
-				uni.navigateTo({
-					url: `../address/replace/replace?jump_page=index`
-				});
-			},
-
-			showDialog: function() {
-				this.setData({
-					dialogvisible: true
-				});
-			},
-
-			gotoShop(e) {
-				app.globalData.isRemindNewPeople().then((result) => {
-					if (result) {
-						this.setData({
-							dialogShow: false,
-							maskClosable: true
-						});
-					}
-					uni.switchTab({
-						url: '../menu/index/index'
-					});
-				});
-			},
 
 			businessTap(e) {
-				console.log(e)
 				var index = e.currentTarget.dataset.index;
-				console.log("tiaozhuan", index);
 				app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = index;
 				app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = true;
 				app.globalData.deliveryAndSelfTaking.ifChooseBack = false;
@@ -214,8 +225,7 @@
 				});
 			},
 
-			searchBusinessTap(e) {
-				console.log(this);
+			searchBusinessTap() {
 				uni.navigateTo({
 					url: '../menu/search/search?location=' + app.globalData.deliveryAndSelfTaking.location
 				});
@@ -223,59 +233,24 @@
 
 			commodityDetailTap(e) {
 				uni.navigateTo({
-					url: '../menu/detail/detail?id=' + e.currentTarget.dataset.id + '&shopId=' + e
-						.currentTarget
-						.dataset.shopid
+					url: '../menu/detail/detail?id=' + e.currentTarget.dataset.id + '&shopId=' + e.currentTarget.dataset.shopid
 				});
 			},
 
-			carouseCommodityDetailTap(e) {
-				let _this = this;
-				authService.checkIsLogin().then((result) => {
-					console.log(result);
-					if (result) {
-						_this.getUserInfo(e);
-						return;
-					}
-					app.globalData.checkIsAuth('scope.userInfo');
+			bindOrderInfo() {
+				uni.navigateTo({
+					url: '../order/index/index?currentTab=0&modeType=all&currentOrderTab=0'
 				});
 			},
 
-			getUserInfo: function(e) {
-				https.request('/rest/member/getLoginMemberInfo', {}).then((result) => {
-					if (result.success) {
-						uni.navigateTo({
-							url: e.currentTarget.dataset.imagelinkurl
-						});
-					} else {
-						app.globalData.checkIsAuth('scope.userInfo');
-					}
-				});
+			isPromotionTap() {
+				this.isActivityDialog = !this.isActivityDialog;
 			},
-			bindInDevelopment() {
-				app.globalData.bindInDevelopment();
+
+			closeActivity() {
+				this.isActivityDialog = false;
 			},
-			getShoppingCartList() {
-				this.shopList.forEach((item, index) => {
-					https.request('/rest/member/shoppingCart/list', {
-						shopId: item.id,
-						pageNo: -1,
-						pageSize: 20
-					}).then((result) => {
-						show.hideLoading();
-						if (result.success && result.data) {
-							var number = 0;
-							result.data.records.forEach((cart, index) => {
-								number = number + cart.number;
-							});
-							item.shopCartNums = number;
-							this.setData({
-								shopList: this.shopList
-							});
-						}
-					});
-				});
-			},
+
 			getCarouselList() {
 				https.request('/rest/advertisement/list', {
 					type: 1,
@@ -283,419 +258,515 @@
 					pageSize: 20
 				}).then((result) => {
 					if (result.success) {
-						result.data.records.forEach(function(item, index) {
+						result.data.records.forEach(function (item) {
 							item.imagePath = GlobalConfig.ossUrl + item.imagePath;
 						});
-						this.setData({
-							carouselUrls: result.data.records
-						});
+						this.carouselUrls = result.data.records;
 					}
 				});
 			},
 
-			openConfirm() {
-				this.setData({
-					dialogShow: true,
-					maskClosable: false
+			getRecommendGoods() {
+				https.request('/rest/goods/list', {
+					pageNo: 1,
+					pageSize: 6,
+					isRecommend: 1
+				}).then((result) => {
+					if (result.success && result.data) {
+						result.data.records.forEach((item) => {
+							item.mainImage = item.mainImage ? GlobalConfig.ossUrl + item.mainImage : '';
+						});
+						this.recommendGoodsList = result.data.records;
+					}
 				});
 			},
 
-			close() {
-				app.globalData.isRemindNewPeople().then((result) => {
+			getPromotionList() {
+				https.request('/rest/fullReductionRule/list', {
+					pageNo: -1,
+					pageSize: 5
+				}).then((result) => {
+					if (result.success) {
+						this.promotionList = result.data.records || [];
+					}
+				});
+			},
+
+			// 规格相关
+			openSpecifications(e) {
+				this.specificationsDialog = true;
+				this.specLoading = true;
+				this.goodsId = e.currentTarget.dataset.goodsid;
+				this.getCommodityDetails(e.currentTarget.dataset.goodsid);
+			},
+
+			closeSpecifications() {
+				this.specificationsDialog = false;
+				this.specList = [];
+				this.specLoading = false;
+			},
+
+			getCommodityDetails(id) {
+				https.request('/rest/goods/selectById', {
+					id: id,
+					position: app.globalData.deliveryAndSelfTaking.location
+				}).then((result) => {
+					if (result.success && result.data) {
+						result.data.mainImage = GlobalConfig.ossUrl + result.data.mainImage;
+						this.goodsInfo = result.data;
+						this.priceAfter = result.data.price;
+						this.selectByGoodsId(id);
+					}
+				});
+			},
+
+			selectByGoodsId(goodsId) {
+				https.request('/rest/goodsSpecificationOption/selectByGoodsId', {
+					goodsId: goodsId
+				}).then((result) => {
+					if (result.success && result.data) {
+						let specList = result.data;
+						let price = this.goodsInfo.price;
+						let specListString = '';
+						for (let key in specList) {
+							let isChecked = true;
+							for (let keyof in specList[key]) {
+								specList[key][keyof].checked = false;
+								if (specList[key][keyof].stock == 1 && isChecked) {
+									specList[key][keyof].checked = true;
+									price = price + specList[key][keyof].price;
+									specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
+									isChecked = false;
+								}
+							}
+						}
+						this.specListString = specListString;
+						this.specList = JSON.stringify(specList) == '{}' ? [] : specList;
+						this.specLoading = false;
+					}
+				});
+			},
+
+			radioChange(e) {
+				var checkValue = e.detail.value;
+				let firstIndex = e.currentTarget.dataset.firstindex;
+				let specList = this.specList;
+				for (var j in specList[firstIndex]) {
+					specList[firstIndex][j].checked = false;
+				}
+				specList[firstIndex][checkValue].checked = true;
+				let price = this.goodsInfo.price;
+				let specListString = '';
+				for (let key in specList) {
+					for (let keyof in specList[key]) {
+						if (specList[key][keyof].checked) {
+							price = price + specList[key][keyof].price;
+							specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
+						}
+					}
+				}
+				this.specList = specList;
+				this.specListString = specListString;
+				this.priceAfter = price;
+			},
+
+			insertShoppingCart() {
+				var _this = this;
+				authService.checkIsLogin().then((result) => {
+					toastService.showLoading();
 					if (result) {
-						this.setData({
-							dialogShow: false,
-							maskClosable: true
+						let goodsSpecs = {};
+						let specList = _this.specList;
+						for (let key in specList) {
+							for (let keyof in specList[key]) {
+								if (specList[key][keyof].checked) {
+									goodsSpecs[key] = specList[key][keyof].name;
+								}
+							}
+						}
+						toastService.hideLoading();
+						https.request('/rest/member/shoppingCart/insert', {
+							goodsId: _this.goodsId,
+							specList: JSON.stringify(goodsSpecs),
+							shopId: _this.recommendGoodsList[0] ? _this.recommendGoodsList[0].shopId : ''
+						}).then((result) => {
+							if (result.success) {
+								_this.specificationsDialog = false;
+								_this.specList = [];
+								_this.specLoading = true;
+								toastService.showSuccess('已加入购物车', false);
+							}
 						});
+						return;
 					}
+					_this.specificationsDialog = false;
+					toastService.hideLoading();
+					app.globalData.checkIsAuth('scope.userInfo');
 				});
 			},
-
-			isPromotionTap(e) {
-				let shopIndex = e.currentTarget.dataset.shopindex;
-				console.log(shopIndex);
-				this.setData({
-					isActivityDialog: true,
-					shopIndex: shopIndex
-				});
-			}
 		}
 	};
 </script>
 <style>
 	page {
 		width: 100%;
-
+		background: #F8F6F2;
 	}
 
-	.banner {
-		border-radius: 15rpx;
-		/* margin: 20rpx; */
-		background: white;
-		padding-bottom: 0rpx;
+	.page {
+		min-height: 100vh;
+		padding: 0 24rpx 120rpx;
+		box-sizing: border-box;
 	}
 
-	.location-address {
+	/* 问候语 */
+	.greeting-section {
+		padding: 40rpx 10rpx 20rpx;
+	}
+
+	.greeting-title {
+		font-size: 40rpx;
+		font-weight: 700;
+		color: #2D1A08;
+	}
+
+	.greeting-subtitle {
+		margin-top: 10rpx;
+		font-size: 26rpx;
+		color: #9A9A8E;
+	}
+
+	/* 搜索条 */
+	.search-bar {
+		margin: 10rpx 0 24rpx;
+	}
+
+	.search-bar-inner {
 		display: flex;
 		align-items: center;
-		padding: 20rpx;
-		font-weight: bold;
-		font-size: 34rpx;
+		background: #F0EDE6;
+		border-radius: 50rpx;
+		padding: 22rpx 28rpx;
 	}
 
-	.search-input-views {
-		padding: 20rpx;
-		background: white;
+	.search-icon {
+		font-size: 28rpx;
+		margin-right: 14rpx;
 	}
 
-	.iconsousuo-copy {
-		color: #c3c3c3;
+	.search-placeholder {
+		font-size: 28rpx;
+		color: #B5B0A4;
 	}
 
-	.search-input-view {
-		width: 100%;
+	/* Banner */
+	.home-banner {
+		height: 340rpx;
+		margin-bottom: 28rpx;
+		border-radius: 24rpx;
+		overflow: hidden;
+	}
+
+	.banner-item {
+		height: 100%;
+	}
+
+	.banner-card {
+		display: flex;
+		height: 100%;
+		background: linear-gradient(135deg, #3D1F08 0%, #5C3414 100%);
+		border-radius: 24rpx;
+		overflow: hidden;
+	}
+
+	.banner-text-area {
+		flex: 1;
+		padding: 36rpx 30rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.banner-tag {
+		font-size: 22rpx;
+		color: #F5C89A;
+		margin-bottom: 10rpx;
+	}
+
+	.banner-title {
+		font-size: 38rpx;
+		font-weight: 800;
+		color: #FFF;
+		margin-bottom: 8rpx;
+	}
+
+	.banner-desc {
+		font-size: 22rpx;
+		color: rgba(255, 255, 255, 0.7);
+		margin-bottom: 24rpx;
+	}
+
+	.banner-btn {
+		display: inline-block;
+		width: 160rpx;
+		padding: 14rpx 0;
+		background: #FFF9F2;
+		color: #4A2605;
+		font-size: 24rpx;
+		font-weight: 700;
+		border-radius: 50rpx;
+		text-align: center;
+	}
+
+	.banner-image {
+		width: 280rpx;
+		height: 100%;
+		border-radius: 0 24rpx 24rpx 0;
+	}
+
+	/* 快捷入口 */
+	.quick-entries {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 32rpx;
+	}
+
+	.quick-entry {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 22%;
+	}
+
+	.quick-entry-icon {
+		width: 100rpx;
+		height: 100rpx;
+		border-radius: 24rpx;
+		background: #F0EBE0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #f5f5f5;
-		border-radius: 30rpx;
-		padding: 15rpx 0;
+		margin-bottom: 12rpx;
 	}
 
-	.search-image-class {
-		width: 44rpx;
-		height: auto;
+	.quick-entry-emoji {
+		font-size: 44rpx;
 	}
 
-	.search-input {
-		color: #c3c3c3;
-		font-size: 28rpx;
-		margin-left: 10rpx;
+	.quick-entry-text {
+		font-size: 24rpx;
+		color: #5C4A3A;
+		font-weight: 500;
 	}
 
-	.place-image {
-		width: 10%;
-		height: auto;
-		padding-right: 20rpx;
-	}
-
-	.menu-swiper {
-		height: 400rpx;
-		position: sticky;
-		top: 0;
-	}
-
-	.carousel_img {
-		border-radius: 15rpx;
-	}
-
-	.index-nav-view-first {
-		display: flex;
-		flex-direction: column;
-		margin: 30rpx 20rpx;
-	}
-
-	.index-nav-view-second {
+	/* 分区标题 */
+	.section-header {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 20rpx;
+		padding: 0 6rpx;
 	}
 
-	.index-nav-view-third {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 20rpx;
+	.section-title {
+		font-size: 32rpx;
+		font-weight: 700;
+		color: #2D1A08;
 	}
 
-	.index-nav-view-third image {
-		width: 70%;
-		height: auto;
-		margin-bottom: 14rpx;
-		box-shadow: -2px 0px 5px 0.5px rgba(0, 0, 0, 0), 0px -2px 5px 1px rgba(0, 0, 0, 0.1), 2px 0px 5px 1px rgba(0, 0, 0, 0), 0px 2px 5px 1px rgba(0, 0, 0, 0.1);
-		border-radius: 60rpx;
-	}
-
-	.index-nav-view-third text {
+	.section-more {
 		font-size: 24rpx;
-		color: rgb(0, 0, 0);
-	}
-
-	.carousel-swiper {
-		margin: 20rpx;
-		height: 558rpx;
-	}
-
-	.carousel-swiper-item {
-		height: 100%;
-	}
-
-	.carousel-image {
-		width: 100%;
-		height: 100%;
-	}
-
-	.recommend-business-title {
-		font-size: 34rpx;
-		font-weight: bold;
-		margin: 20rpx;
-	}
-
-	.business-item {
-		display: flex;
-
-		/* align-items: center; */
-	}
-
-	.main-image-num {
-		position: relative;
-		width: 100%;
-	}
-
-	.business-image {
-		width: 100%;
-		height: auto;
-	}
-
-	.business-info {
-		width: 75%;
-		margin-left: 15rpx;
-		padding: 10rpx 0 20rpx 0;
-		border-bottom: 1rpx solid #f5f5f5;
-	}
-
-	.business-info-flex {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		font-size: 24rpx;
-		color: #717171;
-		margin-top: 10rpx;
-	}
-
-	.business-sale {
-		margin: 5rpx 0;
-	}
-
-	.business-fsize-color {
-		font-size: 24rpx;
-		color: #717171;
-	}
-
-	.business-name {
-		font-size: 34rpx;
-		font-weight: bold;
-		color: black;
-	}
-
-	.business-evaluate {
-		color: #ff6500;
-	}
-
-	.business-right {
-		margin-left: 15rpx;
-	}
-
-	.business-discount-list {
-		padding: 1rpx 6rpx;
-		font-size: 20rpx;
-		border-radius: 10rpx;
-		margin-right: 10rpx;
-	}
-
-	.business-discount {
-		width: 85%;
-		padding-bottom: 1rpx;
-		/* margin-bottom: 10rpx; */
+		color: #9A9A8E;
 		display: flex;
 		align-items: center;
 	}
 
-	.settlement-view {
-		position: fixed;
-		z-index: 999;
-		background: white;
-		width: 94.8%;
-		top: 0;
+	.section-arrow {
+		font-size: 30rpx;
+		margin-left: 4rpx;
 	}
 
-	.radio-group {
-		width: 100%;
-		display: flex;
-		justify-content: flex-start;
-		align-items: center;
-		flex-wrap: wrap;
-		/* padding: 10rpx 10rpx 10rpx 0; */
+	/* 推荐菜品 grid */
+	.recommend-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-column-gap: 14rpx;
+		margin-bottom: 32rpx;
+	}
+
+	.recommend-item {
 		background: #fff;
+		border-radius: 16rpx;
+		overflow: hidden;
+		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+	}
+
+	.recommend-image {
+		width: 100%;
+		height: 190rpx;
+		display: block;
+	}
+
+	.recommend-info {
+		padding: 14rpx 12rpx 18rpx;
+	}
+
+	.recommend-name {
+		font-size: 24rpx;
+		font-weight: 600;
+		color: #2D1A08;
+		margin-bottom: 12rpx;
+	}
+
+	.recommend-bottom {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.recommend-bottom .price-accent {
+		font-size: 26rpx;
+	}
+
+	.recommend-bottom .btn-add-circle {
+		width: 40rpx;
+		height: 40rpx;
+		font-size: 26rpx;
+	}
+
+	/* 优惠卡片 */
+	.promotion-card {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: #fff;
+		border-radius: 16rpx;
+		padding: 26rpx 24rpx;
+		margin-bottom: 16rpx;
+		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+	}
+
+	.promotion-info {}
+
+	.promotion-title {
+		font-size: 28rpx;
+		font-weight: 700;
+		color: #2D1A08;
+		margin-bottom: 6rpx;
+	}
+
+	.promotion-desc {
+		font-size: 22rpx;
+		color: #9A9A8E;
+	}
+
+	.promotion-btn {
+		padding: 12rpx 24rpx;
+		background: #F05A2A;
+		color: #fff;
+		font-size: 24rpx;
+		font-weight: 600;
 		border-radius: 50rpx;
 	}
 
-	.group-label {
-		margin-right: 5rpx;
-		margin-bottom: 5rpx;
-		font-size: 20rpx;
-		border-radius: 10rpx;
-		text-align: center;
-		padding: 2rpx 5rpx;
-		display: inline-block；;
-	}
-
-	.disabled-group-label {
-		background: #f5f5f5;
-		color: #808080;
-		border: none;
-	}
-
-	.radio {
-		display: none;
-	}
-
-	/* 商品推荐 */
-	.like-items {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-column-gap: 10px;
-		padding: 0 20rpx 10rpx 20rpx;
-	}
-
-	.like-item {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-		background: #f5f5f5;
-		border-radius: 15rpx;
-		margin-bottom: 20rpx;
-		border: 1rpx #f5f5f5 solid;
-	}
-
-	.icon-like-class {
-		width: 100%;
-		height: 350rpx;
-		border-radius: 15rpx 15rpx 0 0;
-	}
-
-	.item-two {
-		margin: 0 3.5%;
-	}
-
-	.like-detail-view {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-	}
-
-	.fullname-class {
-		margin-top: 11rpx;
-		font-size: 26rpx;
-		width: 90%;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.name-text {
-		width: 65%;
-	}
-
-	.latelyMonthlySales {
-		width: 35%;
-	}
-
-	.num {
-		position: absolute;
-		top: -6px;
-		right: -10px;
-		width: 24px;
-		height: 24px;
-		line-height: 24px;
-		text-align: center;
-		border-radius: 16px;
-		font-size: 9px;
+	/* 活动弹窗 */
+	.dialog-title {
+		font-size: 28rpx;
 		font-weight: 700;
-		color: #fff;
-		background: rgb(240, 20, 20);
-		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
-	}
-
-	.go-to-shop {
-		padding: 0 20rpx;
-		border-radius: 10rpx;
-	}
-
-	.engname-class {
-		font-size: 24rpx;
-		color: #ccc;
-		width: 90%;
-	}
-
-	.like-money-view {
-		width: 90%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 15rpx 0 10rpx 0;
-	}
-
-	.like-money {
-		font-size: 26rpx;
-		font-weight: bold;
-	}
-
-	.new-commodity-button {
-		font-size: 26rpx;
-	}
-
-	.reduced-delivery-price {
-		font-size: 30rpx;
-		margin-top: 20rpx;
-	}
-
-	.self_out_items {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-column-gap: 10px;
 		padding: 20rpx;
-		height: 175px;
 	}
 
-	.self_out_items_view {
-		position: absolute;
-		width: 100%;
+	.business-discount-info {
+		padding: 0 20rpx;
 	}
 
-	.self_out_item {
-		height: 175px;
-		position: relative;
-		background: #f6f6f6;
-		border-radius: 20rpx;
+	.business-discount {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10rpx;
 	}
 
-	.self_out_item_text {
-		position: relative;
+	.business-discount-list {
+		padding: 4rpx 12rpx;
+		font-size: 22rpx;
+		font-weight: 600;
+		border-radius: 8rpx;
 	}
 
-	.self_out_image {
-		position: absolute;
-		width: 100%;
+	/* 规格弹窗 */
+	.content {
+		padding: 0 16px 16px 16px;
 	}
 
-	.self_out_item_title {
-		margin-top: 32px;
-		margin-left: 20rpx;
+	.goods-info-view {
+		display: flex;
+		padding: 20rpx;
+		border-bottom: 1rpx solid #f0f0f0;
 	}
 
-	.self_out_title {
+	.goods-info-view .commodity-image {
+		width: 160rpx;
+		height: 160rpx;
+		border-radius: 12rpx;
+		margin-right: 20rpx;
+	}
+
+	.goods-info-name {
+		font-size: 30rpx;
+		font-weight: 700;
+		color: #2D1A08;
+		margin-bottom: 8rpx;
+	}
+
+	.goods-info-specListString {
+		font-size: 24rpx;
+		color: #9A9A8E;
+		margin-bottom: 10rpx;
+	}
+
+	.goods-info-price {
 		font-size: 32rpx;
 	}
 
-	.self_out_desc {
-		margin-top: 10rpx;
+	.commdity-name-type-view {
+		padding: 20rpx;
+	}
+
+	.commdity-type-item {
+		margin-bottom: 20rpx;
+	}
+
+	.commdity-type-name {
+		font-size: 26rpx;
+		font-weight: 600;
+		color: #2D1A08;
+		margin-bottom: 14rpx;
+	}
+
+	.radio-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12rpx;
+	}
+
+	.group-label {
+		padding: 10rpx 18rpx;
 		font-size: 24rpx;
-		color: #646566;
+		border-radius: 8rpx;
+	}
+
+	.good-choice-btn {
+		width: 100%;
+		padding: 26rpx 0;
+		text-align: center;
+		font-size: 30rpx;
+		font-weight: 700;
+		border-radius: 50rpx;
+		margin: 16rpx;
+		width: calc(100% - 32rpx);
+	}
+
+	.safe-area-bottom {
+		height: calc(100rpx + env(safe-area-inset-bottom));
 	}
 </style>

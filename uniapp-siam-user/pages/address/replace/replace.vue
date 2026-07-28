@@ -29,7 +29,7 @@
 				</view>
 			</view>
 			<van-empty v-if="tips.length <= 0" description="没有搜索到地址">
-				<van-button type="primary" size="small" color="#004ca0" @bindTap="openSettingInfo"
+				<van-button type="primary" size="small" color="#4A2605" @bindTap="openSettingInfo"
 					v-if="!userLocation">位置授权</van-button>
 			</van-empty>
 		</view>

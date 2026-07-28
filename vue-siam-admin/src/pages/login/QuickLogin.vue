@@ -188,7 +188,7 @@
     .title {
       margin-bottom: 20px;
       text-align: center;
-      color: #0A79F9;
+      color: #111111;
       font-size: 30px;
       line-height: 30px;
     }
@@ -211,7 +211,7 @@
         color: #A4ABB2;
       }
       .blueColor:hover {
-        color: #0A79F9;
+        color: #111111;
       }
     }
   }

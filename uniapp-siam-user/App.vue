@@ -60,7 +60,11 @@
 			//   }
 			// })
 			this.globalData.getSystemInfo();
-			this.globalData.getUserInfo();
+			authService.checkIsLogin().then((isLoggedIn) => {
+				if (isLoggedIn) {
+					this.globalData.getUserInfo();
+				}
+			});
 			// this.globalData.getUserAgent().then((result)=>{
 			// 	toastService.showToast(result);
 			// });
@@ -671,13 +675,13 @@
 
 	/* 主题颜色 */
 	.active {
-		color: #4A2605;
-		border-bottom: 4rpx solid #4A2605;
+		color: #111111;
+		border-bottom: 4rpx solid #111111;
 		/* transition: 0.5s; */
 	}
 
 	.active_ {
-		color: #4A2605;
+		color: #111111;
 		border-bottom: 4rpx solid white;
 		/* transition: 0.5s; */
 	}
@@ -687,45 +691,45 @@
 	}
 
 	.theme-bg {
-		background: #4A2605;
+		background: #111111;
 		color: white;
 		border: none;
 	}
 
 	.theme-color {
-		color: #4A2605;
+		color: #111111;
 	}
 
 	.theme-border {
-		border: 0.5rpx solid #4A2605;
+		border: 0.5rpx solid #111111;
 	}
 
 	/* 是字体颜色加边框的宽度和实心颜色 */
 	.theme-color-border {
-		color: #4A2605;
-		border: 0.5rpx solid #4A2605;
+		color: #111111;
+		border: 0.5rpx solid #111111;
 	}
 
 	/* 只是边框颜色 */
 	.theme-border-color {
-		border-color: #4A2605;
+		border-color: #111111;
 	}
 
 	/* 价格强调色 */
 	.price-accent {
-		color: #F05A2A;
+		color: #111111;
 		font-weight: 700;
 	}
 
 	/* 暖色背景 */
 	.page-bg-warm {
-		background: #F8F6F2;
+		background: #F7F7F7;
 	}
 
 	/* 深棕大圆角按钮 */
 	.btn-primary-lg {
-		background: #4A2605;
-		color: #FFF9F2;
+		background: #050505;
+		color: #FFFFFF;
 		border: none;
 		border-radius: 50rpx;
 		font-size: 32rpx;
@@ -739,7 +743,7 @@
 		width: 48rpx;
 		height: 48rpx;
 		border-radius: 50%;
-		background: #4A2605;
+		background: #050505;
 		color: #fff;
 		display: flex;
 		align-items: center;

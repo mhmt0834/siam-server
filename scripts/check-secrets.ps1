@@ -1,9 +1,12 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$ProjectRoot = '',
     [switch]$Quiet
 )
 
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $ProjectRoot = Split-Path -Parent $PSScriptRoot
+}
 $root = [System.IO.Path]::GetFullPath($ProjectRoot)
 $excludedDirectories = @(
     '.git', '.idea', 'node_modules', 'target', 'unpackage',

@@ -1,62 +1,50 @@
 <template>
-	<view class="page page-bg-warm">
-		<!-- 问候语 -->
-		<view class="greeting-section">
-			<view class="greeting-title">您好，欢迎光临 👋</view>
-			<view class="greeting-subtitle">美味佳肴 · 优质服务</view>
-		</view>
-
-		<!-- 搜索条 -->
-		<view class="search-bar" @tap="searchBusinessTap">
-			<view class="search-bar-inner">
-				<text class="search-icon">🔍</text>
-				<text class="search-placeholder">搜索菜品</text>
+	<view class="page">
+		<!-- 品牌信息 -->
+		<view class="brand-header">
+			<view class="brand-mark">玉</view>
+			<view class="brand-copy">
+				<view class="brand-name">{{ brand.restaurantName }}</view>
+				<view class="brand-slogan">{{ brand.slogan }}</view>
 			</view>
 		</view>
 
-		<!-- Banner轮播 -->
-		<swiper v-if="carouselUrls.length" :indicator-dots="true" class="home-banner" :autoplay="autoplay"
-			:interval="interval" :duration="duration" indicator-active-color="#4A2605" indicator-color="rgba(255,255,255,0.5)">
-			<block v-for="(item, index) in carouselUrls" :key="index">
-				<swiper-item class="banner-item">
-					<view class="banner-card">
-						<view class="banner-text-area">
-							<view class="banner-tag">新疆风味 · 串串飘香</view>
-							<view class="banner-title">精选羊肉串</view>
-							<view class="banner-desc">肉质鲜嫩 · 香味浓郁</view>
-							<view class="banner-btn" @tap.stop="businessTap" data-index="0">立即点餐</view>
-						</view>
-						<image :src="item.imagePath" class="banner-image" mode="aspectFill" />
-					</view>
-				</swiper-item>
-			</block>
-		</swiper>
+		<!-- 问候语 -->
+		<view class="greeting-section">
+			<view class="greeting-title">您好，欢迎光临 👋</view>
+			<view class="greeting-subtitle">新鲜食材 · 精心烹饪 · 用心服务</view>
+		</view>
+
+		<view class="start-order-button" hover-class="start-order-button--pressed" @tap="businessTap" data-index="0">
+			<text>开始点餐</text>
+			<text class="start-order-arrow">›</text>
+		</view>
 
 		<!-- 四个快捷入口 -->
 		<view class="quick-entries">
 			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="0">
 				<view class="quick-entry-icon">
-					<text class="quick-entry-emoji">🍽️</text>
+					<text class="quick-entry-symbol">⌂</text>
 				</view>
 				<text class="quick-entry-text">店内点餐</text>
 			</view>
 			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="1">
 				<view class="quick-entry-icon">
-					<text class="quick-entry-emoji">🛵</text>
+					<text class="quick-entry-symbol">↗</text>
 				</view>
-				<text class="quick-entry-text">外卖点餐</text>
-			</view>
-			<view class="quick-entry" hover-class="hover-class-public" @tap="isPromotionTap">
-				<view class="quick-entry-icon">
-					<text class="quick-entry-emoji">🎫</text>
-				</view>
-				<text class="quick-entry-text">优惠活动</text>
+				<text class="quick-entry-text">外卖配送</text>
 			</view>
 			<view class="quick-entry" hover-class="hover-class-public" @tap="bindOrderInfo">
 				<view class="quick-entry-icon">
-					<text class="quick-entry-emoji">📋</text>
+					<text class="quick-entry-symbol">▤</text>
 				</view>
-				<text class="quick-entry-text">我的订单</text>
+				<text class="quick-entry-text">订单记录</text>
+			</view>
+			<view class="quick-entry" hover-class="hover-class-public" @tap="isPromotionTap">
+				<view class="quick-entry-icon">
+					<text class="quick-entry-symbol">◇</text>
+				</view>
+				<text class="quick-entry-text">优惠活动</text>
 			</view>
 		</view>
 
@@ -171,10 +159,6 @@
 		data() {
 			return {
 				brand: BrandConfig,
-				autoplay: true,
-				interval: 5000,
-				duration: 1000,
-				carouselUrls: [],
 				recommendGoodsList: [],
 				promotionList: [],
 				isActivityDialog: false,
@@ -191,7 +175,6 @@
 		},
 		onLoad: function () {
 			app = getApp();
-			this.getCarouselList();
 			this.getRecommendGoods();
 			this.getPromotionList();
 		},
@@ -199,7 +182,6 @@
 			this.getRegeoInit();
 		},
 		onPullDownRefresh() {
-			this.getCarouselList();
 			this.getRecommendGoods();
 			this.getPromotionList();
 			setTimeout(() => {
@@ -251,25 +233,10 @@
 				this.isActivityDialog = false;
 			},
 
-			getCarouselList() {
-				https.request('/rest/advertisement/list', {
-					type: 1,
-					pageNo: -1,
-					pageSize: 20
-				}).then((result) => {
-					if (result.success) {
-						result.data.records.forEach(function (item) {
-							item.imagePath = GlobalConfig.ossUrl + item.imagePath;
-						});
-						this.carouselUrls = result.data.records;
-					}
-				});
-			},
-
 			getRecommendGoods() {
 				https.request('/rest/goods/list', {
 					pageNo: 1,
-					pageSize: 6,
+					pageSize: 3,
 					isRecommend: 1
 				}).then((result) => {
 					if (result.success && result.data) {
@@ -410,125 +377,104 @@
 <style>
 	page {
 		width: 100%;
-		background: #F8F6F2;
+		background: #fff;
 	}
 
 	.page {
 		min-height: 100vh;
-		padding: 0 24rpx 120rpx;
+		padding: calc(44rpx + env(safe-area-inset-top)) 40rpx 120rpx;
 		box-sizing: border-box;
+	}
+
+	/* 品牌信息 */
+	.brand-header {
+		display: flex;
+		align-items: center;
+		padding: 10rpx 0 74rpx;
+	}
+
+	.brand-mark {
+		width: 64rpx;
+		height: 64rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: #050505;
+		color: #fff;
+		font-size: 30rpx;
+		font-weight: 700;
+	}
+
+	.brand-copy {
+		margin-left: 18rpx;
+	}
+
+	.brand-name {
+		color: #0a0a0a;
+		font-size: 30rpx;
+		font-weight: 700;
+		line-height: 1.25;
+	}
+
+	.brand-slogan {
+		margin-top: 4rpx;
+		color: #8a8a8a;
+		font-size: 21rpx;
 	}
 
 	/* 问候语 */
 	.greeting-section {
-		padding: 40rpx 10rpx 20rpx;
+		padding: 0 0 52rpx;
 	}
 
 	.greeting-title {
-		font-size: 40rpx;
+		font-size: 42rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #090909;
+		letter-spacing: -1rpx;
 	}
 
 	.greeting-subtitle {
-		margin-top: 10rpx;
-		font-size: 26rpx;
-		color: #9A9A8E;
-	}
-
-	/* 搜索条 */
-	.search-bar {
-		margin: 10rpx 0 24rpx;
-	}
-
-	.search-bar-inner {
-		display: flex;
-		align-items: center;
-		background: #F0EDE6;
-		border-radius: 50rpx;
-		padding: 22rpx 28rpx;
-	}
-
-	.search-icon {
-		font-size: 28rpx;
-		margin-right: 14rpx;
-	}
-
-	.search-placeholder {
-		font-size: 28rpx;
-		color: #B5B0A4;
-	}
-
-	/* Banner */
-	.home-banner {
-		height: 340rpx;
-		margin-bottom: 28rpx;
-		border-radius: 24rpx;
-		overflow: hidden;
-	}
-
-	.banner-item {
-		height: 100%;
-	}
-
-	.banner-card {
-		display: flex;
-		height: 100%;
-		background: linear-gradient(135deg, #3D1F08 0%, #5C3414 100%);
-		border-radius: 24rpx;
-		overflow: hidden;
-	}
-
-	.banner-text-area {
-		flex: 1;
-		padding: 36rpx 30rpx;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-	}
-
-	.banner-tag {
-		font-size: 22rpx;
-		color: #F5C89A;
-		margin-bottom: 10rpx;
-	}
-
-	.banner-title {
-		font-size: 38rpx;
-		font-weight: 800;
-		color: #FFF;
-		margin-bottom: 8rpx;
-	}
-
-	.banner-desc {
-		font-size: 22rpx;
-		color: rgba(255, 255, 255, 0.7);
-		margin-bottom: 24rpx;
-	}
-
-	.banner-btn {
-		display: inline-block;
-		width: 160rpx;
-		padding: 14rpx 0;
-		background: #FFF9F2;
-		color: #4A2605;
+		margin-top: 14rpx;
 		font-size: 24rpx;
-		font-weight: 700;
-		border-radius: 50rpx;
-		text-align: center;
+		color: #8c8c8c;
+		letter-spacing: 1rpx;
 	}
 
-	.banner-image {
-		width: 280rpx;
-		height: 100%;
-		border-radius: 0 24rpx 24rpx 0;
+	.start-order-button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		height: 96rpx;
+		margin-bottom: 58rpx;
+		border-radius: 18rpx;
+		background: #050505;
+		color: #fff;
+		font-size: 28rpx;
+		font-weight: 700;
+		box-shadow: 0 12rpx 30rpx rgba(0, 0, 0, 0.12);
+	}
+
+	.start-order-button--pressed {
+		opacity: 0.82;
+	}
+
+	.start-order-arrow {
+		position: absolute;
+		right: 28rpx;
+		top: 50%;
+		transform: translateY(-54%);
+		font-size: 42rpx;
+		font-weight: 300;
 	}
 
 	/* 快捷入口 */
 	.quick-entries {
 		display: flex;
 		justify-content: space-between;
-		margin-bottom: 32rpx;
+		margin-bottom: 70rpx;
 	}
 
 	.quick-entry {
@@ -539,23 +485,23 @@
 	}
 
 	.quick-entry-icon {
-		width: 100rpx;
-		height: 100rpx;
-		border-radius: 24rpx;
-		background: #F0EBE0;
+		width: 70rpx;
+		height: 70rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 12rpx;
+		margin-bottom: 14rpx;
 	}
 
-	.quick-entry-emoji {
+	.quick-entry-symbol {
 		font-size: 44rpx;
+		color: #0a0a0a;
+		font-weight: 500;
 	}
 
 	.quick-entry-text {
-		font-size: 24rpx;
-		color: #5C4A3A;
+		font-size: 23rpx;
+		color: #171717;
 		font-weight: 500;
 	}
 
@@ -571,12 +517,12 @@
 	.section-title {
 		font-size: 32rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.section-more {
 		font-size: 24rpx;
-		color: #9A9A8E;
+		color: #858585;
 		display: flex;
 		align-items: center;
 	}
@@ -596,9 +542,9 @@
 
 	.recommend-item {
 		background: #fff;
-		border-radius: 16rpx;
+		border-radius: 14rpx;
 		overflow: hidden;
-		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+		box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.06);
 	}
 
 	.recommend-image {
@@ -614,7 +560,7 @@
 	.recommend-name {
 		font-size: 24rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 12rpx;
 	}
 
@@ -626,12 +572,14 @@
 
 	.recommend-bottom .price-accent {
 		font-size: 26rpx;
+		color: #111;
 	}
 
 	.recommend-bottom .btn-add-circle {
 		width: 40rpx;
 		height: 40rpx;
 		font-size: 26rpx;
+		background: #050505;
 	}
 
 	/* 优惠卡片 */
@@ -651,18 +599,18 @@
 	.promotion-title {
 		font-size: 28rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 6rpx;
 	}
 
 	.promotion-desc {
 		font-size: 22rpx;
-		color: #9A9A8E;
+		color: #858585;
 	}
 
 	.promotion-btn {
 		padding: 12rpx 24rpx;
-		background: #F05A2A;
+		background: #050505;
 		color: #fff;
 		font-size: 24rpx;
 		font-weight: 600;
@@ -714,13 +662,13 @@
 	.goods-info-name {
 		font-size: 30rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 8rpx;
 	}
 
 	.goods-info-specListString {
 		font-size: 24rpx;
-		color: #9A9A8E;
+		color: #858585;
 		margin-bottom: 10rpx;
 	}
 
@@ -739,7 +687,7 @@
 	.commdity-type-name {
 		font-size: 26rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 14rpx;
 	}
 

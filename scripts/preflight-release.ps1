@@ -1,11 +1,14 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$ProjectRoot = '',
     [string]$HealthUrl = '',
     [switch]$RequireBuildArtifacts,
     [switch]$PaymentConfirmed
 )
 
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $ProjectRoot = Split-Path -Parent $PSScriptRoot
+}
 $root = [System.IO.Path]::GetFullPath($ProjectRoot)
 $results = New-Object System.Collections.Generic.List[object]
 

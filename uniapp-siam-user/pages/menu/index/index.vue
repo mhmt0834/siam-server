@@ -1,5 +1,5 @@
 <template>
-	<view class="menu-page page-bg-warm">
+	<view class="menu-page">
 		<!-- 左右分栏主体 -->
 		<view class="menu-body" :style="'height:' + (winHeight - (carHeight || 70) - 5) + 'px;'">
 			<!-- 左侧分类栏 -->
@@ -80,7 +80,7 @@
 					parseEventDynamicCode($event, !shopInfo.isOutofDeliveryRange && shopInfo.isOperatingOfShop && shopInfo.shop.isOperating ? 'openShoppingCart' : '')
 				">
 					<view class="cart-icon-wrap">
-						<text class="cart-icon">🛒</text>
+						<van-icon name="cart-o" class="cart-icon" />
 						<view class="cart-badge" v-if="totalNum > 0">{{ totalNum }}</view>
 					</view>
 					<view class="cart-price-info">
@@ -648,6 +648,7 @@
 		flex-direction: column;
 		height: 100vh;
 		overflow: hidden;
+		background: #fff;
 	}
 
 	.menu-body {
@@ -658,8 +659,8 @@
 
 	/* 左侧分类 */
 	.menu-left {
-		width: 170rpx;
-		background: #F8F6F2;
+		width: 150rpx;
+		background: #fff;
 		flex-shrink: 0;
 	}
 
@@ -669,13 +670,13 @@
 		align-items: center;
 		padding: 28rpx 16rpx 28rpx 20rpx;
 		font-size: 26rpx;
-		color: #8C8C88;
+		color: #777;
 	}
 
 	.left-item--active {
 		background: #FFF;
 		font-weight: 700;
-		color: #4A2605;
+		color: #111;
 		border-radius: 0 16rpx 16rpx 0;
 	}
 
@@ -686,7 +687,7 @@
 		transform: translateY(-50%);
 		width: 6rpx;
 		height: 32rpx;
-		background: #4A2605;
+		background: #050505;
 		border-radius: 3rpx;
 	}
 
@@ -709,7 +710,7 @@
 		padding: 24rpx 8rpx 16rpx;
 		font-size: 28rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 		background: #FFF;
 		position: sticky;
 		top: 0;
@@ -721,7 +722,7 @@
 		display: flex;
 		padding: 16rpx 0;
 		position: relative;
-		border-bottom: 1rpx solid #F5F2ED;
+		border-bottom: 1rpx solid #f1f1f1;
 	}
 
 	.goods-card--soldout {
@@ -729,9 +730,9 @@
 	}
 
 	.goods-image {
-		width: 170rpx;
-		height: 166rpx;
-		border-radius: 12rpx;
+		width: 148rpx;
+		height: 148rpx;
+		border-radius: 14rpx;
 		flex-shrink: 0;
 	}
 
@@ -758,7 +759,7 @@
 	.goods-name {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 		display: flex;
 		align-items: center;
 	}
@@ -768,14 +769,14 @@
 		padding: 2rpx 10rpx;
 		font-size: 18rpx;
 		font-weight: 600;
-		background: #F05A2A;
+		background: #111;
 		color: #FFF;
 		border-radius: 6rpx;
 	}
 
 	.goods-desc {
 		font-size: 22rpx;
-		color: #B5B0A4;
+		color: #999;
 		margin-top: 4rpx;
 	}
 
@@ -788,6 +789,7 @@
 
 	.goods-bottom .price-accent {
 		font-size: 30rpx;
+		color: #111;
 	}
 
 	/* 步进器 */
@@ -809,13 +811,13 @@
 	}
 
 	.add-btn {
-		background: #4A2605;
+		background: #050505;
 		color: #FFF;
 	}
 
 	.reduce-btn {
-		color: #4A2605;
-		border: 1rpx solid #4A2605;
+		color: #111;
+		border: 1rpx solid #111;
 	}
 
 	.step-input {
@@ -823,7 +825,7 @@
 		text-align: center;
 		font-size: 26rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 		background: transparent;
 	}
 
@@ -841,10 +843,10 @@
 	.cart-bar-inner {
 		display: flex;
 		align-items: center;
-		background: #4A2605;
+		background: #050505;
 		border-radius: 50rpx;
 		padding: 8rpx 12rpx 8rpx 20rpx;
-		box-shadow: 0 8rpx 28rpx rgba(74, 38, 5, 0.3);
+		box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.24);
 		height: 100rpx;
 	}
 
@@ -864,7 +866,8 @@
 	}
 
 	.cart-icon {
-		font-size: 44rpx;
+		font-size: 48rpx;
+		color: #fff;
 	}
 
 	.cart-badge {
@@ -875,8 +878,8 @@
 		height: 32rpx;
 		line-height: 32rpx;
 		text-align: center;
-		background: #F05A2A;
-		color: #FFF;
+		background: #fff;
+		color: #050505;
 		font-size: 20rpx;
 		font-weight: 700;
 		border-radius: 16rpx;
@@ -912,8 +915,8 @@
 	}
 
 	.cart-submit--ready {
-		background: #FFF9F2;
-		color: #4A2605;
+		background: #fff;
+		color: #050505;
 	}
 
 	.cart-submit--pending {
@@ -941,12 +944,12 @@
 	.cart-pop-name {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.cart-pop-spec {
 		font-size: 22rpx;
-		color: #9A9A8E;
+		color: #888;
 		margin-top: 4rpx;
 	}
 
@@ -962,7 +965,7 @@
 		justify-content: space-between;
 		padding: 20rpx 0;
 		font-size: 26rpx;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	/* 规格弹窗 */
@@ -982,13 +985,13 @@
 	.goods-info-name {
 		font-size: 30rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 8rpx;
 	}
 
 	.goods-info-specListString {
 		font-size: 24rpx;
-		color: #9A9A8E;
+		color: #888;
 		margin-bottom: 10rpx;
 	}
 
@@ -1007,7 +1010,7 @@
 	.commdity-type-name {
 		font-size: 26rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 14rpx;
 	}
 

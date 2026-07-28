@@ -63,7 +63,7 @@
 		{
 			"path": "pages/menu/index/index",
 			"style": {
-				"navigationBarTitleText": "菜单"
+				"navigationBarTitleText": "菜单点餐"
 			}
 		},
 		{
@@ -81,7 +81,7 @@
 		{
 			"path": "pages/menu/search/search",
 			"style": {
-				"navigationBarBackgroundColor": "#4A2605",
+				"navigationBarBackgroundColor": "#111111",
 				"navigationBarTextStyle": "white"
 			}
 		},
@@ -146,7 +146,7 @@
 	],
 	"tabBar": {
 		"color": "#bebebe",
-			"selectedColor": "#4A2605",
+			"selectedColor": "#111111",
 		"borderStyle": "white",
 		"list": [{
 				"pagePath": "pages/index/index",

@@ -1,12 +1,15 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$ProjectRoot = '',
     [string]$HBuilderCli = $env:HBUILDERX_CLI,
     [string]$NpmCommand = 'npm.cmd',
     [string]$NodeBin = '',
     [switch]$RunPreflight
 )
 
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $ProjectRoot = Split-Path -Parent $PSScriptRoot
+}
 $root = [System.IO.Path]::GetFullPath($ProjectRoot)
 $adminRoot = Join-Path $root 'vue-siam-admin'
 $miniProgramRoot = Join-Path $root 'uniapp-siam-user'

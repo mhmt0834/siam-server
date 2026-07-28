@@ -83,6 +83,10 @@ $brandPath = Join-Path $root 'uniapp-siam-user\utils\brand-config.js'
 $brand = Read-Utf8 $brandPath
 $brand = $brand -replace "restaurantName:\s*'[^']*'", ("restaurantName: '" + (Escape-Js $RestaurantName) + "'")
 $brand = $brand -replace "slogan:\s*'[^']*'", ("slogan: '" + (Escape-Js $Slogan) + "'")
+$brand = $brand -replace "primary:\s*'[^']*'", ("primary: '" + $config.theme.primary + "'")
+$brand = $brand -replace "accent:\s*'[^']*'", ("accent: '" + $config.theme.accent + "'")
+$brand = $brand -replace "background:\s*'[^']*'", ("background: '" + $config.theme.background + "'")
+$brand = $brand -replace "surface:\s*'[^']*'", ("surface: '" + $config.theme.surface + "'")
 $brand = $brand -replace 'onlinePayment:\s*(true|false)', ('onlinePayment: ' + ([bool]$EnableWechatPay).ToString().ToLowerInvariant())
 Write-Utf8 $brandPath $brand
 

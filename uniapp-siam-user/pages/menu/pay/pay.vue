@@ -403,15 +403,16 @@
 	.pay-page {
 		min-height: 100vh;
 		padding: 20rpx 24rpx;
+		background: #f7f7f7;
 	}
 
 	/* 卡片 */
 	.pay-card {
 		background: #fff;
-		border-radius: 16rpx;
+		border-radius: 14rpx;
 		padding: 24rpx;
 		margin-bottom: 16rpx;
-		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.035);
 	}
 
 	.pay-card--row {
@@ -419,20 +420,20 @@
 		justify-content: space-between;
 		align-items: center;
 		font-size: 28rpx;
-		color: #2D1A08;
+		color: #111;
 		font-weight: 500;
 	}
 
 	.pay-card-title {
 		font-size: 28rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 		margin-bottom: 20rpx;
 	}
 
 	.pay-card-hint {
 		font-size: 26rpx;
-		color: #B5B0A4;
+		color: #999;
 	}
 
 	.pay-card-right {
@@ -454,27 +455,27 @@
 		text-align: center;
 		font-size: 28rpx;
 		font-weight: 600;
-		border-radius: 50rpx;
-		background: #F5F2ED;
-		color: #8C8C88;
+		border-radius: 12rpx;
+		background: #f6f6f6;
+		color: #555;
 		transition: 0.2s;
 	}
 
 	.mode-btn--active {
-		background: #FFF;
-		color: #4A2605;
-		border: 2rpx solid #F05A2A;
+		background: #050505;
+		color: #fff;
+		border: 2rpx solid #050505;
 	}
 
 	.address-info {
 		font-size: 24rpx;
-		color: #8C8C88;
+		color: #777;
 		padding: 12rpx 0;
 		border-top: 1rpx solid #F5F2ED;
 	}
 
 	.address-label {
-		color: #2D1A08;
+		color: #111;
 		font-weight: 500;
 	}
 
@@ -505,12 +506,12 @@
 	.order-item-name {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.order-item-spec {
 		font-size: 22rpx;
-		color: #9A9A8E;
+		color: #888;
 		margin-top: 4rpx;
 	}
 
@@ -523,7 +524,7 @@
 
 	.order-item-qty {
 		font-size: 24rpx;
-		color: #9A9A8E;
+		color: #888;
 	}
 
 	.order-extra {
@@ -531,7 +532,7 @@
 		justify-content: space-between;
 		padding: 12rpx 0;
 		font-size: 26rpx;
-		color: #8C8C88;
+		color: #666;
 	}
 
 	/* 备注 */
@@ -547,19 +548,19 @@
 		width: 100%;
 		height: 120rpx;
 		font-size: 26rpx;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.remarks-count {
 		text-align: right;
 		font-size: 22rpx;
-		color: #B5B0A4;
+		color: #999;
 	}
 
 	/* 优惠券 */
 	.coupon-used {
 		font-size: 26rpx;
-		color: #F05A2A;
+		color: #111;
 	}
 
 	/* 金额明细 */
@@ -568,11 +569,11 @@
 		justify-content: space-between;
 		padding: 10rpx 0;
 		font-size: 26rpx;
-		color: #8C8C88;
+		color: #555;
 	}
 
 	.price-row--discount {
-		color: #F05A2A;
+		color: #111;
 	}
 
 	.price-total {
@@ -581,7 +582,7 @@
 		padding-top: 16rpx;
 		font-size: 30rpx;
 		font-weight: 700;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.price-total-num {
@@ -598,12 +599,12 @@
 	.settle-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #4A2605;
+		color: #111;
 	}
 
 	.settle-hint {
 		font-size: 22rpx;
-		color: #B5B0A4;
+		color: #999;
 	}
 
 	/* 底部 */
@@ -627,7 +628,7 @@
 
 	.pay-bottom-label {
 		font-size: 28rpx;
-		color: #2D1A08;
+		color: #111;
 	}
 
 	.pay-bottom-price {
@@ -642,7 +643,7 @@
 	.pay-agreement {
 		text-align: center;
 		font-size: 22rpx;
-		color: #B5B0A4;
+		color: #999;
 	}
 
 	/* 支付方式 */
@@ -664,8 +665,8 @@
 	}
 
 	.payment-checked {
-		border-color: #4A2605;
-		background: #FFF9F2;
+		border-color: #111;
+		background: #f5f5f5;
 	}
 
 	.payment-not-checked {
@@ -678,7 +679,7 @@
 
 	.line-through {
 		text-decoration: line-through;
-		color: #B5B0A4;
+		color: #999;
 		margin-right: 8rpx;
 	}
 

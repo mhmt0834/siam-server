@@ -1,8 +1,9 @@
 {
-	"pages": [{
+	"pages": [
+		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "玉KING智能点餐",
+				"navigationBarTitleText": "首页",
 				"enablePullDownRefresh": true,
 				"navigationStyle": "custom"
 			}
@@ -52,6 +53,37 @@
 			"path": "pages/mine/userinfo/userinfo",
 			"style": {
 				"navigationBarTitleText": "个人资料"
+			}
+		},
+		{
+			"path": "pages/mine/collect/index/index",
+			"style": {
+				"navigationBarTitleText": "我的收藏",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/mine/settings/index",
+			"style": {
+				"navigationBarTitleText": "设置中心"
+			}
+		},
+		{
+			"path": "pages/mine/security/index/index",
+			"style": {
+				"navigationBarTitleText": "账号安全"
+			}
+		},
+		{
+			"path": "pages/mine/security/reset/reset",
+			"style": {
+				"navigationBarTitleText": "设置支付密码"
+			}
+		},
+		{
+			"path": "pages/mine/security/verify/verify",
+			"style": {
+				"navigationBarTitleText": "身份验证"
 			}
 		},
 		{
@@ -146,25 +178,32 @@
 	],
 	"tabBar": {
 		"color": "#bebebe",
-			"selectedColor": "#111111",
+		"selectedColor": "#111111",
 		"borderStyle": "white",
-		"list": [{
+		"list": [
+			{
 				"pagePath": "pages/index/index",
 				"text": "首页",
 				"iconPath": "static/assets/tabbar/Icon/index.png",
-					"selectedIconPath": "static/assets/tabbar/Icon/index.png"
+				"selectedIconPath": "static/assets/tabbar/Icon/index.png"
 			},
 			{
 				"pagePath": "pages/menu/index/index",
-				"text": "点餐",
+				"text": "菜单",
+				"iconPath": "static/assets/tabbar/Icon/store.png",
+				"selectedIconPath": "static/assets/tabbar/Icon/store.png"
+			},
+			{
+				"pagePath": "pages/order/index/index",
+				"text": "订单",
 				"iconPath": "static/assets/tabbar/Icon/order.png",
-					"selectedIconPath": "static/assets/tabbar/Icon/order.png"
+				"selectedIconPath": "static/assets/tabbar/Icon/order.png"
 			},
 			{
 				"pagePath": "pages/mine/index/index",
 				"text": "我的",
 				"iconPath": "static/assets/tabbar/Icon/mine.png",
-					"selectedIconPath": "static/assets/tabbar/Icon/mine.png"
+				"selectedIconPath": "static/assets/tabbar/Icon/mine.png"
 			}
 		]
 	},
@@ -174,21 +213,23 @@
 	],
 	"permission": {
 		"scope.userLocation": {
-			"desc": "你的位置信息将用于小程序位置接口的效果展示"
+			"desc": "你的位置信息将用于小程序定位接口的效果展示"
 		}
 	},
 	"globalStyle": {
 		"backgroundTextStyle": "dark",
 		"navigationBarBackgroundColor": "#fff",
-		"navigationBarTitleText": "玉KING智能点餐",
+		"navigationBarTitleText": "首页",
 		"navigationBarTextStyle": "black"
 		// #ifdef H5
-		,"app-plus": {
-			"titleNView": false //禁用原生导航栏  
+		,
+		"app-plus": {
+			"titleNView": false
 		}
 		// #endif
 		// #ifdef MP-WEIXIN
-		,"usingComponents": {
+		,
+		"usingComponents": {
 			"van-button": "/wxcomponents/dist/vant/button/index",
 			"van-loading": "/wxcomponents/dist/vant/loading/index",
 			"van-action-sheet": "/wxcomponents/dist/vant/action-sheet/index",

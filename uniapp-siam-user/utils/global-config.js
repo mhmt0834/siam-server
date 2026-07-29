@@ -4,7 +4,7 @@ export default class GlabalConfig {
 	static baseUrl = 'siam-server';
 	// #endif
 	// #ifdef APP-PLUS||MP-WEIXIN||MP-ALIPAY
-	static baseUrl = 'http://192.168.1.4:9200/siam-server';
+	static baseUrl = 'http://127.0.0.1:9200/siam-server';
 	// #endif
 	static defaultShopId = 13;
     

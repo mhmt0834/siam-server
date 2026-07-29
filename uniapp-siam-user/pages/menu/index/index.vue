@@ -1,1044 +1,1129 @@
 <template>
-	<view class="menu-page">
-		<!-- 左右分栏主体 -->
-		<view class="menu-body" :style="'height:' + (winHeight - (carHeight || 70) - 5) + 'px;'">
-			<!-- 左侧分类栏 -->
-			<scroll-view :scroll-y="true" :enable-flex="true" class="menu-left"
-				:scroll-into-view="'left' + activeLeftTab" :scroll-with-animation="true">
-				<block v-for="(menu, menuIndex) in menuList">
-					<view :id="'left' + menuIndex" v-if="menu.goodsList.length > 0" @tap="leftTap"
-						:data-index="menuIndex"
-						:class="(menuIndex == activeLeftTab) ? 'left-item left-item--active' : 'left-item'">
-						<view class="left-indicator" v-if="menuIndex == activeLeftTab"></view>
-						<text class="left-text">{{ menu.name }}</text>
-					</view>
-				</block>
-			</scroll-view>
+	<view class="menu-page ui-page">
+		<view class="menu-shell">
+			<app-header
+				title="菜单点餐"
+				subtitle="新疆风味 · 现点现做"
+				:status-text="shopInfo.shop && shopInfo.shop.isOperating ? '营业中' : '休息中'"
+				:logo="shopInfo.shop && shopInfo.shop.logoImg ? shopInfo.shop.logoImg : ''"
+				mark="M"
+			/>
 
-			<!-- 右侧商品列表 -->
-			<scroll-view :scroll-y="true" :enable-flex="true" class="menu-right"
-				@scroll="mainScroll" @touchstart="mainTouch"
-				:scroll-into-view="'into' + activeTab" :scroll-with-animation="true" id="scroll_right">
-				<view class="menu-right-inner">
-					<view v-for="(menu, menuIndex) in menuList" :id="'into' + menuIndex" :key="menuIndex">
-						<view class="category-title" v-if="menu.goodsList.length > 0">
-							<text>{{ menu.name }}</text>
-						</view>
-						<block v-for="(goods, goodsIndex) in menu.goodsList" :key="goodsIndex">
-							<view :class="'goods-card ' + (goods.goodsStatus == 4 ? 'goods-card--soldout' : '')"
-								hover-class="hover-class-public"
-								@tap="parseEventDynamicCode($event, goods.goodsStatus == 4 ? '' : 'commodityDetailTap')"
-								:data-id="goods.goodsId">
-								<image
-									:src="goods.mainImage ? goods.mainImage : '/static/assets/common/load-image.png'"
-									mode="aspectFill" class="goods-image" />
-								<view class="sell-out-mark" v-if="goods.goodsStatus == 4">售罄</view>
-								<view class="goods-info">
-									<view class="goods-name">
-										<text>{{ goods.goodsName }}</text>
-										<text class="goods-tag" v-if="goods.isRecommend">招牌</text>
-									</view>
-									<view class="goods-desc out_of_range one_row" v-if="goods.briefDescription">
-										{{ goods.briefDescription }}
-									</view>
-									<view class="goods-bottom">
-										<text class="price-accent">¥{{ goods.goodsPrice }}</text>
-										<view class="goods-action"
-											v-if="!shopInfo.isOutofDeliveryRange && shopInfo.isOperatingOfShop && shopInfo.shop.isOperating">
-											<block v-if="goods.number > 0">
-												<view class="stepper">
-													<view class="step-btn reduce-btn" @click.stop="bindMinus"
-														:data-cartId="goods.cartId" :data-number="goods.number">−</view>
-													<input disabled type="number" :value="goods.number"
-														class="step-input" />
-													<view class="step-btn add-btn"
-														@click.stop="parseEventDynamicCode($event, goods.goodsStatus != 4 ? 'openSpecifications' : '')"
-														:data-goodsId="goods.goodsId">＋</view>
-												</view>
-											</block>
-											<block v-else>
-												<view :class="'btn-add-circle ' + (goods.goodsStatus == 4 ? 'isEnd' : '')"
-													:data-goodsId="goods.goodsId"
-													@click.stop="parseEventDynamicCode($event, goods.goodsStatus != 4 ? 'openSpecifications' : '')">＋</view>
-											</block>
-										</view>
-									</view>
-								</view>
+			<navigator url="../search/search" class="menu-search ui-surface">
+				<text class="menu-search__icon">⌕</text>
+				<text class="menu-search__text">搜索菜品、口味、套餐</text>
+			</navigator>
+
+			<view class="menu-layout">
+				<category-menu :items="menuList" :active-index="activeLeftTab" @select="leftTap" />
+
+				<scroll-view
+					class="menu-content"
+					scroll-y
+					:scroll-with-animation="true"
+					:scroll-into-view="'into' + activeTab"
+					@scroll="mainScroll"
+					@touchstart="mainTouch"
+				>
+					<view v-if="menuList.length > 0" class="menu-content__inner">
+						<view v-for="(menu, menuIndex) in menuList" :id="'into' + menuIndex" :key="menuIndex" class="menu-section">
+							<view class="menu-section__title">{{ menu.name }}</view>
+							<view class="menu-section__list">
+								<food-card
+									v-for="goods in menu.goodsList"
+									:key="goods.goodsId"
+									:item="goods"
+									layout="row"
+									:show-add="goods.goodsStatus != 4"
+									@tap="commodityDetailTap(goods.goodsId)"
+									@add="openSpecifications(goods.goodsId)"
+								/>
 							</view>
-						</block>
-						<view v-if="(menuList.length - 1) == menuIndex" class="more_box">没有更多啦~</view>
-					</view>
-				</view>
-			</scroll-view>
-		</view>
-
-		<!-- 底部购物车栏 -->
-		<view class="cart-bar" id="shopping-cart-detail">
-			<view class="cart-bar-inner"
-				:class="shopInfo.isOutofDeliveryRange || !shopInfo.isOperatingOfShop || !shopInfo.shop.isOperating ? 'cart-bar--disabled' : ''">
-				<view class="cart-left" @tap="
-					parseEventDynamicCode($event, !shopInfo.isOutofDeliveryRange && shopInfo.isOperatingOfShop && shopInfo.shop.isOperating ? 'openShoppingCart' : '')
-				">
-					<view class="cart-icon-wrap">
-						<van-icon name="cart-o" class="cart-icon" />
-						<view class="cart-badge" v-if="totalNum > 0">{{ totalNum }}</view>
-					</view>
-					<view class="cart-price-info">
-						<view class="cart-price" v-if="shoppingCartList.length > 0">¥{{ totalPrice }}</view>
-						<view class="cart-price-hint" v-else>暂未选购商品</view>
-						<view class="cart-fee-hint" v-if="shoppingCartList.length > 0">
-							另需配送费 ¥{{ shopInfo.shop.startDeliveryPrice || 0 }}
 						</view>
+						<view class="menu-content__end">没有更多啦~</view>
 					</view>
-				</view>
-				<view :class="(isStartDeliveryPrice ? 'cart-submit cart-submit--ready' : 'cart-submit cart-submit--pending')"
-					@tap="
-						parseEventDynamicCode($event,
-							shoppingCartList.length <= 0 || !isStartDeliveryPrice ||
-							shopInfo.isOutofDeliveryRange || !shopInfo.isOperatingOfShop ||
-							!shopInfo.shop.isOperating ? '' : 'goToPay')
-				">
-					{{ isStartDeliveryPrice ? '去结算' : '差 ¥' + priceDifference + ' 起送' }}
-				</view>
+
+					<empty-state
+						v-else
+						class="menu-empty"
+						title="暂无菜品"
+						desc="请稍后再来看看，或联系门店更新菜单"
+						action-text="刷新"
+						@action="getShopList"
+					/>
+				</scroll-view>
 			</view>
 		</view>
 
-		<!-- 购物车弹窗 -->
-		<van-action-sheet v-model:show="shoppingCartDialog" :show="shoppingCartDialog" title="已选商品"
-			@close="closeShoppingCart" @cancel="closeShoppingCart" z-index="2">
-			<view class="content">
-				<scroll-view style="height: 55vh" scroll-y>
-					<view class="cart-pop-item" v-for="(item, index) in shoppingCartList" :key="index">
-						<view class="cart-pop-name-wrap">
-							<view class="cart-pop-name out_of_range one_row">{{ item.goodsName }}</view>
-							<view class="cart-pop-spec out_of_range one_row">{{ item.restructure }}</view>
-						</view>
-						<view class="cart-pop-right">
-							<view class="price-accent">¥{{ item.price }}</view>
-							<view class="stepper">
-								<view class="step-btn reduce-btn" @tap="bindMinus" :data-cartid="item.id"
-									:data-number="item.number">−</view>
-								<input disabled type="number" :value="item.number" class="step-input" />
-								<view class="step-btn add-btn" @tap="bindPlus"
-									:data-num="index + ',' + item.number">＋</view>
+		<view class="menu-cart" :class="{ 'menu-cart--disabled': !isCartEnabled }">
+			<view class="menu-cart__left" @tap="openShoppingCart">
+				<view class="menu-cart__bag">
+					<text class="menu-cart__bag-text">购</text>
+					<view v-if="totalNum > 0" class="menu-cart__badge">{{ totalNum }}</view>
+				</view>
+				<view class="menu-cart__info">
+					<text class="menu-cart__price" v-if="shoppingCartList.length > 0">¥{{ totalPrice }}</text>
+					<text class="menu-cart__hint" v-else>暂未选购商品</text>
+					<text class="menu-cart__sub" v-if="shoppingCartList.length > 0">另需包装费 ¥{{ packingCharges }}</text>
+				</view>
+			</view>
+			<view class="menu-cart__right" @tap="goToPay">
+				<text>{{ isStartDeliveryPrice ? '去结算' : '还差 ¥' + priceDifference + ' 起送' }}</text>
+			</view>
+		</view>
+
+		<view v-if="shoppingCartDialog" class="ui-overlay" @tap="closeShoppingCart">
+			<view class="ui-sheet ui-sheet--cart" @tap.stop>
+				<view class="ui-sheet__head">
+					<text class="ui-sheet__title">已选商品</text>
+					<text class="ui-sheet__sub">共 {{ totalNum }} 件</text>
+				</view>
+
+				<scroll-view class="ui-sheet__body" scroll-y>
+					<view v-if="shoppingCartList.length > 0" class="cart-list">
+						<view v-for="(item, index) in shoppingCartList" :key="index" class="cart-item">
+							<view class="cart-item__meta">
+								<text class="cart-item__name">{{ item.goodsName }}</text>
+								<text class="cart-item__spec" v-if="item.restructure">{{ item.restructure }}</text>
+							</view>
+							<view class="cart-item__right">
+								<text class="cart-item__price">¥{{ item.price }}</text>
+								<view class="cart-stepper">
+									<view class="cart-stepper__btn" @tap.stop="bindMinus" :data-cartid="item.id" :data-number="item.number">−</view>
+									<text class="cart-stepper__num">{{ item.number }}</text>
+									<view class="cart-stepper__btn" @tap.stop="bindPlus" :data-num="index + ',' + item.number">+</view>
+								</view>
 							</view>
 						</view>
 					</view>
-					<view class="cart-pop-packing">
+					<empty-state v-else title="购物车空空的" desc="先去选几道菜吧" />
+				</scroll-view>
+
+				<view class="cart-summary">
+					<view class="cart-summary__row">
+						<text>商品金额</text>
+						<text>¥{{ totalPrice }}</text>
+					</view>
+					<view class="cart-summary__row">
 						<text>包装费</text>
 						<text>¥{{ packingCharges }}</text>
 					</view>
-				</scroll-view>
+					<view class="cart-summary__row cart-summary__row--total">
+						<text>合计</text>
+						<text>¥{{ totalPrice }}</text>
+					</view>
+					<primary-button text="去结算" :disabled="!isStartDeliveryPrice" @tap="goToPay" />
+				</view>
 			</view>
-		</van-action-sheet>
+		</view>
 
-		<!-- 规格弹窗 -->
-		<van-action-sheet :show="specificationsDialog" @close="closeSpecifications" @cancel="closeSpecifications"
-			title="选择规格">
-			<view class="content">
-				<view class="goods-info-view">
-					<image :src="goodsInfo.mainImage" mode="aspectFill" class="commodity-image"></image>
-					<view>
-						<view class="goods-info-name">{{ goodsInfo.name }}</view>
-						<view class="goods-info-specListString">已选：{{ specListString }}</view>
-						<view class="goods-info-price price-accent">¥{{ priceAfter }}</view>
+		<view v-if="specificationsDialog" class="ui-overlay" @tap="closeSpecifications">
+			<view class="ui-sheet ui-sheet--spec" @tap.stop>
+				<view class="ui-sheet__head">
+					<text class="ui-sheet__title">选择规格</text>
+					<text class="ui-sheet__sub">{{ specListString ? '已选：' + specListString : '请选择口味规格' }}</text>
+				</view>
+
+				<view class="spec-head">
+					<image class="spec-head__image" :src="goodsInfo.mainImage || '/static/assets/common/load-image.png'" mode="aspectFill" />
+					<view class="spec-head__body">
+						<text class="spec-head__name">{{ goodsInfo.name }}</text>
+						<text class="spec-head__price">¥{{ priceAfter }}</text>
+						<text class="spec-head__tips">精选食材 · 现做现卖</text>
 					</view>
 				</view>
-				<scroll-view scroll-y style="height: 50vh">
-					<view class="commdity-name-type-view">
-						<view class="commdity-type-item" v-for="(item, key) in specList" :key="key">
-							<view class="commdity-type-name">{{ key }}</view>
-							<radio-group class="radio-group" @change="radioChange" :data-firstIndex="key">
-								<label :class="
-									'group-label theme-border ' +
-									(!item.stock ? 'disabled-group-label' : '') +
-									' ' +
-									(item.checked ? 'active theme-bg' : 'theme-color-border') +
-									' out_of_range one_row'
-								" v-for="(item, index) in item" :key="index">
-									<radio :value="index" :checked="item.checked" :disabled="!item.stock" class="radio" />
-									{{ item.name }}
+
+				<scroll-view class="ui-sheet__body" scroll-y>
+					<view class="spec-list">
+						<view class="spec-group" v-for="(options, key) in specList" :key="key">
+							<text class="spec-group__title">{{ key }}</text>
+							<radio-group class="spec-group__options" @change="radioChange" :data-firstIndex="key">
+								<label
+									v-for="(option, index) in options"
+									:key="index"
+									class="spec-option"
+									:class="{ 'spec-option--active': option.checked, 'spec-option--disabled': !option.stock }"
+								>
+									<radio :value="index" :checked="option.checked" :disabled="!option.stock" class="spec-option__radio" />
+									<text>{{ option.name }}</text>
 								</label>
 							</radio-group>
 						</view>
-						<view class="loading_box" v-if="specLoading&&specList.length==0">
-							<van-loading custom-class="loading_box_class" vertical>加载中...</van-loading>
-						</view>
-						<van-empty v-if="!specLoading&&specList.length <= 0" description="暂无规格"></van-empty>
+
+						<view v-if="specLoading && specList.length == 0" class="spec-loading">加载中...</view>
+						<empty-state v-if="!specLoading && specList.length <= 0" title="暂无规格" />
 					</view>
 				</scroll-view>
-				<view slot="footer" class="position-sticky-bottom">
-					<view class="good-choice-btn theme-bg" @tap="insertShoppingCart">我选好了</view>
-				</view>
+
+				<primary-button text="加入购物车" @tap="insertShoppingCart" />
 			</view>
-		</van-action-sheet>
+		</view>
 	</view>
 </template>
 
 <script>
-	import GlobalConfig from '../../../utils/global-config';
-	import https from '../../../utils/http';
-	import authService from '../../../utils/auth';
-	import toastService from '../../../utils/toast.service';
-	import utilHelper from '../../../utils/util';
+import AppHeader from '../../../components/ui/app-header.vue';
+import CategoryMenu from '../../../components/ui/category-menu.vue';
+import FoodCard from '../../../components/ui/food-card.vue';
+import PrimaryButton from '../../../components/ui/primary-button.vue';
+import EmptyState from '../../../components/ui/empty-state.vue';
+import GlobalConfig from '../../../utils/global-config';
+import https from '../../../utils/http';
+import authService from '../../../utils/auth';
+import toastService from '../../../utils/toast.service';
+import utilHelper from '../../../utils/util';
 
-	let app = null;
-	export default {
-		data() {
-			return {
-				menuList: [],
-				shopInfo: {
-					shop: {
-						id: '',
-						name: '',
-						startDeliveryPrice: 0,
-						startTime: '',
-						endTime: '',
-						isOperating: true
-					},
-					isOutofDeliveryRange: false,
-					isOperatingOfShop: true,
-					promotionList: []
+let app = null;
+
+export default {
+	components: {
+		AppHeader,
+		CategoryMenu,
+		FoodCard,
+		PrimaryButton,
+		EmptyState
+	},
+	data() {
+		return {
+			menuList: [],
+			shopInfo: {
+				shop: {
+					id: '',
+					name: '',
+					logoImg: '',
+					startDeliveryPrice: 0,
+					startTime: '',
+					endTime: '',
+					isOperating: true
 				},
-				initShopInfo: { id: '', shopAdditionalVo: {} },
-				activeTab: 0,
-				activeLeftTab: 0,
-				shoppingCartDialog: false,
-				specificationsDialog: false,
-				shoppingCartList: [],
-				totalNum: 0,
-				totalPrice: 0,
-				packingCharges: 0,
-				isStartDeliveryPrice: false,
-				priceDifference: 0,
-				isMainScroll: false,
-				topArr: [],
-				winHeight: 0,
-				topHeight: 0,
-				carHeight: 70,
-				ifScroll: true,
-				isLoading: true,
-				selfOutActiveIndex: 0,
-				deliveryAndSelfTaking: { deliveryAddress: {} },
-				memberInfo: {},
-				specLoading: false,
-				goodsId: '',
-				goodsInfo: { mainImage: '', name: '' },
-				specList: [],
-				specListString: '',
-				priceAfter: '',
-				staticImg: ''
-			};
+				isOutofDeliveryRange: false,
+				isOperatingOfShop: true,
+				promotionList: []
+			},
+			initShopInfo: { id: '', shopAdditionalVo: {} },
+			activeTab: 0,
+			activeLeftTab: 0,
+			shoppingCartDialog: false,
+			specificationsDialog: false,
+			shoppingCartList: [],
+			totalNum: 0,
+			totalPrice: 0,
+			packingCharges: 0,
+			isStartDeliveryPrice: false,
+			priceDifference: 0,
+			isMainScroll: false,
+			topArr: [],
+			winHeight: 0,
+			topHeight: 0,
+			carHeight: 70,
+			ifScroll: true,
+			isLoading: true,
+			selfOutActiveIndex: 0,
+			deliveryAndSelfTaking: { deliveryAddress: {} },
+			memberInfo: {},
+			specLoading: false,
+			goodsId: '',
+			goodsInfo: { mainImage: '', name: '' },
+			specList: [],
+			specListString: '',
+			priceAfter: '',
+			staticImg: ''
+		};
+	},
+	computed: {
+		isCartEnabled() {
+			return !this.shopInfo.isOutofDeliveryRange && this.shopInfo.isOperatingOfShop && this.shopInfo.shop.isOperating;
+		}
+	},
+	onLoad() {
+		app = getApp();
+	},
+	onShow() {
+		let selfOutActiveIndex = 0;
+		if ('selfOutActiveIndex' in app.globalData.deliveryAndSelfTaking) {
+			selfOutActiveIndex = app.globalData.deliveryAndSelfTaking.selfOutActiveIndex;
+		}
+		app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = false;
+		app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = selfOutActiveIndex;
+		app.globalData.deliveryAndSelfTaking.chooseIndex = selfOutActiveIndex;
+
+		this.activeLeftTab = 0;
+		this.activeTab = 0;
+		this.topArr = [];
+		this.isMainScroll = false;
+		this.selfOutActiveIndex = selfOutActiveIndex;
+		this.deliveryAndSelfTaking.deliveryAddress = app.globalData.deliveryAndSelfTaking.deliveryAddress;
+		this.staticImg = app.globalData.staticImg;
+
+		this.isLoading = true;
+		this.menuList = [];
+		this.getShopList();
+		this.selfAdaption();
+
+		this.$nextTick(() => {
+			setTimeout(() => {
+				this.getElementTop();
+			}, 500);
+			setTimeout(() => {
+				this.isLoading = false;
+			}, 2000);
+		});
+	},
+	onHide() {
+		this.shoppingCartDialog = false;
+	},
+	onPullDownRefresh() {
+		uni.showNavigationBarLoading();
+		this.getShopList();
+		uni.hideNavigationBarLoading();
+		uni.stopPullDownRefresh();
+	},
+	methods: {
+		selfAdaption() {
+			const _this = this;
+			uni.getSystemInfo({
+				success(res) {
+					_this.winHeight = res.windowHeight;
+					setTimeout(() => {
+						uni.createSelectorQuery()
+							.in(_this)
+							.selectAll('#shopping-cart-detail')
+							.boundingClientRect(function(rects) {
+								if (rects && rects.length > 0) {
+									_this.carHeight = rects[0].height;
+								}
+							})
+							.exec();
+					}, 800);
+				}
+			});
 		},
-		onLoad(options) {
-			app = getApp();
-		},
-		onShow() {
-			var selfOutActiveIndex = 0;
-			if ('selfOutActiveIndex' in app.globalData.deliveryAndSelfTaking) {
-				selfOutActiveIndex = app.globalData.deliveryAndSelfTaking.selfOutActiveIndex;
+		getShopList() {
+			if (GlobalConfig.defaultShopId) {
+				this.getShopInfo({ id: GlobalConfig.defaultShopId, shopAdditionalVo: { deliveryDistanceText: '' } });
+				return;
 			}
-			app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = false;
-			app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = selfOutActiveIndex;
-			app.globalData.deliveryAndSelfTaking.chooseIndex = selfOutActiveIndex;
+			if (app.globalData.deliveryAndSelfTaking.location) {
+				https.request('/rest/shop/list', {
+					pageNo: -1,
+					pageSize: 1,
+					position: app.globalData.deliveryAndSelfTaking.location
+				}).then((result) => {
+					if (result.success && result.data.records.length > 0) {
+						this.getShopInfo(result.data.records[0]);
+					} else {
+						this.isLoading = false;
+					}
+				});
+			}
+		},
+		getShopInfo(initShopInfo) {
+			const shopId = initShopInfo.id;
+			const requestData = { id: shopId };
+			if (!GlobalConfig.defaultShopId && app.globalData.deliveryAndSelfTaking.location) {
+				requestData.position = app.globalData.deliveryAndSelfTaking.location;
+			}
+			https.request('/rest/shop/detail', requestData).then((result) => {
+				if (result.success && result.data) {
+					this.shopInfo = result.data;
+					this.initShopInfo = initShopInfo;
+					this.getMenuList(shopId);
+				}
+			});
+		},
+		getMenuList(shopId) {
+			https.request('/rest/menu/listWithGoods', { shopId }).then((result) => {
+				if (result.success && result.data) {
+					const goodsList = [];
+					result.data.forEach((item) => {
+						if (item.goodsList && item.goodsList.length > 0) {
+							item.goodsList.forEach((goods) => {
+								goods.mainImage = goods.mainImage ? GlobalConfig.ossUrl + goods.mainImage : '';
+								goods.number = 0;
+								goods.cartId = '';
+							});
+							goodsList.push(item);
+						}
+					});
+					this.menuList = goodsList;
+					this.$nextTick(() => {
+						this.getElementTop();
+						this.getShoppingCartList(shopId);
+					});
+					this.isLoading = false;
+				}
+			});
+		},
+		getShoppingCartList(shopId) {
+			https.request('/rest/member/shoppingCart/list', {
+				shopId,
+				pageNo: -1,
+				pageSize: 20
+			}).then((result) => {
+				if (result.success && result.data) {
+					let packingCharges = 0;
+					let totalNum = 0;
+					let totalPrice = 0;
 
-			this.activeLeftTab = 0;
-			this.activeTab = 0;
-			this.topArr = [];
-			this.isMainScroll = false;
-			this.selfOutActiveIndex = selfOutActiveIndex;
-			this.deliveryAndSelfTaking.deliveryAddress = app.globalData.deliveryAndSelfTaking.deliveryAddress;
-			this.staticImg = app.globalData.staticImg;
+					this.menuList.forEach((menu, menuIndex) => {
+						menu.goodsList.forEach((goods, goodsIndex) => {
+							let number = 0;
+							this.menuList[menuIndex].goodsList[goodsIndex].number = number;
+							result.data.records.forEach((record) => {
+								if (goods.goodsId == record.goodsId) {
+									number = number + record.number;
+									this.menuList[menuIndex].goodsList[goodsIndex].number = number;
+									this.menuList[menuIndex].goodsList[goodsIndex].cartId = record.id;
+								}
+							});
+						});
+					});
 
+					result.data.records.forEach((record) => {
+						let specList = '';
+						try {
+							for (const key in JSON.parse(record.specList)) {
+								specList = (specList ? specList + '/' : specList) + JSON.parse(record.specList)[key];
+							}
+						} catch (e) {
+							specList = '';
+						}
+						record.restructure = specList;
+						totalNum += record.number;
+						totalPrice += record.price * record.number;
+						if (!(record.goodsStatus == 1 || record.goodsStatus == 3 || record.goodsStatus == 4)) {
+							packingCharges += record.packingCharges * record.number;
+						}
+					});
+
+					totalPrice = utilHelper.toFixed(totalPrice, 2);
+					const startDeliveryPrice = this.shopInfo.shop.startDeliveryPrice || 0;
+					this.isStartDeliveryPrice = totalPrice + packingCharges >= startDeliveryPrice;
+					this.priceDifference = utilHelper.toFixed(startDeliveryPrice - (totalPrice + packingCharges), 2);
+					this.totalNum = totalNum;
+					this.shoppingCartList = result.data.records;
+					this.packingCharges = packingCharges;
+					this.totalPrice = utilHelper.toFixed(totalPrice + packingCharges, 2);
+				}
+			});
+		},
+		commodityDetailTap(eOrId) {
+			const goodsId = typeof eOrId === 'object' ? eOrId.currentTarget?.dataset?.id : eOrId;
+			if (!goodsId) return;
+			uni.navigateTo({
+				url:
+					'../detail/detail?id=' +
+					goodsId +
+					'&shopId=' +
+					this.shopInfo.shop.id +
+					'&initShopInfo=' +
+					JSON.stringify(this.initShopInfo)
+			});
+		},
+		openShoppingCart() {
+			authService.checkIsLogin().then((result) => {
+				if (result) {
+					if (this.shoppingCartList.length > 0) {
+						this.shoppingCartDialog = !this.shoppingCartDialog;
+					}
+					return;
+				}
+				app.globalData.checkIsAuth('scope.userInfo');
+			});
+		},
+		closeShoppingCart() {
+			this.shoppingCartDialog = false;
+		},
+		openSpecifications(eOrId) {
+			const goodsId = typeof eOrId === 'object' ? eOrId.currentTarget?.dataset?.goodsid : eOrId;
+			if (!goodsId) return;
+			this.specificationsDialog = true;
+			this.specLoading = true;
+			this.goodsId = goodsId;
+			this.getCommodityDetails(goodsId);
+		},
+		closeSpecifications() {
 			if (this.shopInfo.shop.id) {
 				this.getShoppingCartList(this.shopInfo.shop.id);
 			}
-
-			this.isLoading = true;
-			this.menuList = [];
-			this.getShopList();
-
-			this.selfAdaption();
-			var _this = this;
-			this.$nextTick(() => {
-				setTimeout(() => { _this.getElementTop(); }, 500);
-				setTimeout(() => { _this.isLoading = false; }, 2000);
+			this.specificationsDialog = false;
+			this.specList = [];
+			this.specLoading = false;
+		},
+		getCommodityDetails(id) {
+			https.request('/rest/goods/selectById', {
+				id,
+				position: app.globalData.deliveryAndSelfTaking.location
+			}).then((result) => {
+				if (result.success && result.data) {
+					result.data.mainImage = result.data.mainImage ? GlobalConfig.ossUrl + result.data.mainImage : '';
+					this.goodsInfo = result.data;
+					this.priceAfter = result.data.price;
+					this.selectByGoodsId(id);
+				}
 			});
 		},
-		onHide() {
-			this.shoppingCartDialog = false;
-		},
-		onPullDownRefresh() {
-			uni.showNavigationBarLoading();
-			this.getShopList();
-			uni.hideNavigationBarLoading();
-			uni.stopPullDownRefresh();
-		},
-		methods: {
-			selfAdaption() {
-				var _this = this;
-				uni.getSystemInfo({
-					success(res) {
-						_this.winHeight = res.windowHeight;
-						setTimeout(() => {
-							uni.createSelectorQuery().in(_this).selectAll('#shopping-cart-detail')
-								.boundingClientRect(function (rects) {
-									if (rects && rects.length > 0) {
-										_this.carHeight = rects[0].height;
-									}
-								}).exec();
-						}, 800);
+		selectByGoodsId(goodsId) {
+			https.request('/rest/goodsSpecificationOption/selectByGoodsId', { goodsId }).then((result) => {
+				if (result.success && result.data) {
+					const specList = result.data;
+					let price = this.goodsInfo.price;
+					let specListString = '';
+					for (const key in specList) {
+						let isChecked = true;
+						for (const keyof in specList[key]) {
+							specList[key][keyof].checked = false;
+							if (specList[key][keyof].stock == 1 && isChecked) {
+								specList[key][keyof].checked = true;
+								price = price + specList[key][keyof].price;
+								specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
+								isChecked = false;
+							}
+						}
 					}
-				});
-			},
-			getShopList() {
-				if (GlobalConfig.defaultShopId) {
-					this.getShopInfo({ id: GlobalConfig.defaultShopId, shopAdditionalVo: { deliveryDistanceText: '' } });
-					return;
+					this.specListString = specListString;
+					this.specList = JSON.stringify(specList) == '{}' ? [] : specList;
+					this.priceAfter = price;
+					this.specLoading = false;
 				}
-				if (app.globalData.deliveryAndSelfTaking.location) {
-					var _this = this;
-					https.request('/rest/shop/list', {
-						pageNo: -1, pageSize: 1, position: app.globalData.deliveryAndSelfTaking.location
+			});
+		},
+		radioChange(e) {
+			const checkValue = e.detail.value;
+			const firstIndex = e.currentTarget.dataset.firstindex;
+			const specList = this.specList;
+			for (const j in specList[firstIndex]) {
+				specList[firstIndex][j].checked = false;
+			}
+			specList[firstIndex][checkValue].checked = true;
+			let price = this.goodsInfo.price;
+			let specListString = '';
+			for (const key in specList) {
+				for (const keyof in specList[key]) {
+					if (specList[key][keyof].checked) {
+						price = price + specList[key][keyof].price;
+						specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
+					}
+				}
+			}
+			this.specList = specList;
+			this.specListString = specListString;
+			this.priceAfter = price;
+		},
+		insertShoppingCart() {
+			authService.checkIsLogin().then((result) => {
+				toastService.showLoading();
+				if (result) {
+					const goodsSpecs = {};
+					const specList = this.specList;
+					for (const key in specList) {
+						for (const keyof in specList[key]) {
+							if (specList[key][keyof].checked) {
+								goodsSpecs[key] = specList[key][keyof].name;
+							}
+						}
+					}
+					toastService.hideLoading();
+					https.request('/rest/member/shoppingCart/insert', {
+						goodsId: this.goodsId,
+						specList: JSON.stringify(goodsSpecs),
+						shopId: this.shopInfo.shop.id
 					}).then((result) => {
-						if (result.success && result.data.records.length > 0) {
-							_this.getShopInfo(result.data.records[0]);
-						} else {
-							setTimeout(() => { _this.isLoading = false; }, 1000);
+						if (result.success) {
+							this.specificationsDialog = false;
+							this.specList = [];
+							this.specLoading = true;
+							this.getShoppingCartList(this.shopInfo.shop.id);
 						}
 					});
+					return;
 				}
-			},
-			getShopInfo(initShopInfo) {
-				var shopId = initShopInfo.id;
-				var requestData = { id: shopId };
-				if (!GlobalConfig.defaultShopId && app.globalData.deliveryAndSelfTaking.location) {
-					requestData.position = app.globalData.deliveryAndSelfTaking.location;
-				}
-				https.request('/rest/shop/detail', requestData).then((result) => {
-					if (result.success && result.data) {
-						this.shopInfo = result.data;
-						this.initShopInfo = initShopInfo;
-						this.getMenuList(shopId);
-						this.getShoppingCartList(shopId);
-					}
-				});
-			},
-			getMenuList(shopId) {
-				var _this = this;
-				https.request('/rest/menu/listWithGoods', { shopId: shopId }).then((result) => {
-					if (result.success && result.data) {
-						var goodsList = [];
-						result.data.forEach((aitem) => {
-							if (aitem.goodsList.length > 0) {
-								aitem.goodsList.forEach((bitem) => {
-									bitem.mainImage = bitem.mainImage ? GlobalConfig.ossUrl + bitem.mainImage : '';
-									bitem.number = 0;
-									bitem.cartId = '';
-								});
-								goodsList.push(aitem);
-							}
-						});
-						this.menuList = goodsList;
-						setTimeout(() => { _this.isLoading = false; }, 0);
-					}
-				});
-			},
-			getShoppingCartList(shopId) {
-				var _this = this;
-				https.request('/rest/member/shoppingCart/list', {
-					shopId: shopId, pageNo: -1, pageSize: 20
-				}).then((result) => {
-					if (result.success && result.data) {
-						var packingCharges = 0;
-						var totalNum = 0;
-						var totalPrice = 0;
-						this.menuList.forEach((menu, menuIndex) => {
-							menu.goodsList.forEach((goods, goodsIndex) => {
-								let number = 0;
-								this.menuList[menuIndex].goodsList[goodsIndex].number = number;
-								result.data.records.forEach((record) => {
-									if (goods.goodsId == record.goodsId) {
-										number = number + record.number;
-										this.menuList[menuIndex].goodsList[goodsIndex].number = number;
-										this.menuList[menuIndex].goodsList[goodsIndex].cartId = record.id;
-									}
-								});
-							});
-						});
-						result.data.records.forEach((record) => {
-							let specList = '';
-							try {
-								for (var key in JSON.parse(record.specList)) {
-									specList = (specList ? specList + '/' : specList) + JSON.parse(record.specList)[key];
-								}
-							} catch (e) { }
-							record.restructure = specList;
-							totalNum = totalNum + record.number;
-							totalPrice += record.price * record.number;
-							if (!(record.goodsStatus == 1 || record.goodsStatus == 3 || record.goodsStatus == 4)) {
-								packingCharges += record.packingCharges * record.number;
-							}
-						});
-						totalPrice = utilHelper.toFixed(totalPrice, 2);
-						var isStartDeliveryPrice = false;
-						var priceDifference = 0;
-						var startDeliveryPrice = this.shopInfo.shop.startDeliveryPrice || 0;
-						if (totalPrice + packingCharges >= startDeliveryPrice) {
-							isStartDeliveryPrice = true;
-						}
-						priceDifference = startDeliveryPrice - (totalPrice + packingCharges);
-						this.totalNum = totalNum;
-						this.priceDifference = utilHelper.toFixed(priceDifference, 2);
-						this.isStartDeliveryPrice = isStartDeliveryPrice;
-						this.shoppingCartList = result.data.records;
-						this.packingCharges = packingCharges;
-						this.totalPrice = utilHelper.toFixed(totalPrice + packingCharges, 2);
-					}
-				});
-			},
-			commodityDetailTap(e) {
-				uni.navigateTo({
-					url: '../detail/detail?id=' + e.currentTarget.dataset.id + '&shopId=' + this.shopInfo.shop.id +
-						'&initShopInfo=' + JSON.stringify(this.initShopInfo)
-				});
-			},
-			openShoppingCart() {
-				var _this = this;
-				authService.checkIsLogin().then((result) => {
-					if (result) {
-						if (_this.shoppingCartList.length > 0) {
-							_this.shoppingCartDialog = !_this.shoppingCartDialog;
-						}
-						return;
-					}
-					app.globalData.checkIsAuth('scope.userInfo');
-				});
-			},
-			closeShoppingCart() { this.shoppingCartDialog = false; },
-			openSpecifications(e) {
-				this.specificationsDialog = true;
-				this.specLoading = true;
-				this.goodsId = e.currentTarget.dataset.goodsid;
-				this.getCommodityDetails(e.currentTarget.dataset.goodsid);
-			},
-			closeSpecifications() {
-				this.getShoppingCartList(this.shopInfo.shop.id);
 				this.specificationsDialog = false;
-				this.specList = [];
-				this.specLoading = false;
-			},
-			getCommodityDetails(id) {
-				https.request('/rest/goods/selectById', {
-					id: id, position: app.globalData.deliveryAndSelfTaking.location
-				}).then((result) => {
-					if (result.success && result.data) {
-						result.data.mainImage = GlobalConfig.ossUrl + result.data.mainImage;
-						this.goodsInfo = result.data;
-						this.priceAfter = result.data.price;
-						this.selectByGoodsId(id);
-					}
-				});
-			},
-			selectByGoodsId(goodsId) {
-				https.request('/rest/goodsSpecificationOption/selectByGoodsId', { goodsId: goodsId }).then((result) => {
-					if (result.success && result.data) {
-						let specList = result.data;
-						let price = this.goodsInfo.price;
-						let specListString = '';
-						for (let key in specList) {
-							let isChecked = true;
-							for (let keyof in specList[key]) {
-								specList[key][keyof].checked = false;
-								if (specList[key][keyof].stock == 1 && isChecked) {
-									specList[key][keyof].checked = true;
-									price = price + specList[key][keyof].price;
-									specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
-									isChecked = false;
-								}
-							}
-						}
-						this.specListString = specListString;
-						this.specList = JSON.stringify(specList) == '{}' ? [] : specList;
-						this.specLoading = false;
-					}
-				});
-			},
-			radioChange(e) {
-				var checkValue = e.detail.value;
-				let firstIndex = e.currentTarget.dataset.firstindex;
-				let specList = this.specList;
-				for (var j in specList[firstIndex]) { specList[firstIndex][j].checked = false; }
-				specList[firstIndex][checkValue].checked = true;
-				let price = this.goodsInfo.price;
-				let specListString = '';
-				for (let key in specList) {
-					for (let keyof in specList[key]) {
-						if (specList[key][keyof].checked) {
-							price = price + specList[key][keyof].price;
-							specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
-						}
-					}
-				}
-				this.specList = specList;
-				this.specListString = specListString;
-				this.priceAfter = price;
-			},
-			insertShoppingCart() {
-				var _this = this;
-				authService.checkIsLogin().then((result) => {
+				toastService.hideLoading();
+				app.globalData.checkIsAuth('scope.userInfo');
+			});
+		},
+		bindMinus(e) {
+			toastService.showLoading();
+			const cartId = e.currentTarget.dataset.cartid || e.currentTarget.dataset.cartId;
+			const number = e.currentTarget.dataset.number;
+			if (number == 1) {
+				toastService.hideLoading();
+				toastService.showModal(null, '确定不要这个了吗？', () => {
 					toastService.showLoading();
-					if (result) {
-						let goodsSpecs = {};
-						let specList = _this.specList;
-						for (let key in specList) {
-							for (let keyof in specList[key]) {
-								if (specList[key][keyof].checked) {
-									goodsSpecs[key] = specList[key][keyof].name;
-								}
-							}
+					this.updateNumber(cartId, 1, 0, () => {
+						if (this.shoppingCartList.length == 1) {
+							this.shoppingCartDialog = false;
 						}
 						toastService.hideLoading();
-						https.request('/rest/member/shoppingCart/insert', {
-							goodsId: _this.goodsId, specList: JSON.stringify(goodsSpecs), shopId: _this.shopInfo.shop.id
-						}).then((result) => {
-							if (result.success) {
-								_this.specificationsDialog = false;
-								_this.specList = [];
-								_this.specLoading = true;
-								_this.getShoppingCartList(_this.shopInfo.shop.id);
-							}
-						});
-						return;
-					}
-					_this.specificationsDialog = false;
-					toastService.hideLoading();
-					app.globalData.checkIsAuth('scope.userInfo');
-				});
-			},
-			bindMinus(e) {
-				toastService.showLoading();
-				var _this = this;
-				let cartId = e.currentTarget.dataset.cartid || e.currentTarget.dataset.cartId;
-				let number = e.currentTarget.dataset.number;
-				if (number == 1) {
-					toastService.hideLoading();
-					toastService.showModal(null, '确定不要这个了吗？', function confirm() {
-						toastService.showLoading();
-						_this.updateNumber(cartId, 1, 0, function () {
-							if (_this.shoppingCartList.length == 1) { _this.shoppingCartDialog = false; }
-							toastService.hideLoading();
-							_this.getShoppingCartList(_this.shopInfo.shop.id);
-						});
+						this.getShoppingCartList(this.shopInfo.shop.id);
 					});
+				});
+				return;
+			}
+			this.updateNumber(cartId, 1, 0, () => {
+				this.getShoppingCartList(this.shopInfo.shop.id);
+			});
+		},
+		bindPlus(e) {
+			toastService.showLoading();
+			const numList = e.currentTarget.dataset.num.split(',');
+			const items = this.shoppingCartList;
+			items[numList[0]].number = Number(numList[1]) + 1;
+			if (items[numList[0]].disable) {
+				toastService.hideLoading();
+				return;
+			}
+			this.updateNumber(items[numList[0]].id, 1, 1, () => {
+				toastService.hideLoading();
+				this.getShoppingCartList(this.shopInfo.shop.id);
+			});
+		},
+		updateNumber(id, number, type, callback) {
+			authService.checkIsLogin().then((result) => {
+				if (!result) {
+					app.globalData.checkIsAuth('scope.userInfo');
 					return;
 				}
-				this.updateNumber(cartId, 1, 0, function () {
-					_this.getShoppingCartList(_this.shopInfo.shop.id);
+				https.request('/rest/member/shoppingCart/updateNumber', {
+					id,
+					number,
+					type
+				}).then((result) => {
+					if (result.success) callback();
 				});
-			},
-			bindPlus(e) {
-				toastService.showLoading();
-				var _this = this;
-				let numList = e.currentTarget.dataset.num.split(',');
-				let items = this.shoppingCartList;
-				items[numList[0]].number = Number(numList[1]) + 1;
-				if (items[numList[0]].disable) { toastService.hideLoading(); return; }
-				this.updateNumber(items[numList[0]].id, 1, 1, function () {
-					toastService.hideLoading();
-					_this.getShoppingCartList(_this.shopInfo.shop.id);
-				});
-			},
-			updateNumber(id, number, type, callback) {
-				authService.checkIsLogin().then((result) => {
-					if (!result) { app.globalData.checkIsAuth('scope.userInfo'); return; }
-					https.request('/rest/member/shoppingCart/updateNumber', {
-						id: id, number: number, type: type
-					}).then((result) => { if (result.success) callback(); });
-				});
-			},
-			goToPay() {
-				authService.checkIsLogin().then((result) => {
-					if (!result) { app.globalData.checkIsAuth('scope.userInfo'); return; }
-					let startTime = this.shopInfo.shop.startTime;
-					let endTime = this.shopInfo.shop.endTime;
-					let isOperating = this.shopInfo.shop.isOperating;
-					app.globalData.getIsBusiness(startTime, endTime, isOperating).then((result) => {
-						if (!result) return;
-						this.toPay();
-					});
-				});
-			},
-			toPay() {
-				var list = this.shoppingCartList;
-				var orderDetail = {};
-				orderDetail.actualPrice = this.totalPrice;
-				orderDetail.fullPriceReduction = this.totalPrice;
-				orderDetail.reducedPrice = 0;
-				orderDetail.shopId = this.shopInfo.shop.id;
-				orderDetail.initShopInfo = this.initShopInfo;
-				orderDetail.selfOutActiveIndex = this.selfOutActiveIndex;
-				orderDetail.orderDetailList = [];
-				orderDetail.packingCharges = 0;
-				for (var key in list) {
-					orderDetail.packingCharges = orderDetail.packingCharges + list[key].packingCharges;
-					orderDetail.orderDetailList.push({
-						goodsId: list[key].goodsId, specList: list[key].specList,
-						number: list[key].number, goodsName: list[key].goodsName,
-						restructure: list[key].restructure, price: list[key].price,
-						id: list[key].id, packingCharges: list[key].packingCharges,
-						totalPrice: list[key].price * list[key].number
-					});
+			});
+		},
+		goToPay() {
+			if (!this.isCartEnabled || !this.isStartDeliveryPrice || this.shoppingCartList.length <= 0) return;
+			authService.checkIsLogin().then((result) => {
+				if (!result) {
+					app.globalData.checkIsAuth('scope.userInfo');
+					return;
 				}
-				setTimeout(() => {
-					app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = this.selfOutActiveIndex;
-					app.globalData.deliveryAndSelfTaking.payType = 'car';
-					app.globalData.deliveryAndSelfTaking.orderDetail = orderDetail;
-					uni.navigateTo({ url: '../pay/pay' });
-				}, 100);
-			},
-			getScrollTop(selector) {
-				var _this = this;
-				return new Promise((resolve) => {
-					uni.createSelectorQuery().in(_this).select(selector).boundingClientRect(data => {
-						if (data && 'top' in data) resolve(data.top);
-					}).exec();
+				const startTime = this.shopInfo.shop.startTime;
+				const endTime = this.shopInfo.shop.endTime;
+				const isOperating = this.shopInfo.shop.isOperating;
+				app.globalData.getIsBusiness(startTime, endTime, isOperating).then((result) => {
+					if (!result) return;
+					this.toPay();
 				});
-			},
-			async getElementTop() {
-				let p_arr = [];
-				for (let i = 0; i < this.menuList.length; i++) {
-					const resu = await this.getScrollTop('#into' + i);
-					p_arr.push(resu - this.topHeight);
-				}
-				this.topArr = p_arr;
-			},
-			mainScroll(e) {
-				if (!this.isMainScroll || this.topArr.length == 0) return;
-				let top = e.detail.scrollTop;
-				let index = -1;
-				if (top >= this.topArr[this.topArr.length - 1]) {
-					index = this.topArr.length - 1;
-				} else {
-					index = this.topArr.findIndex((item, idx) => this.topArr[idx + 1] >= top);
-				}
-				this.activeLeftTab = (index < 0 ? 0 : index);
-			},
-			mainTouch() { this.isMainScroll = true; },
-			leftTap(e) {
-				let index = e.currentTarget.dataset.index;
-				this.isMainScroll = false;
-				this.activeLeftTab = Number(index);
-				this.activeTab = Number(index);
-			},
-			parseEventDynamicCode(e, method) {
-				if (method && this[method]) { this[method](e); }
-			},
-			close() {
-				this.specificationsDialog = false;
-				this.shoppingCartDialog = false;
+			});
+		},
+		toPay() {
+			const list = this.shoppingCartList;
+			const orderDetail = {
+				actualPrice: this.totalPrice,
+				fullPriceReduction: this.totalPrice,
+				reducedPrice: 0,
+				shopId: this.shopInfo.shop.id,
+				initShopInfo: this.initShopInfo,
+				selfOutActiveIndex: this.selfOutActiveIndex,
+				orderDetailList: [],
+				packingCharges: 0
+			};
+			for (const key in list) {
+				orderDetail.packingCharges += list[key].packingCharges;
+				orderDetail.orderDetailList.push({
+					goodsId: list[key].goodsId,
+					specList: list[key].specList,
+					number: list[key].number,
+					goodsName: list[key].goodsName,
+					restructure: list[key].restructure,
+					price: list[key].price,
+					id: list[key].id,
+					packingCharges: list[key].packingCharges,
+					totalPrice: list[key].price * list[key].number
+				});
 			}
+			setTimeout(() => {
+				app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = this.selfOutActiveIndex;
+				app.globalData.deliveryAndSelfTaking.payType = 'car';
+				app.globalData.deliveryAndSelfTaking.orderDetail = orderDetail;
+				uni.navigateTo({ url: '../pay/pay' });
+			}, 100);
+		},
+		getScrollTop(selector) {
+			return new Promise((resolve) => {
+				uni.createSelectorQuery()
+					.in(this)
+					.select(selector)
+					.boundingClientRect((data) => {
+						if (data && 'top' in data) resolve(data.top);
+					})
+					.exec();
+			});
+		},
+		async getElementTop() {
+			const p_arr = [];
+			for (let i = 0; i < this.menuList.length; i++) {
+				const resu = await this.getScrollTop('#into' + i);
+				p_arr.push(resu - this.topHeight);
+			}
+			this.topArr = p_arr;
+		},
+		mainScroll(e) {
+			if (!this.isMainScroll || this.topArr.length == 0) return;
+			const top = e.detail.scrollTop;
+			let index = -1;
+			if (top >= this.topArr[this.topArr.length - 1]) {
+				index = this.topArr.length - 1;
+			} else {
+				index = this.topArr.findIndex((item, idx) => this.topArr[idx + 1] >= top);
+			}
+			this.activeLeftTab = index < 0 ? 0 : index;
+			this.activeTab = this.activeLeftTab;
+		},
+		mainTouch() {
+			this.isMainScroll = true;
+		},
+		leftTap(indexOrEvent) {
+			const index = typeof indexOrEvent === 'number' ? indexOrEvent : Number(indexOrEvent.currentTarget?.dataset?.index ?? 0);
+			this.isMainScroll = false;
+			this.activeLeftTab = index;
+			this.activeTab = index;
+		},
+		close() {
+			this.specificationsDialog = false;
+			this.shoppingCartDialog = false;
 		}
-	};
+	}
+};
 </script>
+
 <style>
-	.menu-page {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		height: 100vh;
-		overflow: hidden;
-		background: #fff;
-	}
+.menu-page {
+	position: relative;
+	height: 100vh;
+	overflow: hidden;
+	background: #f7f7f7;
+}
 
-	.menu-body {
-		display: flex;
-		flex: 1;
-		overflow: hidden;
-	}
+.menu-shell {
+	height: 100%;
+	padding: 24rpx 24rpx 220rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 20rpx;
+}
 
-	/* 左侧分类 */
-	.menu-left {
-		width: 150rpx;
-		background: #fff;
-		flex-shrink: 0;
-	}
+.menu-search {
+	height: 86rpx;
+	padding: 0 24rpx;
+	display: flex;
+	align-items: center;
+	gap: 14rpx;
+	border-radius: 16rpx;
+	border: 1rpx solid #eaeaea;
+	background: #fff;
+	color: #666;
+}
 
-	.left-item {
-		position: relative;
-		display: flex;
-		align-items: center;
-		padding: 28rpx 16rpx 28rpx 20rpx;
-		font-size: 26rpx;
-		color: #777;
-	}
+.menu-search__icon {
+	font-size: 32rpx;
+	color: #000;
+	line-height: 1;
+}
 
-	.left-item--active {
-		background: #FFF;
-		font-weight: 700;
-		color: #111;
-		border-radius: 0 16rpx 16rpx 0;
-	}
+.menu-search__text {
+	font-size: 24rpx;
+	color: #666;
+}
 
-	.left-indicator {
-		position: absolute;
-		left: 0;
-		top: 50%;
-		transform: translateY(-50%);
-		width: 6rpx;
-		height: 32rpx;
-		background: #050505;
-		border-radius: 3rpx;
-	}
+.menu-layout {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	border-radius: 16rpx;
+	overflow: hidden;
+	background: #fff;
+	border: 1rpx solid #eaeaea;
+	box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
 
-	.left-text {
-		margin-left: 8rpx;
-	}
+.menu-content {
+	flex: 1;
+	min-width: 0;
+	height: 100%;
+	background: #fff;
+}
 
-	/* 右侧列表 */
-	.menu-right {
-		flex: 1;
-		background: #FFF;
-		border-radius: 16rpx 0 0 0;
-	}
+.menu-content__inner {
+	padding: 20rpx;
+}
 
-	.menu-right-inner {
-		padding: 0 20rpx;
-	}
+.menu-section + .menu-section {
+	margin-top: 20rpx;
+}
 
-	.category-title {
-		padding: 24rpx 8rpx 16rpx;
-		font-size: 28rpx;
-		font-weight: 700;
-		color: #111;
-		background: #FFF;
-		position: sticky;
-		top: 0;
-		z-index: 1;
-	}
+.menu-section__title {
+	margin-bottom: 16rpx;
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	/* 商品卡片 */
-	.goods-card {
-		display: flex;
-		padding: 16rpx 0;
-		position: relative;
-		border-bottom: 1rpx solid #f1f1f1;
-	}
+.menu-section__list {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
 
-	.goods-card--soldout {
-		opacity: 0.5;
-	}
+.menu-content__end {
+	padding: 8rpx 0 24rpx;
+	text-align: center;
+	font-size: 22rpx;
+	color: #999;
+}
 
-	.goods-image {
-		width: 148rpx;
-		height: 148rpx;
-		border-radius: 14rpx;
-		flex-shrink: 0;
-	}
+.menu-empty {
+	margin: 24rpx;
+}
 
-	.sell-out-mark {
-		position: absolute;
-		top: 50%;
-		left: 85rpx;
-		transform: translate(-50%, -50%);
-		background: rgba(0, 0, 0, 0.6);
-		color: #fff;
-		padding: 8rpx 16rpx;
-		border-radius: 8rpx;
-		font-size: 24rpx;
-	}
+.menu-cart {
+	position: fixed;
+	left: 24rpx;
+	right: 24rpx;
+	bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+	min-height: 108rpx;
+	padding: 18rpx;
+	display: flex;
+	align-items: center;
+	gap: 18rpx;
+	background: #000;
+	color: #fff;
+	border-radius: 24rpx;
+	box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+	z-index: 20;
+}
 
-	.goods-info {
-		flex: 1;
-		padding-left: 16rpx;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-	}
+.menu-cart--disabled {
+	opacity: 0.65;
+}
 
-	.goods-name {
-		font-size: 28rpx;
-		font-weight: 600;
-		color: #111;
-		display: flex;
-		align-items: center;
-	}
+.menu-cart__left {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
 
-	.goods-tag {
-		margin-left: 10rpx;
-		padding: 2rpx 10rpx;
-		font-size: 18rpx;
-		font-weight: 600;
-		background: #111;
-		color: #FFF;
-		border-radius: 6rpx;
-	}
+.menu-cart__bag {
+	position: relative;
+	width: 64rpx;
+	height: 64rpx;
+	border-radius: 50%;
+	background: #fff;
+	color: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
 
-	.goods-desc {
-		font-size: 22rpx;
-		color: #999;
-		margin-top: 4rpx;
-	}
+.menu-cart__bag-text {
+	font-size: 26rpx;
+	font-weight: 700;
+	line-height: 1;
+}
 
-	.goods-bottom {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-top: 8rpx;
-	}
+.menu-cart__badge {
+	position: absolute;
+	top: -10rpx;
+	right: -6rpx;
+	min-width: 32rpx;
+	height: 32rpx;
+	padding: 0 8rpx;
+	border-radius: 999px;
+	background: #fff;
+	color: #000;
+	font-size: 18rpx;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2rpx solid #000;
+}
 
-	.goods-bottom .price-accent {
-		font-size: 30rpx;
-		color: #111;
-	}
+.menu-cart__info {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
 
-	/* 步进器 */
-	.stepper {
-		display: flex;
-		align-items: center;
-		gap: 6rpx;
-	}
+.menu-cart__price {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #fff;
+}
 
-	.step-btn {
-		width: 44rpx;
-		height: 44rpx;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 28rpx;
-		font-weight: 600;
-	}
+.menu-cart__hint,
+.menu-cart__sub {
+	margin-top: 4rpx;
+	font-size: 20rpx;
+	color: rgba(255, 255, 255, 0.72);
+}
 
-	.add-btn {
-		background: #050505;
-		color: #FFF;
-	}
+.menu-cart__right {
+	flex-shrink: 0;
+	min-width: 172rpx;
+	height: 72rpx;
+	padding: 0 22rpx;
+	border-radius: 999px;
+	background: #fff;
+	color: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 26rpx;
+	font-weight: 600;
+}
 
-	.reduce-btn {
-		color: #111;
-		border: 1rpx solid #111;
-	}
+.ui-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 30;
+	background: rgba(0, 0, 0, 0.28);
+	display: flex;
+	align-items: flex-end;
+}
 
-	.step-input {
-		width: 40rpx;
-		text-align: center;
-		font-size: 26rpx;
-		font-weight: 600;
-		color: #111;
-		background: transparent;
-	}
+.ui-sheet {
+	width: 100%;
+	background: #fff;
+	border-radius: 24rpx 24rpx 0 0;
+	padding: 24rpx;
+	max-height: 88vh;
+	display: flex;
+	flex-direction: column;
+	gap: 20rpx;
+}
 
-	/* 底部购物车栏 */
-	.cart-bar {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		padding: 10rpx 24rpx calc(10rpx + env(safe-area-inset-bottom));
-		background: transparent;
-		z-index: 999;
-	}
+.ui-sheet__head {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
 
-	.cart-bar-inner {
-		display: flex;
-		align-items: center;
-		background: #050505;
-		border-radius: 50rpx;
-		padding: 8rpx 12rpx 8rpx 20rpx;
-		box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.24);
-		height: 100rpx;
-	}
+.ui-sheet__title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.cart-bar--disabled {
-		opacity: 0.5;
-	}
+.ui-sheet__sub {
+	font-size: 22rpx;
+	color: #666;
+}
 
-	.cart-left {
-		flex: 1;
-		display: flex;
-		align-items: center;
-	}
+.ui-sheet__body {
+	flex: 1;
+	min-height: 0;
+}
 
-	.cart-icon-wrap {
-		position: relative;
-		margin-right: 16rpx;
-	}
+.ui-sheet--cart {
+	padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+}
 
-	.cart-icon {
-		font-size: 48rpx;
-		color: #fff;
-	}
+.cart-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
 
-	.cart-badge {
-		position: absolute;
-		top: -8rpx;
-		right: -14rpx;
-		min-width: 32rpx;
-		height: 32rpx;
-		line-height: 32rpx;
-		text-align: center;
-		background: #fff;
-		color: #050505;
-		font-size: 20rpx;
-		font-weight: 700;
-		border-radius: 16rpx;
-		padding: 0 6rpx;
-	}
+.cart-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18rpx;
+	padding: 16rpx 0;
+	border-bottom: 1rpx solid #f1f1f1;
+}
 
-	.cart-price-info {
-		color: #FFF;
-	}
+.cart-item__meta {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6rpx;
+}
 
-	.cart-price {
-		font-size: 34rpx;
-		font-weight: 700;
-	}
+.cart-item__name {
+	font-size: 26rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.cart-price-hint {
-		font-size: 26rpx;
-		color: rgba(255, 255, 255, 0.6);
-	}
+.cart-item__spec {
+	font-size: 20rpx;
+	color: #666;
+}
 
-	.cart-fee-hint {
-		font-size: 20rpx;
-		color: rgba(255, 255, 255, 0.5);
-		margin-top: 2rpx;
-	}
+.cart-item__right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 10rpx;
+	flex-shrink: 0;
+}
 
-	.cart-submit {
-		padding: 20rpx 36rpx;
-		border-radius: 50rpx;
-		font-size: 28rpx;
-		font-weight: 700;
-		white-space: nowrap;
-	}
+.cart-item__price {
+	font-size: 24rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.cart-submit--ready {
-		background: #fff;
-		color: #050505;
-	}
+.cart-stepper {
+	display: flex;
+	align-items: center;
+	gap: 10rpx;
+}
 
-	.cart-submit--pending {
-		background: rgba(255, 255, 255, 0.2);
-		color: rgba(255, 255, 255, 0.8);
-	}
+.cart-stepper__btn {
+	width: 40rpx;
+	height: 40rpx;
+	border-radius: 50%;
+	border: 1rpx solid #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	/* 购物车弹窗 */
-	.content {
-		padding: 0 16px 16px 16px;
-	}
+.cart-stepper__num {
+	min-width: 28rpx;
+	text-align: center;
+	font-size: 24rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.cart-pop-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20rpx 0;
-		border-bottom: 1rpx solid #F5F2ED;
-	}
+.cart-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 14rpx;
+}
 
-	.cart-pop-name-wrap {
-		flex: 1;
-	}
+.cart-summary__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 24rpx;
+	color: #666;
+}
 
-	.cart-pop-name {
-		font-size: 28rpx;
-		font-weight: 600;
-		color: #111;
-	}
+.cart-summary__row--total {
+	margin-top: 4rpx;
+	font-size: 26rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.cart-pop-spec {
-		font-size: 22rpx;
-		color: #888;
-		margin-top: 4rpx;
-	}
+.ui-sheet--spec {
+	padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+}
 
-	.cart-pop-right {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 12rpx;
-	}
+.spec-head {
+	display: flex;
+	gap: 18rpx;
+	padding: 14rpx;
+	border-radius: 16rpx;
+	background: #f7f7f7;
+}
 
-	.cart-pop-packing {
-		display: flex;
-		justify-content: space-between;
-		padding: 20rpx 0;
-		font-size: 26rpx;
-		color: #111;
-	}
+.spec-head__image {
+	width: 148rpx;
+	height: 148rpx;
+	border-radius: 12rpx;
+	background: #fff;
+	flex-shrink: 0;
+}
 
-	/* 规格弹窗 */
-	.goods-info-view {
-		display: flex;
-		padding: 20rpx;
-		border-bottom: 1rpx solid #f0f0f0;
-	}
+.spec-head__body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+	justify-content: center;
+}
 
-	.goods-info-view .commodity-image {
-		width: 160rpx;
-		height: 160rpx;
-		border-radius: 12rpx;
-		margin-right: 20rpx;
-	}
+.spec-head__name {
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.goods-info-name {
-		font-size: 30rpx;
-		font-weight: 700;
-		color: #111;
-		margin-bottom: 8rpx;
-	}
+.spec-head__price {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.goods-info-specListString {
-		font-size: 24rpx;
-		color: #888;
-		margin-bottom: 10rpx;
-	}
+.spec-head__tips {
+	font-size: 20rpx;
+	color: #666;
+}
 
-	.goods-info-price {
-		font-size: 32rpx;
-	}
+.spec-list {
+	display: flex;
+	flex-direction: column;
+	gap: 18rpx;
+	padding-top: 12rpx;
+}
 
-	.commdity-name-type-view {
-		padding: 20rpx;
-	}
+.spec-group {
+	display: flex;
+	flex-direction: column;
+	gap: 12rpx;
+}
 
-	.commdity-type-item {
-		margin-bottom: 20rpx;
-	}
+.spec-group__title {
+	font-size: 24rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.commdity-type-name {
-		font-size: 26rpx;
-		font-weight: 600;
-		color: #111;
-		margin-bottom: 14rpx;
-	}
+.spec-group__options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12rpx;
+}
 
-	.radio-group {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12rpx;
-	}
+.spec-option {
+	display: inline-flex;
+	align-items: center;
+	gap: 8rpx;
+	min-height: 52rpx;
+	padding: 0 18rpx;
+	border-radius: 999px;
+	border: 1rpx solid #eaeaea;
+	color: #000;
+	font-size: 22rpx;
+	background: #fff;
+}
 
-	.group-label {
-		padding: 10rpx 18rpx;
-		font-size: 24rpx;
-		border-radius: 8rpx;
-	}
+.spec-option--active {
+	border-color: #000;
+	background: #000;
+	color: #fff;
+}
 
-	.good-choice-btn {
-		width: calc(100% - 32rpx);
-		padding: 26rpx 0;
-		text-align: center;
-		font-size: 30rpx;
-		font-weight: 700;
-		border-radius: 50rpx;
-		margin: 16rpx;
-	}
+.spec-option--disabled {
+	opacity: 0.35;
+}
 
-	.position-sticky-bottom {
-		position: sticky;
-		bottom: 0;
-		background: #fff;
-	}
+.spec-option__radio {
+	transform: scale(0.8);
+}
+
+.spec-loading {
+	padding: 24rpx 0 8rpx;
+	font-size: 22rpx;
+	color: #666;
+	text-align: center;
+}
 </style>

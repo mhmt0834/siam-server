@@ -4,23 +4,13 @@
 		<view class="pay-card">
 			<view class="pay-card-title">就餐方式</view>
 			<view class="dining-mode">
-				<view :class="selfOutActiveIndex == 0 ? 'mode-btn mode-btn--active' : 'mode-btn'"
-					@tap="selfTap" data-index="0">
+				<view class="mode-btn mode-btn--active">
 					店内就餐
 				</view>
-				<view :class="selfOutActiveIndex == 1 ? 'mode-btn mode-btn--active' : 'mode-btn'"
-					@tap="selfTap" data-index="1">
-					外卖配送
-				</view>
 			</view>
-			<!-- 地址信息 -->
-			<view class="address-info" v-if="selfOutActiveIndex == 0 && shopInfo && shopInfo.shop.name">
-				<text class="address-label">取餐门店：</text>
+			<view class="address-info" v-if="shopInfo && shopInfo.shop.name">
+				<text class="address-label">就餐门店：</text>
 				<text>{{ shopInfo.shop.name }}</text>
-			</view>
-			<view class="address-info" v-if="selfOutActiveIndex == 1 && deliveryAndSelfTaking.deliveryAddress">
-				<text class="address-label">送至：</text>
-				<text>{{ deliveryAndSelfTaking.deliveryAddress.province }}{{ deliveryAndSelfTaking.deliveryAddress.city }}{{ deliveryAndSelfTaking.deliveryAddress.area }}{{ deliveryAndSelfTaking.deliveryAddress.street }}</text>
 			</view>
 		</view>
 
@@ -42,14 +32,6 @@
 			<view class="order-extra" v-if="orderDetail.packingCharges > 0">
 				<text>包装费</text>
 				<text>¥{{ orderDetail.packingCharges }}</text>
-			</view>
-			<!-- 配送费 -->
-			<view class="order-extra" v-if="deliveryAndSelfTaking && selfOutActiveIndex == 1">
-				<text>配送费</text>
-				<text>
-					<text v-if="deliveryAndSelfTaking.isReducedDeliveryPrice" class="line-through">¥{{ deliveryAndSelfTaking.reducedDeliveryTotalPrice }}</text>
-					¥{{ deliveryAndSelfTaking.feeData }}
-				</text>
 			</view>
 		</view>
 
@@ -83,10 +65,6 @@
 			<view class="price-row price-row--discount" v-if="orderDetail.fullPriceReductionIsHidden">
 				<text>优惠金额</text>
 				<text>−¥{{ (orderDetail.actualPrice - orderDetail.fullPriceReduction).toFixed(2) }}</text>
-			</view>
-			<view class="price-row" v-if="deliveryAndSelfTaking && selfOutActiveIndex == 1">
-				<text>配送费</text>
-				<text>¥{{ deliveryAndSelfTaking.feeData }}</text>
 			</view>
 			<view class="view-line"></view>
 			<view class="price-total">
@@ -130,11 +108,11 @@
 					¥{{ orderDetail.fullPriceReductionIsHidden ? orderDetail.fullPriceReduction : orderDetail.actualPrice }}
 				</text>
 			</view>
-			<view class="btn-primary-lg pay-submit-btn"
+			<primary-button class="pay-submit-btn"
 				@tap="parseEventDynamicCode($event, isForgetThePassword ? 'showPwdLayer' : 'getRequestSubscribeMessage')">
 				{{ brandConfig.features.onlinePayment ? '去支付' : '提交订单' }}
-			</view>
-			<view class="pay-agreement">支付即同意《用户协议》</view>
+			</primary-button>
+			<view class="pay-agreement">提交即同意《用户协议》</view>
 		</view>
 
 		<!-- 密码弹窗 -->
@@ -186,19 +164,19 @@
 	import dateHelper from '../../../utils/date-helper';
 	import utilHelper from '../../../utils/util';
 	import BrandConfig from '../../../utils/brand-config';
+	import PrimaryButton from '../../../components/ui/primary-button.vue';
 	let app = null;
 	var wxNotifyTemplates = [];
 	export default {
+		components: {
+			PrimaryButton
+		},
 		data() {
 			return {
 				brandConfig: BrandConfig,
 				time: '10:00',
 				isChoose: false,
 				selfOutActiveIndex: 0,
-				selfOutItems: [
-					{ text: "自提", tap: "selfTap", index: 0 },
-					{ text: "外送", tap: "outTap", index: 1 }
-				],
 				shopInfo: { shop: {} },
 				initShopInfo: {},
 				orderDetail: {
@@ -252,7 +230,8 @@
 			if (deliveryAndSelfTaking.orderDetail) {
 				this.orderDetail = deliveryAndSelfTaking.orderDetail;
 			}
-			this.selfOutActiveIndex = deliveryAndSelfTaking.selfOutActiveIndex || 0;
+			this.selfOutActiveIndex = 0;
+			app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = 0;
 			this.initShopInfo = this.orderDetail.initShopInfo || {};
 			this.shopInfo = { shop: { name: this.initShopInfo.name || '' } };
 			this.deliveryAndSelfTaking = deliveryAndSelfTaking;
@@ -273,15 +252,6 @@
 						this.paymentModes[1].show = config.balance;
 					}
 				});
-			},
-			selfTap(e) {
-				var index = parseInt(e.currentTarget.dataset.index);
-				this.selfOutActiveIndex = index;
-				if (index == 0) {
-					app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = 0;
-				} else {
-					uni.navigateTo({ url: `../../address/choose/choose?pageType=pay` });
-				}
 			},
 			focusRemarks() { this.showRemarks = !this.showRemarks; },
 			remarksInput(e) {
@@ -341,8 +311,8 @@
 					orderDetailList: JSON.stringify(this.orderDetail.orderDetailList),
 					actualPrice: this.orderDetail.actualPrice,
 					remarks: this.remarks,
-					selfOutActiveIndex: this.selfOutActiveIndex,
-					deliveryAddressId: this.deliveryAndSelfTaking.deliveryAddress ? this.deliveryAndSelfTaking.deliveryAddress.id : '',
+					selfOutActiveIndex: 0,
+					deliveryAddressId: '',
 					afterDiscount: this.afterDiscount ? this.afterDiscount.id : ''
 				};
 				if (this.brandConfig.features.onlinePayment) {

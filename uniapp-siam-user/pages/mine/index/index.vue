@@ -1,757 +1,330 @@
 <template>
-	<view class="container">
-		<view class="mine-brand-hero">
-			<view class="mine-brand-en">{{ brand.nameEn }}</view>
-			<view class="mine-brand-name">{{ brand.name }}</view>
-			<view class="mine-brand-slogan">{{ brand.slogan }}</view>
-		</view>
-		<view class="userinfo">
-			<block v-if="!data.id">
-				<button @tap="getUserProfile" :plain="true" class="userinfo-button"
-					style="margin: 0; width: 100%; padding: inherit">
-					<view class="notlogin">
-						<image class="userinfo-avatar" src="/static/assets/images/user-head.png" mode="cover"></image>
-						<!-- <text class="userinfo-nickname">{{userInfo.nickName}}</text> -->
-						请登录/注册
-					</view>
-				</button>
-			</block>
-			<block v-else>
-				<navigator url="../userinfo/userinfo" class="navigator-userinfo">
-					<view class="flex_between" style="width: 100%;">
-						<view class="userinfo-view">
-							<image class="userinfo-avatar"
-								:src="data.headImg ? data.headImg : '/static/assets/images/user-head.png'" mode="cover">
-							</image>
-							<view class="userinfo-nickname">
-								<view class="nickname-class">{{ data.username }}</view>
-								<view>
-									<text :decode="true">NO:&nbsp;&nbsp;{{ data.vipNo }}</text>
-								</view>
-							</view>
-						</view>
-						<view><van-icon name="arrow" /></view>
-					</view>
-				</navigator>
-			</block>
-			<view id="content_info" v-if="data.id">
-				<view class="mine-blocking-view" v-if="false">
-					<view class="mine-blocking">
-						<navigator class="mine-navigator" url="../share/reward/reward">
-							<view class="number-tip theme-color">{{ data.inviteRewardAmount }}</view>
-							<view class="text-tip">佣金</view>
-						</navigator>
-						<text class="line-tip">|</text>
-						<navigator class="mine-navigator" url="../integral/integral">
-							<view class="number-tip theme-color">{{ data.points }}</view>
-							<view class="text-tip">我的积分</view>
-						</navigator>
-						<text class="line-tip">|</text>
-						<navigator class="mine-navigator" url="../coupons/coupons">
-							<view class="number-tip theme-color">{{ data.couponsNumber ? data.couponsNumber : 0 }}
-							</view>
-							<view class="text-tip">优惠券</view>
-						</navigator>
-						<text class="line-tip">|</text>
-						<navigator class="mine-navigator" url="../member/index/index">
-							<view class="number-tip theme-color">{{ data.balance }}</view>
-							<view class="text-tip">会员中心</view>
-						</navigator>
-					</view>
+	<view class="mine-page ui-page">
+		<view class="mine-shell">
+			<app-header
+				:title="brand.restaurantName"
+				:subtitle="brand.slogan"
+				:logo="headerLogo"
+				status-text="我的"
+			/>
+
+			<view class="profile-card ui-card" @tap="handleProfileTap">
+				<image
+					class="avatar"
+					:src="profile.headImg || '/static/assets/images/user-head.png'"
+					mode="aspectFill"
+				/>
+				<view class="profile-copy">
+					<text class="profile-name">{{ isLoggedIn ? profile.username || '微信用户' : '登录 / 注册' }}</text>
+					<text class="profile-meta">
+						{{ isLoggedIn ? memberDescription : '登录后查看订单、收藏与优惠' }}
+					</text>
 				</view>
-				<view class="my-order-box">
-					<view class="my-order-title my-order-all" @tap="bindOrderInfo">
-						<view class="order-title">我的订单</view>
-						<view class="order-all">
-							<text>查看全部</text>
-							<van-icon name="arrow" />
-						</view>
-					</view>
-					<view class="swiper-content">
-						<view class="swiper-tab self-adaption">
-							<view class="swiper-tab-item" :data-current="index" @tap="clickTab"
-								hover-class="hover-click-class" v-for="(item, index) in tabList" :key="index">
-								<view :class="'swiper_table_item_view ' + (currentTab == item.modeId ? 'active_' : '')"
-									:data-current="index" @tap="clickTab">
-									{{ item.modeName }}
-								</view>
-							</view>
-						</view>
-					</view>
-					<swiper :current="currentTab" class="swiper-box" duration="300" @change="bindSlideChange"
-						style="height: 78px">
-						<swiper-item class="swiper-items" v-if="false">
-							<view class="mine-blocking">
-								<navigator class="order-navigator"
-									:url="'../../order/index/index?currentTab=' + currentTab + '&modeType=' + item.modeType + '&currentOrderTab=' + item.modeId"
-									v-for="(item, index) in shopOrderTabList" :key="index">
-									<van-icon :name="item.icon" size="50rpx" />
-									<view class="text-tip">{{ item.modeName }}</view>
-								</navigator>
-							</view>
-						</swiper-item>
-						<swiper-item class="swiper-items">
-							<view class="mine-blocking">
-								<navigator class="order-navigator"
-									:url="'../../order/index/index?currentTab=' + currentTab + '&modeType=' + item.modeType + '&currentOrderTab=' + item.modeId"
-									v-for="(item, index) in pointsOrderTabList" :key="index">
-									<van-icon :name="item.icon" size="50rpx" />
-									<view class="text-tip">{{ item.modeName }}</view>
-								</navigator>
-							</view>
-						</swiper-item>
-					</swiper>
-					<navigator class="navigator-class" url="../collect/index/index" v-if="false">
-						<view class="navigator-view">
-							<view>我的收藏</view>
-							<van-icon name="arrow" />
-						</view>
-					</navigator>
+				<text class="profile-arrow">›</text>
+			</view>
+
+			<view class="order-card ui-card" @tap="openOrders">
+				<view>
+					<text class="order-title">我的订单</text>
+					<text class="order-subtitle">查看进行中与历史订单</text>
 				</view>
-				<view class="navigator-box">
-					<view class="navigator-radius">
-						<navigator class="navigator-class" url="../../address/index/index">
-							<view class="navigator-view">
-								<view>收货地址</view>
-								<van-icon name="arrow" />
-							</view>
-						</navigator>
-						<view class="view-line"></view>
-						<navigator class="navigator-class" url="../userinfo/userinfo">
-							<view class="navigator-view">
-								<view>个人资料</view>
-								<van-icon name="arrow" />
-							</view>
-						</navigator>
-					</view>
+				<view class="order-action">
+					<text>查看全部</text>
+					<text class="profile-arrow">›</text>
 				</view>
 			</view>
+
+			<view class="menu-card ui-card">
+				<view
+					v-for="(item, index) in menuItems"
+					:key="item.key"
+					class="menu-item"
+					:class="{ 'menu-item--last': index === menuItems.length - 1 }"
+					@tap="openMenuItem(item)"
+				>
+					<view class="menu-icon">{{ item.mark }}</view>
+					<view class="menu-copy">
+						<text class="menu-title">{{ item.title }}</text>
+						<text class="menu-subtitle">{{ item.subtitle }}</text>
+					</view>
+					<text class="menu-arrow">›</text>
+				</view>
+			</view>
+
+			<view class="brand-footer">
+				<text>{{ brand.nameEn }}</text>
+				<text class="brand-footer__version">VERSION {{ appVersion }}</text>
+			</view>
 		</view>
+		<view class="ui-safe-bottom"></view>
 	</view>
 </template>
 
 <script>
-	import https from '../../../utils/http';
-	import GlobalConfig from '../../../utils/global-config';
-	import authService from '../../../utils/auth';
-	import toastService from '../../../utils/toast.service';
-	import dateHelper from '../../../utils/date-helper';
-	import systemStatus from '../../../utils/system-status';
-	import BrandConfig from '../../../utils/brand-config';
-	//获取应用实例
-	let app = null;
-	export default {
-		data() {
-			return {
-				brand: BrandConfig,
-				userInfo: {},
-				hasUserInfo: false,
-				canIUse: uni.canIUse('button.open-type.getUserInfo'),
-				couponsNum: 0,
-				tabList: [{
-					modeId: 0,
-					modeName: '点餐订单'
-				}],
-				shopOrderTabList: [{
-						modeId: 1,
-						modeType: 'waitPayment',
-						modeName: '待确认',
-						icon: 'pending-payment'
-					},
-					{
-						modeId: 2,
-						modeType: 'waitReceived',
-						modeName: '待收货',
-						icon: 'send-gift-o'
-					},
-					{
-						modeId: 3,
-						modeType: 'waitPickedUp',
-						modeName: '待自提',
-						icon: 'bag-o'
-					},
-					{
-						modeId: 4,
-						modeType: 'afterSales',
-						modeName: '退款/售后',
-						icon: 'balance-list-o'
-					}
-				],
-				pointsOrderTabList: [{
-						modeId: 1,
-						modeType: 'waitPayment',
-						modeName: '待付款',
-						icon: 'pending-payment'
-					},
-					{
-						modeId: 2,
-						modeType: 'waitDelivered',
-						modeName: '待发货',
-						icon: 'send-gift-o'
-					},
-					{
-						modeId: 3,
-						modeType: 'waitReceived',
-						modeName: '待收货',
-						icon: 'bag-o'
-					},
-					{
-						modeId: 4,
-						modeType: 'afterSales',
-						modeName: '退款/售后',
-						icon: 'balance-list-o'
-					}
-				],
-				currentTab: 0,
-				isVipImages: [],
-				appVersion: 1.0,
-				statusBarHeight: '',
-				initData: {
-					headImg: '',
-					username: '',
-					vipNo: '',
-					inviteRewardAmount: '',
-					points: '',
-					couponsNumber: 0,
-					balance: '',
-					id: ''
-				},
-				data: {
-					headImg: '',
-					username: '',
-					vipNo: '',
-					inviteRewardAmount: '',
-					points: '',
-					couponsNumber: 0,
-					balance: '',
-					id: ''
-				},
-				timestamp: ''
-			};
-		},
-		onLoad: function() {
-			app = getApp();
-			this.statusBarHeight = app.globalData.systemInfoSync.statusBarHeight * 2;
-			if (app.globalData.userInfo) {
-				console.log(1);
-				this.userInfo = app.globalData.userInfo;
-				this.hasUserInfo = true;
-			} else if (this.canIUse) {
-				console.log(2);
-				// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-				// 所以此处加入 callback 以防止这种情况
-				app.globalData.userInfoReadyCallback = (res) => {
-					this.userInfo = res.userInfo;
-					this.hasUserInfo = true;
-				};
-			} else {
-				console.log(3);
-				// 在没有 open-type=getUserInfo 版本的兼容处理
-			}
-		},
-		onShow() {
-			authService.checkIsLogin().then((result) => {
-				console.log(result);
-				if (result) {
-					this.getUserInfo();
-					// this.getCouponsSelectCounts();
+import https from '../../../utils/http';
+import authService from '../../../utils/auth';
+import BrandConfig from '../../../utils/brand-config';
+import AppHeader from '../../../components/ui/app-header.vue';
+
+let app = null;
+
+export default {
+	components: {
+		AppHeader
+	},
+	data() {
+		return {
+			brand: BrandConfig,
+			headerLogo: '/static/assets/images/logo.png',
+			isLoggedIn: false,
+			appVersion: '5.28',
+			profile: {
+				id: '',
+				headImg: '',
+				username: '',
+				vipNo: ''
+			},
+			menuItems: [
+				{ key: 'collect', mark: '♡', title: '我的收藏', subtitle: '收藏的菜品与口味' },
+				{ key: 'coupon', mark: '券', title: '优惠活动', subtitle: '查看可用优惠券' },
+				{ key: 'feedback', mark: '言', title: '意见反馈', subtitle: '告诉我们您的建议' },
+				{ key: 'settings', mark: '设', title: '设置中心', subtitle: '账号、隐私与通知' },
+				{ key: 'about', mark: 'i', title: '关于我们', subtitle: '品牌与服务信息' }
+			]
+		};
+	},
+	computed: {
+		memberDescription() {
+			return this.profile.vipNo ? `会员编号 ${this.profile.vipNo}` : '欢迎回来，祝您用餐愉快';
+		}
+	},
+	onLoad() {
+		app = getApp();
+		this.appVersion = String(app.globalData.appVersion || '5.28');
+	},
+	onShow() {
+		this.refreshProfile();
+	},
+	methods: {
+		refreshProfile() {
+			authService.checkIsLogin().then((loggedIn) => {
+				this.isLoggedIn = Boolean(loggedIn);
+				if (!loggedIn) {
+					this.profile = { id: '', headImg: '', username: '', vipNo: '' };
 					return;
 				}
-				this.data = this.initData;
-				this.userInfo = {};
-				app.globalData.checkIsAuth('scope.userInfo');
-			});
-			this.getTimestamp();
-		},
-		onReady() {
-			
-		},
-		methods: {
-			// 滑动切换tab
-			bindSlideChange: function(e) {
-				this.setData({
-					currentTab: e.detail.current
-				});
-			},
-
-			getTimestamp() {
-				var timestamp = dateHelper.getTimestamp();
-				console.log(timestamp);
-				this.setData({
-					timestamp: timestamp
-				});
-			},
-			//点击切换
-			clickTab: function(e) {
-				console.log(e.target.dataset.current);
-				if (this.currentTab === e.target.dataset.current) {
-					return false;
-				} else {
-					// 显示加载图标
-					this.setData({
-						currentTab: e.target.dataset.current
-					});
-				}
-			},
-			getUserProfile(e) {
-				// 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认
-				// 开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
-				console.log(app.globalData.userInfo);
-
-				// #ifdef APP-PLUS||H5
-				uni.navigateTo({
-					url: '../../internal/login/code/code'
-				});
-				// #endif
-				// #ifdef MP-WEIXIN||MP-ALIPAY
-				uni.navigateTo({
-					url: '../../internal/login/choose/choose'
-				});
-				// #endif
-			},
-
-			bindUserinfoTap() {
-				uni.navigateTo({
-					url: '../userinfo/userinfo'
-				});
-			},
-
-			getUserInfo: function(e) {
 				https.request('/rest/member/getLoginMemberInfo', {}).then((result) => {
-					if (result.success) {
-						result.data.typeVipText = systemStatus.typeVipText(result.data.type);
-						result.data.statusVipText = systemStatus.statusVipText(result.data.vipStatus);
-						result.data.vipStartTime = dateHelper.formatDate(result.data.vipStartTime);
-						result.data.vipEndTime = dateHelper.formatDate(result.data.vipEndTime);
-						this.isVipImages = [];
-						if (result.data.type == 1) {
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/user_1.png'
-							);
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/user_2.png'
-							);
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/user_3.png'
-							);
-						} else {
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/vip_1.png'
-							);
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/vip_2.png'
-							);
-							this.isVipImages.push(
-								'https://siam-hangzhou.oss-cn-hangzhou.aliyuncs.com/data/images/business/mine_page/vip_3.png'
-							);
-						}
-						this.setData({
-							data: result.data,
-							userInfo: this.userInfo,
-							isVipImages: this.isVipImages
-						});
+					if (result.success && result.data) {
+						this.profile = result.data;
 					}
 				});
-			},
-
-			getRequestSubscribeMessage() {
-				console.log(111);
-				let use = uni.canIUse('requestSubscribeMessage');
-				console.log(use);
-				if (typeof uni.requestSubscribeMessage === 'function') {
-					console.log(true);
-				}
-				uni.requestSubscribeMessage({
-					tmplIds: ['N63hQksq6Rp3XlrBySkligk-pSvvpJ5fCovwUkwHVH4',
-						'eF29ugG7ZKKKHCDH2Nk48Q2JCH1qKDLBMX2LnAzCz-w',
-						'CE3V7tzt4-PSsf8s-xZg731zHtDEkQmBOedcEEv3cx8'
-					],
-					success(res) {
-						console.log(res);
-					},
-					fail(error) {
-						console.log(error);
-					}
-				});
-			},
-
-			bindAccountBalance() {
-				uni.navigateTo({
-					url: '../balance/index/index'
-				});
-			},
-
-			bindMemberCenter() {
-				uni.navigateTo({
-					url: '../member/index/index'
-				});
-			},
-
-			bindInDevelopment() {
-				app.globalData.bindInDevelopment();
-			},
-
-			bindOrderInfo(e) {
-				uni.navigateTo({
-					url: '../../order/index/index?currentTab=0&modeType=all&currentOrderTab=0'
-				});
+			});
+		},
+		handleProfileTap() {
+			if (this.isLoggedIn) {
+				uni.navigateTo({ url: '../userinfo/userinfo' });
+				return;
 			}
+			// #ifdef APP-PLUS||H5
+			uni.navigateTo({ url: '../../internal/login/code/code' });
+			// #endif
+			// #ifdef MP-WEIXIN||MP-ALIPAY
+			uni.navigateTo({ url: '../../internal/login/choose/choose' });
+			// #endif
+		},
+		openOrders() {
+			uni.switchTab({ url: '/pages/order/index/index' });
+		},
+		openMenuItem(item) {
+			const routes = {
+				collect: '../collect/index/index',
+				coupon: '../coupons/coupons',
+				feedback: '../settings/index?section=feedback',
+				settings: '../settings/index',
+				about: '../settings/index?section=about'
+			};
+			if (routes[item.key]) {
+				if (!this.isLoggedIn) {
+					this.handleProfileTap();
+					return;
+				}
+				uni.navigateTo({ url: routes[item.key] });
+				return;
+			}
+			app.globalData.bindInDevelopment();
 		}
-	};
+	}
+};
 </script>
-<style>
-	page {
-		background: #f5f5f5;
-		width: 100%;
-		margin: 0;
-	}
 
-	.container {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		box-sizing: border-box;
-		background: #f5f5f3;
-	}
+<style scoped>
+page {
+	background: #f7f7f7;
+}
 
-	.mine-brand-hero {
-		box-sizing: border-box;
-		width: 100%;
-		padding: 120rpx 40rpx 110rpx;
-		background: #4A2605;
-		color: #fff;
-	}
+.mine-page {
+	min-height: 100vh;
+	background: #f7f7f7;
+}
 
-	.mine-brand-en {
-		color: #F5C89A;
-		font-size: 18rpx;
-		letter-spacing: 7rpx;
-	}
+.mine-shell {
+	padding: calc(32rpx + env(safe-area-inset-top)) 32rpx 48rpx;
+}
 
-	.mine-brand-name {
-		margin-top: 18rpx;
-		font-size: 48rpx;
-		font-weight: 900;
-	}
+.ui-card {
+	border: 2rpx solid #f0f0f0;
+	border-radius: 32rpx;
+	background: #ffffff;
+	box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.04);
+}
 
-	.mine-brand-slogan {
-		margin-top: 18rpx;
-		color: rgba(255, 255, 255, .68);
-		font-size: 24rpx;
-	}
+.profile-card {
+	display: flex;
+	align-items: center;
+	margin-top: 38rpx;
+	padding: 34rpx;
+}
 
-	.userinfo {
-		width: 100%;
-		position: relative;
-		box-sizing: border-box;
-		background: #f5f5f3;
-	}
+.avatar {
+	width: 118rpx;
+	height: 118rpx;
+	flex-shrink: 0;
+	border: 2rpx solid #eaeaea;
+	border-radius: 50%;
+	background: #f7f7f7;
+}
 
-	.notlogin {
-		display: flex;
-		align-items: center;
-		margin: 0 20rpx 20rpx;
-		padding: 40rpx 20rpx;
-		border-radius: 16rpx;
-		background: #fff;
-		color: #111;
-	}
+.profile-copy {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	margin-left: 24rpx;
+}
 
-	.notlogin button {
-		width: 100%;
-		padding: inherit;
-	}
+.profile-name {
+	color: #000000;
+	font-size: 36rpx;
+	font-weight: 600;
+	line-height: 1.3;
+}
 
-	.userinfo-avatar {
-		width: 128rpx;
-		height: 128rpx;
-		margin-right: 20rpx;
-		border-radius: 50%;
-		box-shadow: -2px 0px 5px 0.5px rgba(0, 0, 0, 0), 0px -2px 5px 1px rgba(0, 0, 0, 0.1), 2px 0px 5px 1px rgba(0, 0, 0, 0), 0px 2px 5px 1px rgba(0, 0, 0, 0.1);
-	}
+.profile-meta {
+	margin-top: 10rpx;
+	color: #666666;
+	font-size: 24rpx;
+}
 
-	.userinfo-name-avatar {
-		width: 80%;
-	}
+.profile-arrow,
+.menu-arrow {
+	flex-shrink: 0;
+	color: #999999;
+	font-size: 42rpx;
+	font-weight: 300;
+	line-height: 1;
+}
 
-	.userinfo-nickname {
-		color: white;
-		font-size: 26rpx;
-		font-weight: bold;
-	}
+.order-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 22rpx;
+	padding: 30rpx 34rpx;
+}
 
-	.vip-class {
-		font-size: 22rpx;
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-	}
+.order-title {
+	display: block;
+	color: #000000;
+	font-size: 30rpx;
+	font-weight: 600;
+}
 
-	.vip-image-view {
-		display: flex;
-		align-items: center;
-	}
+.order-subtitle {
+	display: block;
+	margin-top: 8rpx;
+	color: #666666;
+	font-size: 23rpx;
+}
 
-	.is-vip-class {
-		background: linear-gradient(to right, #d09650, #ba7c3f);
-		padding: 2rpx 8rpx;
-		border-radius: 10rpx;
-		text-align: center;
-	}
+.order-action {
+	display: flex;
+	align-items: center;
+	color: #666666;
+	font-size: 24rpx;
+}
 
-	.not-vip-class {
-		background: #8f8f8f;
-		padding: 2rpx 8rpx;
-		border-radius: 10rpx;
-		text-align: center;
-	}
+.order-action .profile-arrow {
+	margin-left: 8rpx;
+}
 
-	.nickname-class {
-		font-size: 32rpx;
-		margin-bottom: 10rpx;
-	}
+.menu-card {
+	margin-top: 22rpx;
+	padding: 0 30rpx;
+}
 
-	.userinfo-view {
-		width: 100%;
-		display: flex;
-		justify-content: flex-start;
-		align-items: center;
-	}
+.menu-item {
+	display: flex;
+	align-items: center;
+	min-height: 116rpx;
+	border-bottom: 2rpx solid #f2f2f2;
+}
 
-	.button-view {
-		width: auto;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 20rpx;
-	}
+.menu-item--last {
+	border-bottom: 0;
+}
 
-	.userinfo-button {
-		/* width: 80%; */
-		display: flex;
-		justify-content: flex-start;
-	}
+.menu-icon {
+	width: 60rpx;
+	height: 60rpx;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2rpx solid #eaeaea;
+	border-radius: 50%;
+	background: #fafafa;
+	color: #000000;
+	font-size: 25rpx;
+	font-weight: 600;
+}
 
-	.my-order-box {
-		padding: 20rpx 20rpx 0 20rpx;
-		background-color: white;
-		margin: 0 20rpx 20rpx 20rpx;
-		border-radius: 10rpx;
-	}
+.menu-copy {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	margin-left: 22rpx;
+}
 
-	.my-order-title {
-		font-size: 32rpx;
-	}
+.menu-title {
+	color: #1c1c1e;
+	font-size: 28rpx;
+	font-weight: 500;
+}
 
-	.my-order-title text {
-		font-size: 28rpx;
-	}
+.menu-subtitle {
+	margin-top: 5rpx;
+	color: #888888;
+	font-size: 21rpx;
+}
 
-	.my-order-all {
-		font-size: 32rpx;
-	}
+.menu-arrow {
+	font-size: 36rpx;
+}
 
-	.navigator-view {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-size: 28rpx;
-		font-weight: bold;
-	}
+.brand-footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 42rpx;
+	color: #999999;
+	font-size: 20rpx;
+	letter-spacing: 2rpx;
+}
 
-	.navigator-userinfo {
-		margin: 0 20rpx 20rpx;
-		padding: 40rpx 20rpx;
-		border-radius: 16rpx;
-		background: #4A2605;
-	}
-
-	.navigator-box {
-		padding: 0 20rpx;
-		background: inherit;
-		padding-bottom: 120rpx;
-		bottom: calc(var(--window-bottom));
-	}
-
-	.navigator-radius {
-		border-radius: 15rpx;
-		background: white;
-	}
-
-	.navigator-class {
-		padding: 20rpx;
-		background: white;
-		border-radius: 10rpx;
-	}
-
-	button {
-		padding-left: 0px;
-		padding-right: 0px;
-		margin-left: 0px;
-		margin-right: 0px;
-	}
-
-	button[plain] {
-		color: black;
-		border: 0px;
-		font-size: 30rpx;
-	}
-
-	/* 个人余额和钱包等样式 */
-	.mine-blocking-view {
-		padding: 20rpx;
-	}
-
-	.mine-blocking {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		background: white;
-		text-align: center;
-		border-radius: 10rpx;
-	}
-
-	.mine-navigator {
-		padding: 20rpx 0;
-		border-radius: 10rpx;
-		width: 100%;
-	}
-
-	.order-navigator {
-		padding: 10rpx 0;
-		width: 25%;
-		border-radius: 10rpx;
-	}
-
-	.order-navigator .iconfont {
-		font-size: 50rpx;
-	}
-
-	.order-title {
-		font-size: 32rpx;
-	}
-
-	.my-order-all {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.order-all {
-		font-size: 28rpx;
-		color: #8f8f8f;
-	}
-
-	.number-tip {
-		font-size: 33rpx;
-	}
-
-	.text-tip {
-		font-size: 28rpx;
-		color: #8f8f8f;
-	}
-
-	.line-tip {
-		color: #e3e3e3;
-	}
-
-	.is-vip-image {
-		width: 36rpx;
-		height: auto;
-		margin-right: 10rpx;
-	}
-
-	.share-button {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0 15rpx;
-	}
-
-	.share-button::after {
-		border: none;
-	}
-
-	.share-view {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin: 10rpx;
-		/* font-size: 28rpx; */
-		width: 100%;
-	}
-
-	.invite-wrapper {
-		padding: 10rpx;
-	}
-
-	.invite-image {
-		width: 100%;
-		height: auto;
-	}
-
-	.ptyh-class {
-		background: #8f8f8f;
-		padding: 2rpx 10rpx;
-		color: #f5f5f5;
-		border-radius: 10rpx;
-	}
-
-	.cjhy-class {
-		background: linear-gradient(to right, #d09650, #ba7c3f);
-		padding: 2rpx 8rpx;
-		color: white;
-		border-radius: 10rpx;
-	}
-
-	.swiper-content {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.swiper-tab-item {
-		width: 50%;
-	}
-
-	.swiper-box {
-		/* height: 400rpx; */
-		border-radius: 0 0 15rpx 15rpx;
-	}
-
-	.swiper-tab {
-		text-align: center;
-		height: 88rpx;
-		line-height: 88rpx;
-		display: flex;
-		flex-flow: row;
-		justify-content: space-between;
-		background: #fff;
-		z-index: 1;
-	}
-
-	.swiper-tab-item {
-		width: 50%;
-		margin-right: 20rpx;
-	}
-
-	.swiper-box {
-		display: block;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-	}
-
-	.swiper-items {
-		height: 100%;
-	}
-
-	.my-order-box .navigator-class {
-		padding: 0rpx 0rpx 20rpx 0;
-	}
-	
-	#content_info{
-		bottom: calc(var(--window-bottom));
-	}
+.brand-footer__version {
+	margin-top: 8rpx;
+	font-size: 18rpx;
+	letter-spacing: 1rpx;
+}
 </style>

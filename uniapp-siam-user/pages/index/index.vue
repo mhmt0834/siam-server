@@ -1,720 +1,608 @@
 <template>
-	<view class="page">
-		<!-- 品牌信息 -->
-		<view class="brand-header">
-			<view class="brand-mark">玉</view>
-			<view class="brand-copy">
-				<view class="brand-name">{{ brand.restaurantName }}</view>
-				<view class="brand-slogan">{{ brand.slogan }}</view>
+	<view class="home-page ui-page">
+		<view class="home-shell">
+			<app-header
+				:logo="headerLogo"
+				:title="brand.restaurantName"
+				:subtitle="brand.slogan"
+				status-text="营业中"
+			/>
+
+			<view class="hero-card ui-card">
+				<view class="hero-kicker">纯净 / 克制 / 高级</view>
+				<view class="hero-title">您好，欢迎光临 👋</view>
+				<view class="hero-desc">精选食材 · 现做现卖 · 用心服务</view>
+				<primary-button class="hero-button" text="扫码点餐" @tap="enterMenu" />
 			</view>
+
+			<view class="quick-grid">
+				<view
+					v-for="item in quickEntries"
+					:key="item.key"
+					class="quick-item ui-card"
+					hover-class="quick-item--pressed"
+					@tap="handleQuickTap(item.key)"
+				>
+					<view class="quick-icon">
+						<text class="quick-icon__text">{{ item.short }}</text>
+					</view>
+					<text class="quick-title">{{ item.title }}</text>
+				</view>
+			</view>
+
+			<view class="section-head">
+				<view>
+					<view class="ui-section-title">推荐菜品</view>
+					<view class="ui-section-subtitle">新疆风味 · 真实摄影 · 产品级呈现</view>
+				</view>
+				<view class="section-link" @tap="enterMenu">
+					<text>查看全部</text>
+					<text class="section-link__arrow">›</text>
+				</view>
+			</view>
+
+			<view v-if="isLoading" class="loading-box ui-card">
+				<text class="loading-box__text">加载中...</text>
+			</view>
+
+			<scroll-view
+				v-else-if="recommendGoodsList.length > 0"
+				class="food-scroll"
+				scroll-x
+				:show-scrollbar="false"
+			>
+				<view class="food-scroll__inner">
+					<food-card
+						v-for="item in recommendGoodsList"
+						:key="item.goodsId"
+						class="food-scroll__item"
+						layout="stack"
+						:item="item"
+						@tap="openGoodsDetail(item)"
+						@add="openSpecifications(item)"
+					/>
+				</view>
+			</scroll-view>
+
+			<empty-state
+				v-else
+				title="暂无推荐菜品"
+				desc="请稍后刷新，或者直接进入菜单浏览全部商品"
+				action-text="去菜单看看"
+				@action="enterMenu"
+			/>
 		</view>
 
-		<!-- 问候语 -->
-		<view class="greeting-section">
-			<view class="greeting-title">您好，欢迎光临 👋</view>
-			<view class="greeting-subtitle">新鲜食材 · 精心烹饪 · 用心服务</view>
-		</view>
+		<view v-if="specificationsDialog" class="spec-overlay" @tap="closeSpecifications">
+			<view class="spec-sheet ui-card" @tap.stop>
+				<view class="spec-sheet__head">
+					<text class="spec-sheet__title">选择规格</text>
+					<text class="spec-sheet__close" @tap="closeSpecifications">×</text>
+				</view>
 
-		<view class="start-order-button" hover-class="start-order-button--pressed" @tap="businessTap" data-index="0">
-			<text>开始点餐</text>
-			<text class="start-order-arrow">›</text>
-		</view>
-
-		<!-- 四个快捷入口 -->
-		<view class="quick-entries">
-			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="0">
-				<view class="quick-entry-icon">
-					<text class="quick-entry-symbol">⌂</text>
-				</view>
-				<text class="quick-entry-text">店内点餐</text>
-			</view>
-			<view class="quick-entry" hover-class="hover-class-public" @tap="businessTap" data-index="1">
-				<view class="quick-entry-icon">
-					<text class="quick-entry-symbol">↗</text>
-				</view>
-				<text class="quick-entry-text">外卖配送</text>
-			</view>
-			<view class="quick-entry" hover-class="hover-class-public" @tap="bindOrderInfo">
-				<view class="quick-entry-icon">
-					<text class="quick-entry-symbol">▤</text>
-				</view>
-				<text class="quick-entry-text">订单记录</text>
-			</view>
-			<view class="quick-entry" hover-class="hover-class-public" @tap="isPromotionTap">
-				<view class="quick-entry-icon">
-					<text class="quick-entry-symbol">◇</text>
-				</view>
-				<text class="quick-entry-text">优惠活动</text>
-			</view>
-		</view>
-
-		<!-- 推荐菜品 -->
-		<view class="section-header" v-if="recommendGoodsList && recommendGoodsList.length">
-			<view class="section-title">推荐菜品</view>
-			<view class="section-more" @tap="businessTap" data-index="0">
-				<text>查看更多</text>
-				<text class="section-arrow">›</text>
-			</view>
-		</view>
-		<view class="recommend-grid" v-if="recommendGoodsList && recommendGoodsList.length">
-			<view class="recommend-item" v-for="(item, index) in recommendGoodsList" :key="index"
-				hover-class="hover-class-public" @tap="commodityDetailTap" :data-id="item.goodsId"
-				:data-shopid="item.shopId">
-				<image :src="item.mainImage || '/static/assets/common/load-image.png'" mode="aspectFill"
-					class="recommend-image" />
-				<view class="recommend-info">
-					<view class="recommend-name out_of_range one_row">{{ item.goodsName }}</view>
-					<view class="recommend-bottom">
-						<text class="price-accent">¥{{ item.goodsPrice }}</text>
-						<view class="btn-add-circle" @tap.stop="openSpecifications" :data-goodsId="item.goodsId">＋</view>
+				<view class="spec-preview ui-card">
+					<image :src="goodsInfo.mainImage" mode="aspectFill" class="spec-preview__image" />
+					<view class="spec-preview__copy">
+						<view class="spec-preview__title">{{ goodsInfo.name }}</view>
+						<view class="spec-preview__desc">已选：{{ specListString || '默认规格' }}</view>
+						<view class="spec-preview__price">¥{{ priceAfter }}</view>
 					</view>
 				</view>
-			</view>
-		</view>
 
-		<!-- 优惠活动 -->
-		<view class="section-header" v-if="promotionList && promotionList.length">
-			<view class="section-title">优惠活动</view>
-		</view>
-		<view class="promotion-card" v-for="(rule, index) in promotionList" :key="index"
-			v-if="promotionList && promotionList.length" @tap="businessTap" data-index="0">
-			<view class="promotion-info">
-				<view class="promotion-title">{{ rule.name }}</view>
-				<view class="promotion-desc" v-if="rule.validityPeriod">有效期至 {{ rule.validityPeriod }}</view>
-			</view>
-			<view class="promotion-btn">去使用</view>
-		</view>
-
-		<!-- 活动弹窗 -->
-		<van-action-sheet :show="isActivityDialog" @close="closeActivity" @cancel="closeActivity" title="优惠活动">
-			<view slot="desc">
-				<scroll-view style="height: 55vh" scroll-y>
-					<view class="dialog-title">优惠：</view>
-					<view class="business-discount-info">
-						<view class="business-discount" @tap="isPromotionTap">
-							<view class="theme-color-border business-discount-list" v-for="(rule, idx) in promotionList"
-								:key="idx">
-								{{ rule.name }}
-							</view>
-						</view>
-					</view>
-				</scroll-view>
-			</view>
-		</van-action-sheet>
-
-		<!-- 规格弹窗 -->
-		<van-action-sheet :show="specificationsDialog" @close="closeSpecifications" @cancel="closeSpecifications"
-			title="选择规格">
-			<view class="content">
-				<view class="goods-info-view">
-					<image :src="goodsInfo.mainImage" mode="aspectFill" class="commodity-image"></image>
-					<view>
-						<view class="goods-info-name">{{ goodsInfo.name }}</view>
-						<view class="goods-info-specListString">已选：{{ specListString }}</view>
-						<view class="goods-info-price price-accent">¥{{ priceAfter }}</view>
-					</view>
-				</view>
-				<scroll-view scroll-y style="height: 50vh">
-					<view class="commdity-name-type-view">
-						<view class="commdity-type-item" v-for="(item, key) in specList" :key="key">
-							<view class="commdity-type-name">{{ key }}</view>
-							<radio-group class="radio-group" @change="radioChange" :data-firstIndex="key">
-								<label :class="
-									'group-label theme-border ' +
-									(!item.stock ? 'disabled-group-label' : '') +
-									' ' +
-									(item.checked ? 'active theme-bg' : 'theme-color-border') +
-									' out_of_range one_row'
-								" v-for="(item, index) in item" :key="index">
-									<radio :value="index" :checked="item.checked" :disabled="!item.stock" class="radio" />
-									{{ item.name }}
+				<scroll-view scroll-y class="spec-scroll">
+					<view class="spec-list">
+						<view v-for="(group, key) in specList" :key="key" class="spec-group">
+							<view class="spec-group__title">{{ key }}</view>
+							<radio-group class="spec-options" @change="radioChange" :data-first-index="key">
+								<label
+									v-for="(option, index) in group"
+									:key="index"
+									:class="[
+										'spec-option',
+										option.checked ? 'spec-option--active' : '',
+										!option.stock ? 'spec-option--disabled' : ''
+									]"
+								>
+									<radio :value="index" :checked="option.checked" :disabled="!option.stock" />
+									<text class="spec-option__text">{{ option.name }}</text>
 								</label>
 							</radio-group>
 						</view>
-						<view class="loading_box" v-if="specLoading&&specList.length==0">
-							<van-loading custom-class="loading_box_class" vertical>加载中...</van-loading>
-						</view>
-						<van-empty v-if="!specLoading&&specList.length <= 0" description="暂无规格"></van-empty>
+
+						<view v-if="specLoading" class="spec-loading">加载中...</view>
+						<empty-state
+							v-else-if="!specLoading && specList.length <= 0"
+							title="暂无规格"
+							desc="当前商品没有可选规格"
+						/>
 					</view>
 				</scroll-view>
-				<view slot="footer" class="position-sticky-bottom">
-					<view class="good-choice-btn theme-bg" @tap="insertShoppingCart">我选好了</view>
-				</view>
-			</view>
-		</van-action-sheet>
 
-		<!-- 底部安全区 -->
-		<view class="safe-area-bottom"></view>
+				<primary-button text="加入购物车" @tap="insertShoppingCart" />
+			</view>
+		</view>
+
+		<view class="ui-safe-bottom"></view>
 	</view>
 </template>
 
 <script>
-	import GlobalConfig from '../../utils/global-config';
-	import BrandConfig from '../../utils/brand-config';
-	import https from '../../utils/http';
-	import authService from '../../utils/auth';
-	import toastService from '../../utils/toast.service';
-	let app = null;
-	export default {
-		data() {
-			return {
-				brand: BrandConfig,
-				recommendGoodsList: [],
-				promotionList: [],
-				isActivityDialog: false,
-				isLoading: true,
-				// 规格弹窗相关
-				specificationsDialog: false,
-				specLoading: false,
-				goodsId: '',
-				goodsInfo: { mainImage: '', name: '' },
-				specList: [],
-				specListString: '',
-				priceAfter: '',
-			};
+import GlobalConfig from '../../utils/global-config';
+import BrandConfig from '../../utils/brand-config';
+import https from '../../utils/http';
+import authService from '../../utils/auth';
+import toastService from '../../utils/toast.service';
+import AppHeader from '../../components/ui/app-header.vue';
+import PrimaryButton from '../../components/ui/primary-button.vue';
+import FoodCard from '../../components/ui/food-card.vue';
+import EmptyState from '../../components/ui/empty-state.vue';
+
+let app = null;
+
+export default {
+	components: {
+		AppHeader,
+		PrimaryButton,
+		FoodCard,
+		EmptyState
+	},
+	data() {
+		return {
+			brand: BrandConfig,
+			headerLogo: '/static/assets/images/logo.png',
+			quickEntries: [
+				{ key: 'scan', title: '扫码点餐', short: '扫' },
+				{ key: 'dinein', title: '店内就餐', short: '店' },
+				{ key: 'orders', title: '我的订单', short: '订' }
+			],
+			recommendGoodsList: [],
+			isLoading: true,
+			specificationsDialog: false,
+			specLoading: false,
+			goodsId: '',
+			goodsInfo: {
+				mainImage: '',
+				name: '',
+				price: 0
+			},
+			specList: [],
+			specListString: '',
+			priceAfter: 0
+		};
+	},
+	onLoad() {
+		app = getApp();
+		this.getRecommendGoods();
+	},
+	onPullDownRefresh() {
+		this.getRecommendGoods();
+		setTimeout(() => {
+			uni.stopPullDownRefresh();
+			uni.hideNavigationBarLoading();
+		}, 600);
+	},
+	methods: {
+		enterMenu() {
+			app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = 0;
+			app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = true;
+			app.globalData.deliveryAndSelfTaking.ifChooseBack = false;
+			app.globalData.deliveryAndSelfTaking.ifChoosePayBack = false;
+			uni.switchTab({
+				url: '/pages/menu/index/index'
+			});
 		},
-		onLoad: function () {
-			app = getApp();
-			this.getRecommendGoods();
-			this.getPromotionList();
+		enterOrders() {
+			uni.switchTab({
+				url: '/pages/order/index/index'
+			});
 		},
-		onShow: function () {
-			this.getRegeoInit();
+		handleQuickTap(key) {
+			if (key === 'orders') {
+				this.enterOrders();
+				return;
+			}
+			this.enterMenu();
 		},
-		onPullDownRefresh() {
-			this.getRecommendGoods();
-			this.getPromotionList();
-			setTimeout(() => {
-				uni.stopPullDownRefresh();
-				uni.hideNavigationBarLoading();
-			}, 1000);
+		openGoodsDetail(item) {
+			uni.navigateTo({
+				url: `/pages/menu/detail/detail?id=${item.goodsId}&shopId=${item.shopId || GlobalConfig.defaultShopId}`
+			});
 		},
-		methods: {
-			getRegeoInit() {
-				var addressInfo = app.globalData.deliveryAndSelfTaking.initRegeoInfo;
-				app.globalData.deliveryAndSelfTaking.regeoInfo = addressInfo;
-				app.globalData.deliveryAndSelfTaking.location = addressInfo.location;
-			},
-
-			businessTap(e) {
-				var index = e.currentTarget.dataset.index;
-				app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = index;
-				app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = true;
-				app.globalData.deliveryAndSelfTaking.ifChooseBack = false;
-				app.globalData.deliveryAndSelfTaking.ifChoosePayBack = false;
-				uni.switchTab({
-					url: `/pages/menu/index/index`
-				});
-			},
-
-			searchBusinessTap() {
-				uni.navigateTo({
-					url: '../menu/search/search?location=' + app.globalData.deliveryAndSelfTaking.location
-				});
-			},
-
-			commodityDetailTap(e) {
-				uni.navigateTo({
-					url: '../menu/detail/detail?id=' + e.currentTarget.dataset.id + '&shopId=' + e.currentTarget.dataset.shopid
-				});
-			},
-
-			bindOrderInfo() {
-				uni.navigateTo({
-					url: '../order/index/index?currentTab=0&modeType=all&currentOrderTab=0'
-				});
-			},
-
-			isPromotionTap() {
-				this.isActivityDialog = !this.isActivityDialog;
-			},
-
-			closeActivity() {
-				this.isActivityDialog = false;
-			},
-
-			getRecommendGoods() {
-				https.request('/rest/goods/list', {
-					pageNo: 1,
-					pageSize: 3,
-					isRecommend: 1
-				}).then((result) => {
-					if (result.success && result.data) {
-						result.data.records.forEach((item) => {
-							item.mainImage = item.mainImage ? GlobalConfig.ossUrl + item.mainImage : '';
-						});
-						this.recommendGoodsList = result.data.records;
-					}
-				});
-			},
-
-			getPromotionList() {
-				https.request('/rest/fullReductionRule/list', {
-					pageNo: -1,
-					pageSize: 5
-				}).then((result) => {
-					if (result.success) {
-						this.promotionList = result.data.records || [];
-					}
-				});
-			},
-
-			// 规格相关
-			openSpecifications(e) {
-				this.specificationsDialog = true;
-				this.specLoading = true;
-				this.goodsId = e.currentTarget.dataset.goodsid;
-				this.getCommodityDetails(e.currentTarget.dataset.goodsid);
-			},
-
-			closeSpecifications() {
-				this.specificationsDialog = false;
-				this.specList = [];
-				this.specLoading = false;
-			},
-
-			getCommodityDetails(id) {
-				https.request('/rest/goods/selectById', {
-					id: id,
-					position: app.globalData.deliveryAndSelfTaking.location
-				}).then((result) => {
-					if (result.success && result.data) {
-						result.data.mainImage = GlobalConfig.ossUrl + result.data.mainImage;
-						this.goodsInfo = result.data;
-						this.priceAfter = result.data.price;
-						this.selectByGoodsId(id);
-					}
-				});
-			},
-
-			selectByGoodsId(goodsId) {
-				https.request('/rest/goodsSpecificationOption/selectByGoodsId', {
-					goodsId: goodsId
-				}).then((result) => {
-					if (result.success && result.data) {
-						let specList = result.data;
-						let price = this.goodsInfo.price;
-						let specListString = '';
-						for (let key in specList) {
-							let isChecked = true;
-							for (let keyof in specList[key]) {
-								specList[key][keyof].checked = false;
-								if (specList[key][keyof].stock == 1 && isChecked) {
-									specList[key][keyof].checked = true;
-									price = price + specList[key][keyof].price;
-									specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
-									isChecked = false;
-								}
+		getRecommendGoods() {
+			this.isLoading = true;
+			https.request('/rest/goods/homePage/recommendGoodsList', {
+				position: app.globalData.deliveryAndSelfTaking.location || app.globalData.deliveryAndSelfTaking.initRegeoInfo.location
+			}).then((result) => {
+				this.isLoading = false;
+				if (result.success && result.data) {
+					this.recommendGoodsList = (result.data || []).map((item) => ({
+						...item,
+						mainImage: item.mainImage ? GlobalConfig.ossUrl + item.mainImage : ''
+					}));
+				}
+			});
+		},
+		openSpecifications(item) {
+			this.goodsId = item.goodsId;
+			this.specificationsDialog = true;
+			this.specLoading = true;
+			this.getCommodityDetails(item.goodsId);
+		},
+		closeSpecifications() {
+			this.specificationsDialog = false;
+			this.specLoading = false;
+			this.specList = [];
+			this.specListString = '';
+		},
+		getCommodityDetails(id) {
+			https.request('/rest/goods/selectById', {
+				id: id,
+				position: app.globalData.deliveryAndSelfTaking.location
+			}).then((result) => {
+				if (result.success && result.data) {
+					result.data.mainImage = result.data.mainImage ? GlobalConfig.ossUrl + result.data.mainImage : '';
+					this.goodsInfo = result.data;
+					this.priceAfter = result.data.price;
+					this.selectByGoodsId(id);
+				}
+			});
+		},
+		selectByGoodsId(goodsId) {
+			https.request('/rest/goodsSpecificationOption/selectByGoodsId', {
+				goodsId: goodsId
+			}).then((result) => {
+				if (result.success && result.data) {
+					const specList = result.data;
+					let price = this.goodsInfo.price;
+					let specListString = '';
+					for (const key in specList) {
+						let isChecked = true;
+						for (const optionKey in specList[key]) {
+							specList[key][optionKey].checked = false;
+							if (specList[key][optionKey].stock == 1 && isChecked) {
+								specList[key][optionKey].checked = true;
+								price += specList[key][optionKey].price;
+								specListString = (specListString ? `${specListString}/` : '') + specList[key][optionKey].name;
+								isChecked = false;
 							}
 						}
-						this.specListString = specListString;
-						this.specList = JSON.stringify(specList) == '{}' ? [] : specList;
-						this.specLoading = false;
 					}
-				});
-			},
-
-			radioChange(e) {
-				var checkValue = e.detail.value;
-				let firstIndex = e.currentTarget.dataset.firstindex;
-				let specList = this.specList;
-				for (var j in specList[firstIndex]) {
-					specList[firstIndex][j].checked = false;
+					this.specListString = specListString;
+					this.specList = JSON.stringify(specList) === '{}' ? [] : specList;
+					this.priceAfter = price;
+					this.specLoading = false;
 				}
-				specList[firstIndex][checkValue].checked = true;
-				let price = this.goodsInfo.price;
-				let specListString = '';
-				for (let key in specList) {
-					for (let keyof in specList[key]) {
-						if (specList[key][keyof].checked) {
-							price = price + specList[key][keyof].price;
-							specListString = (specListString ? specListString + '/' : specListString) + specList[key][keyof].name;
-						}
+			});
+		},
+		radioChange(e) {
+			const checkValue = e.detail.value;
+			const firstIndex = e.currentTarget.dataset.firstIndex;
+			const specList = this.specList;
+			for (const key in specList[firstIndex]) {
+				specList[firstIndex][key].checked = false;
+			}
+			specList[firstIndex][checkValue].checked = true;
+
+			let price = this.goodsInfo.price;
+			let specListString = '';
+			for (const groupKey in specList) {
+				for (const optionKey in specList[groupKey]) {
+					if (specList[groupKey][optionKey].checked) {
+						price += specList[groupKey][optionKey].price;
+						specListString = (specListString ? `${specListString}/` : '') + specList[groupKey][optionKey].name;
 					}
 				}
-				this.specList = specList;
-				this.specListString = specListString;
-				this.priceAfter = price;
-			},
-
-			insertShoppingCart() {
-				var _this = this;
-				authService.checkIsLogin().then((result) => {
-					toastService.showLoading();
-					if (result) {
-						let goodsSpecs = {};
-						let specList = _this.specList;
-						for (let key in specList) {
-							for (let keyof in specList[key]) {
-								if (specList[key][keyof].checked) {
-									goodsSpecs[key] = specList[key][keyof].name;
-								}
+			}
+			this.specList = specList;
+			this.specListString = specListString;
+			this.priceAfter = price;
+		},
+		insertShoppingCart() {
+			authService.checkIsLogin().then((result) => {
+				toastService.showLoading();
+				if (result) {
+					const goodsSpecs = {};
+					const specList = this.specList;
+					for (const key in specList) {
+						for (const optionKey in specList[key]) {
+							if (specList[key][optionKey].checked) {
+								goodsSpecs[key] = specList[key][optionKey].name;
 							}
 						}
-						toastService.hideLoading();
-						https.request('/rest/member/shoppingCart/insert', {
-							goodsId: _this.goodsId,
-							specList: JSON.stringify(goodsSpecs),
-							shopId: _this.recommendGoodsList[0] ? _this.recommendGoodsList[0].shopId : ''
-						}).then((result) => {
-							if (result.success) {
-								_this.specificationsDialog = false;
-								_this.specList = [];
-								_this.specLoading = true;
-								toastService.showSuccess('已加入购物车', false);
-							}
-						});
-						return;
 					}
-					_this.specificationsDialog = false;
 					toastService.hideLoading();
-					app.globalData.checkIsAuth('scope.userInfo');
-				});
-			},
+					https.request('/rest/member/shoppingCart/insert', {
+						goodsId: this.goodsId,
+						specList: JSON.stringify(goodsSpecs),
+						shopId: this.recommendGoodsList[0] ? this.recommendGoodsList[0].shopId : GlobalConfig.defaultShopId
+					}).then((result) => {
+						if (result.success) {
+							this.closeSpecifications();
+							toastService.showSuccess('已加入购物车', false);
+						}
+					});
+					return;
+				}
+				this.closeSpecifications();
+				toastService.hideLoading();
+				app.globalData.checkIsAuth('scope.userInfo');
+			});
 		}
-	};
+	}
+};
 </script>
+
 <style>
-	page {
-		width: 100%;
-		background: #fff;
-	}
+page {
+	background: #f7f7f7;
+}
 
-	.page {
-		min-height: 100vh;
-		padding: calc(44rpx + env(safe-area-inset-top)) 40rpx 120rpx;
-		box-sizing: border-box;
-	}
+.home-page {
+	min-height: 100vh;
+}
 
-	/* 品牌信息 */
-	.brand-header {
-		display: flex;
-		align-items: center;
-		padding: 10rpx 0 74rpx;
-	}
+.home-shell {
+	padding: calc(32rpx + env(safe-area-inset-top)) 40rpx 24rpx;
+}
 
-	.brand-mark {
-		width: 64rpx;
-		height: 64rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 50%;
-		background: #050505;
-		color: #fff;
-		font-size: 30rpx;
-		font-weight: 700;
-	}
+.hero-card {
+	margin-top: 32rpx;
+	padding: 32rpx;
+}
 
-	.brand-copy {
-		margin-left: 18rpx;
-	}
+.hero-kicker {
+	font-size: 22rpx;
+	color: #666;
+	letter-spacing: 2rpx;
+}
 
-	.brand-name {
-		color: #0a0a0a;
-		font-size: 30rpx;
-		font-weight: 700;
-		line-height: 1.25;
-	}
+.hero-title {
+	margin-top: 16rpx;
+	font-size: 42rpx;
+	line-height: 1.2;
+	font-weight: 600;
+	color: #000;
+}
 
-	.brand-slogan {
-		margin-top: 4rpx;
-		color: #8a8a8a;
-		font-size: 21rpx;
-	}
+.hero-desc {
+	margin-top: 12rpx;
+	font-size: 24rpx;
+	line-height: 1.4;
+	color: #666;
+}
 
-	/* 问候语 */
-	.greeting-section {
-		padding: 0 0 52rpx;
-	}
+.hero-button {
+	margin-top: 28rpx;
+}
 
-	.greeting-title {
-		font-size: 42rpx;
-		font-weight: 700;
-		color: #090909;
-		letter-spacing: -1rpx;
-	}
+.quick-grid {
+	display: flex;
+	gap: 16rpx;
+	margin-top: 24rpx;
+}
 
-	.greeting-subtitle {
-		margin-top: 14rpx;
-		font-size: 24rpx;
-		color: #8c8c8c;
-		letter-spacing: 1rpx;
-	}
+.quick-item {
+	flex: 1;
+	padding: 24rpx 16rpx;
+	text-align: center;
+}
 
-	.start-order-button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		position: relative;
-		height: 96rpx;
-		margin-bottom: 58rpx;
-		border-radius: 18rpx;
-		background: #050505;
-		color: #fff;
-		font-size: 28rpx;
-		font-weight: 700;
-		box-shadow: 0 12rpx 30rpx rgba(0, 0, 0, 0.12);
-	}
+.quick-item--pressed {
+	opacity: 0.72;
+}
 
-	.start-order-button--pressed {
-		opacity: 0.82;
-	}
+.quick-icon {
+	width: 68rpx;
+	height: 68rpx;
+	border-radius: 50%;
+	border: 1rpx solid #eaeaea;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 14rpx;
+	color: #000;
+}
 
-	.start-order-arrow {
-		position: absolute;
-		right: 28rpx;
-		top: 50%;
-		transform: translateY(-54%);
-		font-size: 42rpx;
-		font-weight: 300;
-	}
+.quick-icon__text {
+	font-size: 30rpx;
+	font-weight: 600;
+}
 
-	/* 快捷入口 */
-	.quick-entries {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 70rpx;
-	}
+.quick-title {
+	display: block;
+	font-size: 24rpx;
+	line-height: 1.4;
+	color: #000;
+	font-weight: 500;
+}
 
-	.quick-entry {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		width: 22%;
-	}
+.section-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-top: 40rpx;
+	margin-bottom: 18rpx;
+}
 
-	.quick-entry-icon {
-		width: 70rpx;
-		height: 70rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 14rpx;
-	}
+.section-link {
+	display: inline-flex;
+	align-items: center;
+	color: #666;
+	font-size: 24rpx;
+}
 
-	.quick-entry-symbol {
-		font-size: 44rpx;
-		color: #0a0a0a;
-		font-weight: 500;
-	}
+.section-link__arrow {
+	margin-left: 8rpx;
+	font-size: 30rpx;
+	line-height: 1;
+}
 
-	.quick-entry-text {
-		font-size: 23rpx;
-		color: #171717;
-		font-weight: 500;
-	}
+.food-scroll {
+	width: 100%;
+	white-space: nowrap;
+}
 
-	/* 分区标题 */
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 20rpx;
-		padding: 0 6rpx;
-	}
+.food-scroll__inner {
+	display: inline-flex;
+	gap: 16rpx;
+	padding-bottom: 8rpx;
+}
 
-	.section-title {
-		font-size: 32rpx;
-		font-weight: 700;
-		color: #111;
-	}
+.food-scroll__item {
+	display: inline-flex;
+	vertical-align: top;
+}
 
-	.section-more {
-		font-size: 24rpx;
-		color: #858585;
-		display: flex;
-		align-items: center;
-	}
+.loading-box {
+	padding: 64rpx 24rpx;
+	text-align: center;
+}
 
-	.section-arrow {
-		font-size: 30rpx;
-		margin-left: 4rpx;
-	}
+.loading-box__text {
+	color: #000;
+}
 
-	/* 推荐菜品 grid */
-	.recommend-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-column-gap: 14rpx;
-		margin-bottom: 32rpx;
-	}
+.spec-overlay {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.42);
+	display: flex;
+	align-items: flex-end;
+	z-index: 999;
+}
 
-	.recommend-item {
-		background: #fff;
-		border-radius: 14rpx;
-		overflow: hidden;
-		box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.06);
-	}
+.spec-sheet {
+	width: 100%;
+	padding: 24rpx;
+	border-radius: 24rpx 24rpx 0 0;
+	background: #fff;
+	max-height: 86vh;
+	box-sizing: border-box;
+}
 
-	.recommend-image {
-		width: 100%;
-		height: 190rpx;
-		display: block;
-	}
+.spec-sheet__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16rpx;
+}
 
-	.recommend-info {
-		padding: 14rpx 12rpx 18rpx;
-	}
+.spec-sheet__title {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.recommend-name {
-		font-size: 24rpx;
-		font-weight: 600;
-		color: #111;
-		margin-bottom: 12rpx;
-	}
+.spec-sheet__close {
+	width: 48rpx;
+	height: 48rpx;
+	border-radius: 50%;
+	background: #f5f5f5;
+	color: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 32rpx;
+	line-height: 1;
+}
 
-	.recommend-bottom {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
+.spec-preview {
+	display: flex;
+	align-items: center;
+	padding: 20rpx;
+}
 
-	.recommend-bottom .price-accent {
-		font-size: 26rpx;
-		color: #111;
-	}
+.spec-preview__image {
+	width: 160rpx;
+	height: 160rpx;
+	border-radius: 12rpx;
+	flex-shrink: 0;
+	background: #f7f7f7;
+}
 
-	.recommend-bottom .btn-add-circle {
-		width: 40rpx;
-		height: 40rpx;
-		font-size: 26rpx;
-		background: #050505;
-	}
+.spec-preview__copy {
+	margin-left: 20rpx;
+	flex: 1;
+}
 
-	/* 优惠卡片 */
-	.promotion-card {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		background: #fff;
-		border-radius: 16rpx;
-		padding: 26rpx 24rpx;
-		margin-bottom: 16rpx;
-		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-	}
+.spec-preview__title {
+	font-size: 30rpx;
+	line-height: 1.3;
+	font-weight: 600;
+	color: #000;
+}
 
-	.promotion-info {}
+.spec-preview__desc {
+	margin-top: 8rpx;
+	font-size: 24rpx;
+	color: #666;
+}
 
-	.promotion-title {
-		font-size: 28rpx;
-		font-weight: 700;
-		color: #111;
-		margin-bottom: 6rpx;
-	}
+.spec-preview__price {
+	margin-top: 10rpx;
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #000;
+}
 
-	.promotion-desc {
-		font-size: 22rpx;
-		color: #858585;
-	}
+.spec-scroll {
+	max-height: 46vh;
+	margin-top: 16rpx;
+}
 
-	.promotion-btn {
-		padding: 12rpx 24rpx;
-		background: #050505;
-		color: #fff;
-		font-size: 24rpx;
-		font-weight: 600;
-		border-radius: 50rpx;
-	}
+.spec-list {
+	padding: 4rpx 0 0;
+}
 
-	/* 活动弹窗 */
-	.dialog-title {
-		font-size: 28rpx;
-		font-weight: 700;
-		padding: 20rpx;
-	}
+.spec-group {
+	margin-bottom: 24rpx;
+}
 
-	.business-discount-info {
-		padding: 0 20rpx;
-	}
+.spec-group__title {
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #000;
+	margin-bottom: 14rpx;
+}
 
-	.business-discount {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10rpx;
-	}
+.spec-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12rpx;
+}
 
-	.business-discount-list {
-		padding: 4rpx 12rpx;
-		font-size: 22rpx;
-		font-weight: 600;
-		border-radius: 8rpx;
-	}
+.spec-option {
+	display: inline-flex;
+	align-items: center;
+	gap: 8rpx;
+	padding: 14rpx 18rpx;
+	border-radius: 14rpx;
+	border: 1rpx solid #eaeaea;
+	background: #fff;
+	font-size: 24rpx;
+	color: #000;
+}
 
-	/* 规格弹窗 */
-	.content {
-		padding: 0 16px 16px 16px;
-	}
+.spec-option--active {
+	background: #000;
+	border-color: #000;
+	color: #fff;
+}
 
-	.goods-info-view {
-		display: flex;
-		padding: 20rpx;
-		border-bottom: 1rpx solid #f0f0f0;
-	}
+.spec-option--disabled {
+	opacity: 0.45;
+}
 
-	.goods-info-view .commodity-image {
-		width: 160rpx;
-		height: 160rpx;
-		border-radius: 12rpx;
-		margin-right: 20rpx;
-	}
+.spec-option__text {
+	line-height: 1;
+}
 
-	.goods-info-name {
-		font-size: 30rpx;
-		font-weight: 700;
-		color: #111;
-		margin-bottom: 8rpx;
-	}
-
-	.goods-info-specListString {
-		font-size: 24rpx;
-		color: #858585;
-		margin-bottom: 10rpx;
-	}
-
-	.goods-info-price {
-		font-size: 32rpx;
-	}
-
-	.commdity-name-type-view {
-		padding: 20rpx;
-	}
-
-	.commdity-type-item {
-		margin-bottom: 20rpx;
-	}
-
-	.commdity-type-name {
-		font-size: 26rpx;
-		font-weight: 600;
-		color: #111;
-		margin-bottom: 14rpx;
-	}
-
-	.radio-group {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12rpx;
-	}
-
-	.group-label {
-		padding: 10rpx 18rpx;
-		font-size: 24rpx;
-		border-radius: 8rpx;
-	}
-
-	.good-choice-btn {
-		width: 100%;
-		padding: 26rpx 0;
-		text-align: center;
-		font-size: 30rpx;
-		font-weight: 700;
-		border-radius: 50rpx;
-		margin: 16rpx;
-		width: calc(100% - 32rpx);
-	}
-
-	.safe-area-bottom {
-		height: calc(100rpx + env(safe-area-inset-bottom));
-	}
+.spec-loading {
+	padding: 36rpx 0;
+	text-align: center;
+	color: #666;
+}
 </style>

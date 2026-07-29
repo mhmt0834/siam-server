@@ -38,7 +38,7 @@ export default class AuthService {
         console.log(storageText);
         return storage.getStorage('security.' + storageText);
     }
-    static deleteOpenId(storageText) {
+    static deleteWxStorage(storageText) {
         return storage.removeStorage('security.' + storageText);
     }
     static checkIsLogin() {

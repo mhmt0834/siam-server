@@ -13,7 +13,7 @@ export default {
 	features: {
 		singleStore: true,
 		selfPickup: true,
-		delivery: true,
+		delivery: false,
 		onlinePayment: false,
 		pointsMall: false
 	}

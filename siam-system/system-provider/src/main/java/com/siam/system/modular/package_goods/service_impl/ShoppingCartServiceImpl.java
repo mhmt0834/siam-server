@@ -60,6 +60,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    public ShoppingCart selectSameItem(Integer memberId, Integer shopId, Long diningTableId, Integer goodsId, String specList) {
+        return shoppingCartMapper.selectSameItem(memberId, shopId, diningTableId, goodsId, specList);
+    }
+
+    @Override
     public int countByIdListAndMemberId(List<Integer> idList, Integer memberId) {
         return shoppingCartMapper.countByIdListAndMemberId(idList, memberId);
     }

@@ -27,6 +27,8 @@ public interface ShoppingCartService {
 
     Page<Map<String, Object>> getListByPageJoinGoods(int pageNo, int pageSize, ShoppingCart shoppingCart);
 
+    ShoppingCart selectSameItem(Integer memberId, Integer shopId, Long diningTableId, Integer goodsId, String specList);
+
     /**
      * 根据id集合与用户id统计购物车数量
      * 用于校验id是否存在、以及该购物车数据是否属于当前登录用户

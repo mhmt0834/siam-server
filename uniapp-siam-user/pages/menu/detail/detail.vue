@@ -82,6 +82,7 @@ import https from '../../../utils/http';
 import authService from '../../../utils/auth';
 import toastService from '../../../utils/toast.service';
 import utilHelper from '../../../utils/util';
+import DiningContext from '../../../utils/dining-context';
 import PrimaryButton from '../../../components/ui/primary-button.vue';
 
 let app = null;
@@ -206,6 +207,11 @@ export default {
 		},
 		addToCart() {
 			if (this.submitting || this.goods.goodsStatus == 4) return;
+			const diningContext = DiningContext.get();
+			if (!diningContext.sceneToken) {
+				toastService.showError('请先扫描餐桌二维码');
+				return;
+			}
 			authService.checkIsLogin().then((loggedIn) => {
 				if (!loggedIn) {
 					app.globalData.checkIsAuth('scope.userInfo');
@@ -215,7 +221,7 @@ export default {
 				https.request('/rest/member/shoppingCart/insert', {
 					goodsId: this.goodsId,
 					specList: JSON.stringify(this.getSelectedSpecifications()),
-					shopId: this.shopId,
+					sceneToken: diningContext.sceneToken,
 					number: this.quantity
 				}).then((result) => {
 					if (result.success) {

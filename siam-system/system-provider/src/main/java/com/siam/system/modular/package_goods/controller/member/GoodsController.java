@@ -308,12 +308,6 @@ public class GoodsController {
         BasicData basicResult = new BasicData();
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        //TODO(MARK)-小程序用的是高德地图，后端用的是百度地图，所以需要转换一下
-        String[] strArray = param.getPosition().split(",");
-        Map<String, BigDecimal> coordinateMap = baiduMapUtils.gaoDeToBaidu(Double.valueOf(strArray[0]), Double.valueOf(strArray[1]));
-        log.debug("\n\ngaode-position : " + param.getPosition());
-        log.debug("\n\nbaidu-position : " + coordinateMap.get("lng") + "," + coordinateMap.get("lat"));
-
         //TODO-按照浏览量由高到低查询出前6件商品(暂存)
         //查询近一月销量最高的前6件商品，如4-11~5-11、4-12~5-12区间
         //计算结束时间
@@ -332,6 +326,18 @@ public class GoodsController {
         startCalendar.set(Calendar.SECOND, 0);
         startCalendar.set(Calendar.MILLISECOND, 0);
         Date startTime = startCalendar.getTime();
+
+        if(param.getShopId() != null){
+            resultList.addAll(goodsService.getListByLatelyMonthlySalesTopNumber(
+                    startTime, endTime, Quantity.INT_3, param.getShopId()));
+            return BasicResult.success(resultList);
+        }
+
+        //TODO(MARK)-小程序用的是高德地图，后端用的是百度地图，所以需要转换一下
+        String[] strArray = param.getPosition().split(",");
+        Map<String, BigDecimal> coordinateMap = baiduMapUtils.gaoDeToBaidu(Double.valueOf(strArray[0]), Double.valueOf(strArray[1]));
+        log.debug("\n\ngaode-position : " + param.getPosition());
+        log.debug("\n\nbaidu-position : " + coordinateMap.get("lng") + "," + coordinateMap.get("lat"));
 
         //按照定位地址来查询前6个店铺
         //sql算出来的距离是米，所以这里要乘以1000进行换算

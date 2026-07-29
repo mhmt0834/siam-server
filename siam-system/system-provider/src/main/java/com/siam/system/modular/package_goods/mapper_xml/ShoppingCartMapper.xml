@@ -6,6 +6,7 @@
     <result column="member_id" property="memberId" jdbcType="INTEGER" />
     <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
     <result column="shop_id" property="shopId" jdbcType="INTEGER" />
+    <result column="dining_table_id" property="diningTableId" jdbcType="BIGINT" />
     <result column="spec_list" property="specList" jdbcType="VARCHAR" />
     <result column="number" property="number" jdbcType="INTEGER" />
     <result column="is_goods_exists" property="isGoodsExists" jdbcType="BIT" />
@@ -17,6 +18,7 @@
     <result column="member_id" property="memberId" jdbcType="INTEGER" />
     <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
     <result column="shop_id" property="shopId" jdbcType="INTEGER" />
+    <result column="dining_table_id" property="diningTableId" jdbcType="BIGINT" />
     <result column="spec_list" property="specList" jdbcType="VARCHAR" />
     <result column="number" property="number" jdbcType="INTEGER" />
     <result column="is_goods_exists" property="isGoodsExists" jdbcType="BIT" />
@@ -82,7 +84,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, member_id, goods_id, shop_id, spec_list, number, is_goods_exists, create_time,
+    id, member_id, goods_id, shop_id, dining_table_id, spec_list, number, is_goods_exists, create_time,
     update_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.siam.system.modular.package_goods.model.example.ShoppingCartExample" >
@@ -131,6 +133,9 @@
       <if test="shopId != null" >
         shop_id,
       </if>
+      <if test="diningTableId != null" >
+        dining_table_id,
+      </if>
       <if test="specList != null" >
         spec_list,
       </if>
@@ -159,6 +164,9 @@
       </if>
       <if test="shopId != null" >
         #{shopId,jdbcType=INTEGER},
+      </if>
+      <if test="diningTableId != null" >
+        #{diningTableId,jdbcType=BIGINT},
       </if>
       <if test="specList != null" >
         #{specList,jdbcType=VARCHAR},
@@ -198,6 +206,9 @@
       <if test="record.shopId != null" >
         shop_id = #{record.shopId,jdbcType=INTEGER},
       </if>
+      <if test="record.diningTableId != null" >
+        dining_table_id = #{record.diningTableId,jdbcType=BIGINT},
+      </if>
       <if test="record.specList != null" >
         spec_list = #{record.specList,jdbcType=VARCHAR},
       </if>
@@ -224,6 +235,7 @@
     member_id = #{record.memberId,jdbcType=INTEGER},
     goods_id = #{record.goodsId,jdbcType=INTEGER},
     shop_id = #{record.shopId,jdbcType=INTEGER},
+    dining_table_id = #{record.diningTableId,jdbcType=BIGINT},
     spec_list = #{record.specList,jdbcType=VARCHAR},
     number = #{record.number,jdbcType=INTEGER},
     is_goods_exists = #{record.isGoodsExists,jdbcType=BIT},
@@ -244,6 +256,9 @@
       </if>
       <if test="shopId != null" >
         shop_id = #{shopId,jdbcType=INTEGER},
+      </if>
+      <if test="diningTableId != null" >
+        dining_table_id = #{diningTableId,jdbcType=BIGINT},
       </if>
       <if test="specList != null" >
         spec_list = #{specList,jdbcType=VARCHAR},
@@ -268,6 +283,7 @@
     set member_id = #{memberId,jdbcType=INTEGER},
       goods_id = #{goodsId,jdbcType=INTEGER},
       shop_id = #{shopId,jdbcType=INTEGER},
+      dining_table_id = #{diningTableId,jdbcType=BIGINT},
       spec_list = #{specList,jdbcType=VARCHAR},
       number = #{number,jdbcType=INTEGER},
       is_goods_exists = #{isGoodsExists,jdbcType=BIT},

@@ -132,6 +132,7 @@ import BrandConfig from '../../utils/brand-config';
 import https from '../../utils/http';
 import authService from '../../utils/auth';
 import toastService from '../../utils/toast.service';
+import DiningContext from '../../utils/dining-context';
 import AppHeader from '../../components/ui/app-header.vue';
 import PrimaryButton from '../../components/ui/primary-button.vue';
 import FoodCard from '../../components/ui/food-card.vue';
@@ -183,6 +184,10 @@ export default {
 	},
 	methods: {
 		enterMenu() {
+			if (!DiningContext.get().sceneToken) {
+				this.scanDiningTable();
+				return;
+			}
 			app.globalData.deliveryAndSelfTaking.selfOutActiveIndex = 0;
 			app.globalData.deliveryAndSelfTaking.ifIndexSwitchTab = true;
 			app.globalData.deliveryAndSelfTaking.ifChooseBack = false;
@@ -201,7 +206,30 @@ export default {
 				this.enterOrders();
 				return;
 			}
-			this.enterMenu();
+			this.scanDiningTable();
+		},
+		scanDiningTable() {
+			uni.scanCode({
+				onlyFromCamera: false,
+				success: (scanResult) => {
+					const sceneToken = DiningContext.extractScene(scanResult);
+					if (!sceneToken) {
+						toastService.showError('未识别到有效桌码');
+						return;
+					}
+					https.request('/rest/scan/resolve', { sceneToken }).then((result) => {
+						if (!result.success || !result.data) return;
+						DiningContext.set(result.data);
+						this.getRecommendGoods();
+						this.enterMenu();
+					});
+				},
+				fail: (error) => {
+					if (!error || !String(error.errMsg || '').includes('cancel')) {
+						toastService.showError('桌码识别失败，请重试');
+					}
+				}
+			});
 		},
 		openGoodsDetail(item) {
 			uni.navigateTo({
@@ -210,7 +238,9 @@ export default {
 		},
 		getRecommendGoods() {
 			this.isLoading = true;
+			const diningContext = DiningContext.get();
 			https.request('/rest/goods/homePage/recommendGoodsList', {
+				shopId: diningContext.shopId || GlobalConfig.defaultShopId,
 				position: app.globalData.deliveryAndSelfTaking.location || app.globalData.deliveryAndSelfTaking.initRegeoInfo.location
 			}).then((result) => {
 				this.isLoading = false;
@@ -298,6 +328,12 @@ export default {
 			this.priceAfter = price;
 		},
 		insertShoppingCart() {
+			const diningContext = DiningContext.get();
+			if (!diningContext.sceneToken) {
+				this.closeSpecifications();
+				this.scanDiningTable();
+				return;
+			}
 			authService.checkIsLogin().then((result) => {
 				toastService.showLoading();
 				if (result) {
@@ -314,7 +350,7 @@ export default {
 					https.request('/rest/member/shoppingCart/insert', {
 						goodsId: this.goodsId,
 						specList: JSON.stringify(goodsSpecs),
-						shopId: this.recommendGoodsList[0] ? this.recommendGoodsList[0].shopId : GlobalConfig.defaultShopId
+						sceneToken: diningContext.sceneToken
 					}).then((result) => {
 						if (result.success) {
 							this.closeSpecifications();

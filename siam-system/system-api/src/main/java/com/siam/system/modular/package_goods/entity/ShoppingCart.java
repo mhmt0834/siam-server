@@ -1,6 +1,6 @@
 package com.siam.system.modular.package_goods.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType; import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -34,6 +34,12 @@ public class ShoppingCart {
 
     @ApiModelProperty(notes = "店铺id")
     private Integer shopId;
+
+    @ApiModelProperty(notes = "Dining table id")
+    private Long diningTableId;
+
+    @TableField(exist = false)
+    private String sceneToken;
 
     @ApiModelProperty(notes = "商品规格 JSON格式")
     private String specList;

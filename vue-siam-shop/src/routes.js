@@ -51,6 +51,7 @@ const couponsList = () => import( './pages/promotionManage/couponsList.vue')
 const shopInfo = () => import( './pages/shopManage/shopInfo.vue')
 const shopInfoImportant = () => import( './pages/shopManage/shopInfoImportant.vue')
 const shopChangeRecord = () => import( './pages/shopManage/shopChangeRecord.vue')
+const diningTableList = () => import( './pages/shopManage/diningTableList.vue')
 const courierList = () => import( './pages/shopManage/internal/courierList.vue')
 const ticketPrinterList = () => import( './pages/shopManage/internal/ticketPrinterList.vue')
 const labelPrinterList = () => import( './pages/shopManage/internal/labelPrinterList.vue')
@@ -176,6 +177,7 @@ let routes = [
           { path: '/shopInfo', component: shopInfo, name: '门店基本信息' },
           { path: '/shopInfoImportant', component: shopInfoImportant, name: '门店重要信息' },
           { path: '/shopChangeRecord', component: shopChangeRecord, name: '门店信息变更记录' },          
+          { path: '/diningTableList', component: diningTableList, name: '餐桌二维码' },
           { path: '/advertisementList', component: advertisementList, name: '门店装修' },
           { path: '/courierList', component: courierList, name: '骑手信息' },
       ]

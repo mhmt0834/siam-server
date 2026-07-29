@@ -35,6 +35,8 @@ public interface ShoppingCartMapper extends BaseMapper<ShoppingCart> {
             "<where> 1=1 " +
             "<if test=\"shoppingCart.id != null\"> AND sc.id = #{shoppingCart.id} </if>" +
             "<if test=\"shoppingCart.memberId != null\"> AND sc.member_id = #{shoppingCart.memberId} </if>" +
+            "<if test=\"shoppingCart.shopId != null\"> AND sc.shop_id = #{shoppingCart.shopId} </if>" +
+            "<if test=\"shoppingCart.diningTableId != null\"> AND sc.dining_table_id = #{shoppingCart.diningTableId} </if>" +
             "<if test=\"shoppingCart.goodsId != null\"> AND sc.goods_id = #{shoppingCart.goodsId} </if>" +
             "<if test=\"shoppingCart.specList != null and shoppingCart.specList !=''\"> AND sc.spec_list like '%${shoppingCart.specList}%' </if>" +
             "<if test=\"shoppingCart.number != null\"> AND sc.number = #{shoppingCart.number} </if>" +
@@ -49,6 +51,7 @@ public interface ShoppingCartMapper extends BaseMapper<ShoppingCart> {
             "<where> 1=1 " +
             "<if test=\"shoppingCart.id != null\"> AND sc.id = #{shoppingCart.id} </if>" +
             "<if test=\"shoppingCart.shopId != null\"> AND sc.shop_id = #{shoppingCart.shopId} </if>" +
+            "<if test=\"shoppingCart.diningTableId != null\"> AND sc.dining_table_id = #{shoppingCart.diningTableId} </if>" +
             "<if test=\"shoppingCart.memberId != null\"> AND sc.member_id = #{shoppingCart.memberId} </if>" +
             "<if test=\"shoppingCart.goodsId != null\"> AND sc.goods_id = #{shoppingCart.goodsId} </if>" +
             "<if test=\"shoppingCart.specList != null and shoppingCart.specList !=''\"> AND sc.spec_list like '%${shoppingCart.specList}%' </if>" +
@@ -57,6 +60,15 @@ public interface ShoppingCartMapper extends BaseMapper<ShoppingCart> {
             "</where> order by sc.id asc" +
             "</script>")
     Page<Map<String, Object>> getListByPageJoinGoods(@Param("page") Page page, @Param("shoppingCart") ShoppingCart shoppingCart);
+
+    @ResultMap("BaseResultMap")
+    @Select("select * from tb_shopping_cart where member_id = #{memberId} and shop_id = #{shopId} " +
+            "and dining_table_id = #{diningTableId} and goods_id = #{goodsId} and spec_list = #{specList} limit 1")
+    ShoppingCart selectSameItem(@Param("memberId") Integer memberId,
+                                @Param("shopId") Integer shopId,
+                                @Param("diningTableId") Long diningTableId,
+                                @Param("goodsId") Integer goodsId,
+                                @Param("specList") String specList);
 
     @Select("<script>select count(*) from tb_shopping_cart sc" +
             " where sc.id in <foreach collection=\"idList\" item=\"item\" index=\"index\" open=\"(\" separator=\",\" close=\")\">#{item}</foreach>" +

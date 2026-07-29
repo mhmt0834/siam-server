@@ -3,7 +3,7 @@
 		<view class="menu-shell">
 			<app-header
 				title="菜单点餐"
-				subtitle="新疆风味 · 现点现做"
+				:subtitle="diningContext.tableName ? '桌号：' + diningContext.tableName : '新疆风味 · 现点现做'"
 				:status-text="shopInfo.shop && shopInfo.shop.isOperating ? '营业中' : '休息中'"
 				:logo="shopInfo.shop && shopInfo.shop.logoImg ? shopInfo.shop.logoImg : ''"
 				mark="M"
@@ -172,6 +172,7 @@ import https from '../../../utils/http';
 import authService from '../../../utils/auth';
 import toastService from '../../../utils/toast.service';
 import utilHelper from '../../../utils/util';
+import DiningContext from '../../../utils/dining-context';
 
 let app = null;
 
@@ -227,7 +228,9 @@ export default {
 			specList: [],
 			specListString: '',
 			priceAfter: '',
-			staticImg: ''
+			staticImg: '',
+			diningContext: {},
+			pendingScene: ''
 		};
 	},
 	computed: {
@@ -235,8 +238,9 @@ export default {
 			return !this.shopInfo.isOutofDeliveryRange && this.shopInfo.isOperatingOfShop && this.shopInfo.shop.isOperating;
 		}
 	},
-	onLoad() {
+	onLoad(options) {
 		app = getApp();
+		this.pendingScene = DiningContext.normalizeScene(options && options.scene);
 	},
 	onShow() {
 		let selfOutActiveIndex = 0;
@@ -299,6 +303,18 @@ export default {
 			});
 		},
 		getShopList() {
+			const pendingScene = this.pendingScene;
+			const cachedContext = DiningContext.get();
+			if (pendingScene) {
+				this.pendingScene = '';
+				this.resolveDiningScene(pendingScene);
+				return;
+			}
+			if (cachedContext.sceneToken && cachedContext.shopId) {
+				this.diningContext = cachedContext;
+				this.getShopInfo({ id: cachedContext.shopId, shopAdditionalVo: { deliveryDistanceText: '' } });
+				return;
+			}
 			if (GlobalConfig.defaultShopId) {
 				this.getShopInfo({ id: GlobalConfig.defaultShopId, shopAdditionalVo: { deliveryDistanceText: '' } });
 				return;
@@ -316,6 +332,20 @@ export default {
 					}
 				});
 			}
+		},
+		resolveDiningScene(sceneToken) {
+			https.request('/rest/scan/resolve', { sceneToken }).then((result) => {
+				if (!result.success || !result.data) {
+					DiningContext.clear();
+					this.isLoading = false;
+					return;
+				}
+				this.diningContext = DiningContext.set(result.data);
+				this.getShopInfo({ id: result.data.shopId, shopAdditionalVo: { deliveryDistanceText: '' } });
+			}).catch(() => {
+				DiningContext.clear();
+				this.isLoading = false;
+			});
 		},
 		getShopInfo(initShopInfo) {
 			const shopId = initShopInfo.id;
@@ -355,8 +385,15 @@ export default {
 			});
 		},
 		getShoppingCartList(shopId) {
+			if (!this.diningContext.sceneToken) {
+				this.shoppingCartList = [];
+				this.totalNum = 0;
+				this.totalPrice = 0;
+				this.isStartDeliveryPrice = true;
+				return;
+			}
 			https.request('/rest/member/shoppingCart/list', {
-				shopId,
+				sceneToken: this.diningContext.sceneToken,
 				pageNo: -1,
 				pageSize: 20
 			}).then((result) => {
@@ -397,9 +434,8 @@ export default {
 					});
 
 					totalPrice = utilHelper.toFixed(totalPrice, 2);
-					const startDeliveryPrice = this.shopInfo.shop.startDeliveryPrice || 0;
-					this.isStartDeliveryPrice = totalPrice + packingCharges >= startDeliveryPrice;
-					this.priceDifference = utilHelper.toFixed(startDeliveryPrice - (totalPrice + packingCharges), 2);
+					this.isStartDeliveryPrice = true;
+					this.priceDifference = 0;
 					this.totalNum = totalNum;
 					this.shoppingCartList = result.data.records;
 					this.packingCharges = packingCharges;
@@ -511,6 +547,10 @@ export default {
 			this.priceAfter = price;
 		},
 		insertShoppingCart() {
+			if (!this.diningContext.sceneToken) {
+				toastService.showError('请先扫描餐桌二维码');
+				return;
+			}
 			authService.checkIsLogin().then((result) => {
 				toastService.showLoading();
 				if (result) {
@@ -527,7 +567,7 @@ export default {
 					https.request('/rest/member/shoppingCart/insert', {
 						goodsId: this.goodsId,
 						specList: JSON.stringify(goodsSpecs),
-						shopId: this.shopInfo.shop.id
+						sceneToken: this.diningContext.sceneToken
 					}).then((result) => {
 						if (result.success) {
 							this.specificationsDialog = false;
@@ -588,7 +628,8 @@ export default {
 				https.request('/rest/member/shoppingCart/updateNumber', {
 					id,
 					number,
-					type
+					type,
+					sceneToken: this.diningContext.sceneToken
 				}).then((result) => {
 					if (result.success) callback();
 				});
@@ -617,6 +658,10 @@ export default {
 				fullPriceReduction: this.totalPrice,
 				reducedPrice: 0,
 				shopId: this.shopInfo.shop.id,
+				diningTableId: this.diningContext.tableId,
+				tableNo: this.diningContext.tableNo,
+				tableName: this.diningContext.tableName,
+				sceneToken: this.diningContext.sceneToken,
 				initShopInfo: this.initShopInfo,
 				selfOutActiveIndex: this.selfOutActiveIndex,
 				orderDetailList: [],

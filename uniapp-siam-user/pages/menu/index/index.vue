@@ -9,12 +9,21 @@
 				mark="M"
 			/>
 
-			<navigator url="../search/search" class="menu-search ui-surface">
+			<empty-state
+				v-if="sceneError"
+				class="menu-scene-error"
+				title="二维码无效"
+				:desc="sceneError"
+				action-text="返回首页"
+				@action="goHome"
+			/>
+
+			<navigator v-if="!sceneError" url="../search/search" class="menu-search ui-surface">
 				<text class="menu-search__icon">⌕</text>
 				<text class="menu-search__text">搜索菜品、口味、套餐</text>
 			</navigator>
 
-			<view class="menu-layout">
+			<view v-if="!sceneError" class="menu-layout">
 				<category-menu :items="menuList" :active-index="activeLeftTab" @select="leftTap" />
 
 				<scroll-view
@@ -55,7 +64,7 @@
 			</view>
 		</view>
 
-		<view class="menu-cart" :class="{ 'menu-cart--disabled': !isCartEnabled }">
+		<view v-if="!sceneError" class="menu-cart" :class="{ 'menu-cart--disabled': !isCartEnabled }">
 			<view class="menu-cart__left" @tap="openShoppingCart">
 				<view class="menu-cart__bag">
 					<text class="menu-cart__bag-text">购</text>
@@ -230,7 +239,8 @@ export default {
 			priceAfter: '',
 			staticImg: '',
 			diningContext: {},
-			pendingScene: ''
+			pendingScene: '',
+			sceneError: ''
 		};
 	},
 	computed: {
@@ -305,6 +315,7 @@ export default {
 		getShopList() {
 			const pendingScene = this.pendingScene;
 			const cachedContext = DiningContext.get();
+			this.sceneError = '';
 			if (pendingScene) {
 				this.pendingScene = '';
 				this.resolveDiningScene(pendingScene);
@@ -319,33 +330,29 @@ export default {
 				this.getShopInfo({ id: GlobalConfig.defaultShopId, shopAdditionalVo: { deliveryDistanceText: '' } });
 				return;
 			}
-			if (app.globalData.deliveryAndSelfTaking.location) {
-				https.request('/rest/shop/list', {
-					pageNo: -1,
-					pageSize: 1,
-					position: app.globalData.deliveryAndSelfTaking.location
-				}).then((result) => {
-					if (result.success && result.data.records.length > 0) {
-						this.getShopInfo(result.data.records[0]);
-					} else {
-						this.isLoading = false;
-					}
-				});
-			}
+			this.showSceneError('请重新扫描餐桌二维码');
 		},
 		resolveDiningScene(sceneToken) {
 			https.request('/rest/scan/resolve', { sceneToken }).then((result) => {
 				if (!result.success || !result.data) {
-					DiningContext.clear();
-					this.isLoading = false;
+					this.showSceneError('请重新扫描餐桌二维码');
 					return;
 				}
 				this.diningContext = DiningContext.set(result.data);
 				this.getShopInfo({ id: result.data.shopId, shopAdditionalVo: { deliveryDistanceText: '' } });
 			}).catch(() => {
-				DiningContext.clear();
-				this.isLoading = false;
+				this.showSceneError('请重新扫描餐桌二维码，或检查网络后重试');
 			});
+		},
+		showSceneError(message) {
+			DiningContext.clear();
+			this.diningContext = {};
+			this.menuList = [];
+			this.sceneError = message;
+			this.isLoading = false;
+		},
+		goHome() {
+			uni.switchTab({ url: '/pages/index/index' });
 		},
 		getShopInfo(initShopInfo) {
 			const shopId = initShopInfo.id;
@@ -358,8 +365,10 @@ export default {
 					this.shopInfo = result.data;
 					this.initShopInfo = initShopInfo;
 					this.getMenuList(shopId);
+					return;
 				}
-			});
+				this.showSceneError('当前餐桌所属门店不可用，请重新扫码');
+			}).catch(() => this.showSceneError('门店加载失败，请检查网络后重试'));
 		},
 		getMenuList(shopId) {
 			https.request('/rest/menu/listWithGoods', { shopId }).then((result) => {
@@ -381,8 +390,10 @@ export default {
 						this.getShoppingCartList(shopId);
 					});
 					this.isLoading = false;
+					return;
 				}
-			});
+				this.showSceneError('菜单加载失败，请重新扫码');
+			}).catch(() => this.showSceneError('菜单加载失败，请检查网络后重试'));
 		},
 		getShoppingCartList(shopId) {
 			if (!this.diningContext.sceneToken) {
@@ -750,6 +761,10 @@ export default {
 	display: flex;
 	flex-direction: column;
 	gap: 20rpx;
+}
+
+.menu-scene-error {
+	margin-top: 24rpx;
 }
 
 .menu-search {

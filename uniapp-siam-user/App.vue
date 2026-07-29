@@ -78,9 +78,6 @@
 			this.globalData.getAppLocation();
 			// #endif
 
-			// #ifdef MP-WEIXIN||MP-ALIPAY
-			this.globalData.getRegeoLocation();
-			// #endif
 		},
 		onHide() {},
 		onShow: function() {},

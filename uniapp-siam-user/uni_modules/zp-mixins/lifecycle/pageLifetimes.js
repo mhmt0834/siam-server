@@ -3,10 +3,13 @@
  * @param {Object} node
  * @param {Object} lifeName
  */
-function handlePageLifetime(node, lifeName) {
-	node.$children.map(child => {
+function handlePageLifetime(node, lifeName, visited = new Set()) {
+	const children = node && Array.isArray(node.$children) ? node.$children : []
+	children.forEach(child => {
+		if (!child || visited.has(child)) return
+		visited.add(child)
 		if (typeof child[lifeName] == 'function') child[lifeName]()
-		handlePageLifetime(child, lifeName)
+		handlePageLifetime(child, lifeName, visited)
 	})
 }
 

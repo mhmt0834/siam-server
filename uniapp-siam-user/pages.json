@@ -9,6 +9,12 @@
 			}
 		},
 		{
+			"path": "pages/dev/scene/index",
+			"style": {
+				"navigationBarTitleText": "餐桌码调试"
+			}
+		},
+		{
 			"path": "pages/order/index/index",
 			"style": {
 				"navigationBarTitleText": "订单",
@@ -208,14 +214,6 @@
 		]
 	},
 	"sitemapLocation": "sitemap.json",
-	"requiredBackgroundModes": [
-		"location"
-	],
-	"permission": {
-		"scope.userLocation": {
-			"desc": "你的位置信息将用于小程序定位接口的效果展示"
-		}
-	},
 	"globalStyle": {
 		"backgroundTextStyle": "dark",
 		"navigationBarBackgroundColor": "#fff",

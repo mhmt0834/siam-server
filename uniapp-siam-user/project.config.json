@@ -21,7 +21,7 @@
 		"checkInvalidKey": true,
 		"checkSiteMap": false,
 		"uploadWithSourceMap": true,
-		"compileHotReLoad": true,
+		"compileHotReLoad": false,
 		"useMultiFrameRuntime": true,
 		"useApiHook": true,
 		"useApiHostProcess": false,
@@ -40,23 +40,24 @@
 		"minifyWXSS": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.16.1",
+	"libVersion": "3.16.2",
 	"appid": "",
 	"projectname": "玉KING智能点餐",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {
 		"miniprogram": {
+			"current": -1,
 			"list": [{
-					"name": "菜单",
-					"pathName": "pages/menu/index/index",
+					"name": "首页",
+					"pathName": "pages/index/index",
 					"query": "",
 					"scene": null
 				},
 				{
-					"name": "配送方式",
-					"pathName": "pages/address/choose/choose",
-					"query": "radioIndex=0",
+					"name": "餐桌码模拟（替换 scene 值）",
+					"pathName": "pages/dev/scene/index",
+					"query": "scene=__SCENE_TOKEN__",
 					"scene": null
 				},
 				{

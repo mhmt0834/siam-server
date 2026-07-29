@@ -171,8 +171,13 @@ export default {
 			priceAfter: 0
 		};
 	},
-	onLoad() {
+	onLoad(options) {
 		app = getApp();
+		const sceneToken = DiningContext.normalizeScene(options && options.scene);
+		if (sceneToken) {
+			this.resolveDiningScene(sceneToken);
+			return;
+		}
 		this.getRecommendGoods();
 	},
 	onPullDownRefresh() {
@@ -183,6 +188,25 @@ export default {
 		}, 600);
 	},
 	methods: {
+		resolveDiningScene(sceneToken) {
+			let settled = false;
+			const finish = (context) => {
+				if (settled) return;
+				settled = true;
+				if (context.sceneToken) {
+					DiningContext.set(context);
+				} else {
+					DiningContext.clear();
+				}
+				uni.switchTab({ url: '/pages/menu/index/index' });
+			};
+			setTimeout(() => finish({}), 5000);
+			https.request('/rest/scan/resolve', { sceneToken }).then((result) => {
+				finish(result.success && result.data ? result.data : {});
+			}).catch(() => {
+				finish({});
+			});
+		},
 		enterMenu() {
 			if (!DiningContext.get().sceneToken) {
 				this.scanDiningTable();

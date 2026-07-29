@@ -42,6 +42,8 @@ logs/warn.log
 logs/info.log
 
 logs
+!docs/phase1-acceptance/logs/
+!docs/phase1-acceptance/logs/*.log
 log.path_IS_UNDEFINED
 
 application-test.yml

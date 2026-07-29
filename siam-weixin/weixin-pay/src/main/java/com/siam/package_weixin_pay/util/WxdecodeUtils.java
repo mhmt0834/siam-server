@@ -99,11 +99,6 @@ public class WxdecodeUtils {
 	public String decryptData(String base64Data) throws Exception {
 		log.debug("\n进入decryptData方法");
 
-		String keyParam = "2er2e528d876e0ef66ca5344debb3eac";
-		this.key_second = keyParam;
-		// 转化成JAVA的密钥格式
-		secretKey = new SecretKeySpec(WxMD5Util.MD5Encode(keyParam, "UTF-8").toLowerCase().getBytes(), algorithm);
-
 		initialize();
 
 		// 获取解码器实例，"BC"指定Java使用BouncyCastle库里的加/解密算法。
@@ -131,9 +126,7 @@ public class WxdecodeUtils {
 	 * 构造方法(容器初始化时从配置文件中获取key，在全局中维护一个唯一的SecretKeySpec)
 	 * @param keyParam
 	 */
-	public WxdecodeUtils(@Value("${wxpay.mchKey:2er2e528d876e0ef66ca5344debb3eac}") String keyParam) {
-		log.debug("\n实例化时获取到的key：" + keyParam);
-		keyParam = "2er2e528d876e0ef66ca5344debb3eac";
+	public WxdecodeUtils(@Value("${wxpay.mchKey:}") String keyParam) {
 		this.key_second = keyParam;
 		// 转化成JAVA的密钥格式
 		secretKey = new SecretKeySpec(WxMD5Util.MD5Encode(keyParam, "UTF-8").toLowerCase().getBytes(), algorithm);

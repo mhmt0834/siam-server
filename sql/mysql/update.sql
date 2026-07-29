@@ -44,12 +44,16 @@ END$$
 DELIMITER ;
 
 CALL phase1_add_column('tb_shop', 'checkout_mode', 'int(2) DEFAULT ''1'' COMMENT ''1=pay first, 2=eat first''');
+CALL phase1_add_column('tb_shop', 'kitchen_total_order_printer_id', 'int(11) DEFAULT NULL COMMENT ''Kitchen total-order printer id''');
+CALL phase1_add_column('tb_shop', 'checkout_printer_id', 'int(11) DEFAULT NULL COMMENT ''Checkout printer id''');
 CALL phase1_add_column('tb_shopping_cart', 'dining_table_id', 'bigint(20) DEFAULT NULL COMMENT ''Dining table id''');
 CALL phase1_add_column('tb_order', 'checkout_mode', 'int(2) DEFAULT ''1'' COMMENT ''1=pay first, 2=eat first''');
 CALL phase1_add_column('tb_order', 'table_no', 'varchar(50) DEFAULT NULL COMMENT ''Table number snapshot''');
 CALL phase1_add_column('tb_order', 'table_name', 'varchar(50) DEFAULT NULL COMMENT ''Table name snapshot''');
 CALL phase1_add_column('tb_order', 'dining_table_id', 'bigint(20) DEFAULT NULL COMMENT ''Dining table id''');
 CALL phase1_add_column('tb_order', 'is_payment', 'tinyint(1) DEFAULT ''0'' COMMENT ''Payment completed''');
+CALL phase1_add_column('tb_goods', 'printer_id', 'varchar(255) DEFAULT NULL COMMENT ''Bound printer ids''');
+CALL phase1_add_column('tb_goods', 'print_num', 'int(11) DEFAULT ''1'' COMMENT ''Print copies''');
 
 DROP PROCEDURE IF EXISTS `phase1_add_column`;
 

@@ -1,0 +1,23 @@
+﻿PHASE1 BUSINESS API ACCEPTANCE
+timestamp=2026-07-29T12:51:54.8471177+08:00
+PASS:test_fixture_clean
+PASS:backend_health
+PASS:member_and_merchants_login
+PASS:merchant_shopId_derived_from_token
+PASS:merchant_A_list_isolated
+PASS:merchant_B_list_isolated
+PASS:merchant_B_cannot_update_A_table
+PASS:merchant_generate_qr_path
+PASS:scan_resolves_shop_and_table
+PASS:scan_resolves_second_shop
+PASS:menus_loaded_for_both_shops
+PASS:cart_insert_three_contexts
+PASS:cart_lists_isolated_by_table
+PASS:cart_cannot_cross_table
+PASS:cart_rows_bind_member_shop_table
+PASS:disabled_table_rejects_scan
+PASS:table_status_reenabled
+RESULT=PASS
+cart_bindings=3
+shop15_tables=2
+shop13_tables=1

@@ -1,0 +1,547 @@
+﻿BASELINE IMPORT
+timestamp=2026-07-29T12:49:55.1538041+08:00
+Note (Code 1051): Unknown table 'siam_db.tb_admin'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_admin_token'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_advertisement'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_appraise'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_coupons'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_coupons_goods_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_coupons_member_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_coupons_shop_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_courier'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_delivery_address'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_full_reduction_rule'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_give_like'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_goods'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_goods_specification'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_goods_specification_option'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member_billing_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member_goods_collect'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_member_invite_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member_token'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member_trade_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_member_withdraw_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_menu'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_menu_goods_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant_billing_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant_recommend_goods'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant_token'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant_trade_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_merchant_withdraw_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_message'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_order'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_order_detail'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_order_refund'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_order_refund_goods'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_order_refund_process'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_paperwork_push'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_picture_upload_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_coupons'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_coupons_goods_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_coupons_member_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_full_reduction_rule'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_goods'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_goods_specification'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_goods_specification_option'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_member_goods_collect'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_menu'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_menu_goods_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order_detail'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order_logistics'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order_refund'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order_refund_goods'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_order_refund_process'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_points_mall_shopping_cart'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_printer'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_reply'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Warning (Code 3778): 'utf8mb3_bin' is a collation of the deprecated character set UTF8MB3. Please consider using UTF8MB4 with an appropriate collation instead.
+Note (Code 1051): Unknown table 'siam_db.tb_scheduled_task'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_scheduled_task_log'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_setting'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_shop'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_shop_change_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_shopping_cart'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_sms_log'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_system_usage_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_vip_recharge_denomination'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_vip_recharge_denomination_coupons_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_vip_recharge_record'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_wx_public_platform_subscribe_user'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.transaction_log'
+Note (Code 1051): Unknown table 'siam_db.undo_log'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_rawmaterial'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+Note (Code 1051): Unknown table 'siam_db.tb_goods_rawmaterial_relation'
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 1681): Integer display width is deprecated and will be removed in a future release.
+Warning (Code 3719): 'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous.
+exit_code=0

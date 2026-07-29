@@ -16,14 +16,14 @@ public class TestApp
     public static void main(String[] args)
     {
 
-        String appkey = "2er2e528d876e0ef66ca5344debb3eac";// 微信商户秘钥, 根据实际情况填写
-        String certPath = "D:\\demo\\apiclient_cert.p12";// 微信商户证书路径, 根据实际情况填写
+        String appkey = "";// 微信商户秘钥, 根据实际情况填写
+        String certPath = "";// 微信商户证书路径, 根据实际情况填写
 
         TransfersDto model = new TransfersDto();// 微信接口请求参数, 根据实际情况填写
         /*model.setMch_appid("wx2e1a8193d3ed12fe"); // 申请商户号的appid或商户号绑定的appid
         model.setMchid("1585884941"); // 商户号
         model.setMch_name("暹罗商户号"); // 商户名称*/
-        model.setOpenid("o8Dqn5C5YhXn5IrMhIZPcyx7BVLA"); // 商户appid下，某用户的openid
+        model.setOpenid(""); // 商户appid下，某用户的openid
         model.setAmount(0.3); // 企业付款金额，这里单位为元
         model.setDesc("测试企业付款到零钱");
         model.setRe_user_name("江鹏");

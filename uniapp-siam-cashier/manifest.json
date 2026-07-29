@@ -1,6 +1,6 @@
 {
     "name" : "暹罗收银台点餐",
-    "appid" : "__UNI__9FE3288",
+    "appid" : "__UNI__CASHIER_TEMPLATE",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -80,8 +80,8 @@
         "sdkConfigs" : {
             "maps" : {
                 "amap" : {
-                    "key" : "2ad7570ab2297ed3061f9e4e90d1e2ec",
-                    "securityJsCode" : "9e1a1cd81a5b7c7bd9c717d6be29f0d7",
+                    "key" : "",
+                    "securityJsCode" : "",
                     "serviceHost" : ""
                 }
             }

@@ -34,11 +34,18 @@ Add-Check 'Vant shared WXS' (Test-Path -LiteralPath $vantWxsUtils -PathType Leaf
 
 if (Test-Path -LiteralPath $configPath -PathType Leaf) {
     $config = Get-Content -LiteralPath $configPath -Raw -Encoding utf8 | ConvertFrom-Json
-    Add-Check 'DCloud AppID' ($config.release.dcloudAppId -match '^__UNI__[A-Za-z0-9]+$') 'Use a DCloud AppID owned by the developer'
+    Add-Check 'Merchant instance mode' ($config.templatePolicy.mode -eq 'merchant-instance') 'Run apply_restaurant_config.ps1 on a restaurant copy; never release the reusable template'
+    Add-Check 'Merchant ownership marker' ($config.templatePolicy.miniProgramOwner -eq 'merchant') 'The mini-program owner must remain the merchant'
+    Add-Check 'Restaurant shop ID' ([int]$config.restaurant.shopId -gt 0) 'Use the restaurant-specific backend shop ID'
+    Add-Check 'DCloud AppID' (
+        $config.release.dcloudAppId -match '^__UNI__[A-Za-z0-9]+$' -and
+        $config.release.dcloudAppId -ne '__UNI__TEMPLATE'
+    ) 'Use a project-specific DCloud AppID'
     Add-Check 'WeChat AppID' ($config.release.appId -match '^wx[A-Za-z0-9]{16}$') 'Use the merchant mini-program AppID'
     Add-Check 'HTTPS API' ($config.release.apiBaseUrl -match '^https://') 'API URL must use HTTPS'
     Add-Check 'Request domain' ($config.release.requestDomain -match '^https://') 'Request domain must use HTTPS'
-    Add-Check 'Map key' (-not [string]::IsNullOrWhiteSpace($config.release.mapKey)) 'Map key is required'
+    $locationEnabled = [bool]$config.features.location
+    Add-Check 'Map key' ((-not $locationEnabled) -or -not [string]::IsNullOrWhiteSpace($config.release.mapKey)) 'Map key is required only when location is enabled'
 
     $paymentEnabled = [bool]$config.release.wechatPayEnabled
     Add-Check 'WeChat Pay confirmation' ((-not $paymentEnabled) -or $PaymentConfirmed) 'Merchant confirmation is required before enabling payment'

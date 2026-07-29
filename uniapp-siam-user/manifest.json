@@ -1,6 +1,6 @@
 {
     "name" : "玉KING智能点餐",
-    "appid" : "__UNI__CB4B2E0",
+    "appid" : "__UNI__TEMPLATE",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -49,16 +49,16 @@
                 "maps" : {
                     "amap" : {
                         "name" : "上头",
-                        "appkey_ios" : "1",
-                        "appkey_android" : "4408535d642126ad7094881bc22113e4"
+                        "appkey_ios" : "",
+                        "appkey_android" : ""
                     }
                 },
                 "geolocation" : {
                     "amap" : {
                         "name" : "上头",
                         "__platform__" : [ "android" ],
-                        "appkey_ios" : "1",
-                        "appkey_android" : "4408535d642126ad7094881bc22113e4"
+                        "appkey_ios" : "",
+                        "appkey_android" : ""
                     }
                 },
                 "ad" : {}
@@ -110,8 +110,8 @@
         "sdkConfigs" : {
             "maps" : {
                 "amap" : {
-                    "key" : "2ad7570ab2297ed3061f9e4e90d1e2ec",
-                    "securityJsCode" : "9e1a1cd81a5b7c7bd9c717d6be29f0d7",
+                    "key" : "",
+                    "securityJsCode" : "",
                     "serviceHost" : ""
                 }
             }

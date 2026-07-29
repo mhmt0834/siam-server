@@ -5,9 +5,11 @@ param(
     [Parameter(Mandatory = $true)][string]$Slogan,
     [Parameter(Mandatory = $true)][string]$DCloudAppId,
     [Parameter(Mandatory = $true)][string]$WechatAppId,
+    [Parameter(Mandatory = $true)][int]$DefaultShopId,
     [Parameter(Mandatory = $true)][string]$ApiBaseUrl,
     [Parameter(Mandatory = $true)][string]$RequestDomain,
-    [Parameter(Mandatory = $true)][string]$MapKey,
+    [string]$MapKey = '',
+    [switch]$EnableLocation,
     [switch]$EnableWechatPay,
     [switch]$ValidateOnly
 )
@@ -15,6 +17,7 @@ param(
 $root = [System.IO.Path]::GetFullPath($ProjectRoot)
 $required = @(
     'restaurant-template.config.json',
+    'privacy-data-map.json',
     'uniapp-siam-user\manifest.json',
     'uniapp-siam-user\project.config.json',
     'uniapp-siam-user\utils\brand-config.js',
@@ -31,8 +34,11 @@ foreach ($relative in $required) {
 if ($WechatAppId -notmatch '^wx[A-Za-z0-9]{16}$') {
     throw 'WechatAppId format is invalid.'
 }
-if ($DCloudAppId -notmatch '^__UNI__[A-Za-z0-9]+$') {
+if ($DCloudAppId -notmatch '^__UNI__[A-Za-z0-9]+$' -or $DCloudAppId -eq '__UNI__TEMPLATE') {
     throw 'DCloudAppId format is invalid.'
+}
+if ($DefaultShopId -le 0) {
+    throw 'DefaultShopId must be a positive integer.'
 }
 if ($ApiBaseUrl -notmatch '^https://') {
     throw 'ApiBaseUrl must use HTTPS.'
@@ -40,14 +46,19 @@ if ($ApiBaseUrl -notmatch '^https://') {
 if ($RequestDomain -notmatch '^https://') {
     throw 'RequestDomain must use HTTPS.'
 }
+if ($EnableLocation -and [string]::IsNullOrWhiteSpace($MapKey)) {
+    throw 'MapKey is required only when EnableLocation is used.'
+}
 
 $summary = [ordered]@{
     RestaurantName = $RestaurantName
     Slogan = $Slogan
     DCloudAppId = $DCloudAppId
     WechatAppId = $WechatAppId
+    DefaultShopId = $DefaultShopId
     ApiBaseUrl = $ApiBaseUrl.TrimEnd('/')
     RequestDomain = $RequestDomain.TrimEnd('/')
+    LocationEnabled = [bool]$EnableLocation
     WechatPayEnabled = [bool]$EnableWechatPay
 }
 if ($ValidateOnly) {
@@ -68,16 +79,30 @@ function Escape-Js([string]$Value) {
 
 $configPath = Join-Path $root 'restaurant-template.config.json'
 $config = (Read-Utf8 $configPath) | ConvertFrom-Json
+$config.templatePolicy.mode = 'merchant-instance'
 $config.restaurant.name = $RestaurantName
 $config.restaurant.slogan = $Slogan
+$config.restaurant.shopId = $DefaultShopId
+$config.features.location = [bool]$EnableLocation
 $config.features.onlinePayment = [bool]$EnableWechatPay
 $config.release.dcloudAppId = $DCloudAppId
 $config.release.appId = $WechatAppId
 $config.release.apiBaseUrl = $ApiBaseUrl.TrimEnd('/')
 $config.release.requestDomain = $RequestDomain.TrimEnd('/')
-$config.release.mapKey = $MapKey
+$config.release.mapKey = $(if ($EnableLocation) { $MapKey } else { '' })
 $config.release.wechatPayEnabled = [bool]$EnableWechatPay
 Write-Utf8 $configPath ($config | ConvertTo-Json -Depth 10)
+
+$privacyPath = Join-Path $root 'privacy-data-map.json'
+$privacy = (Read-Utf8 $privacyPath) | ConvertFrom-Json
+$privacy.merchantConfirmedAt = ''
+foreach ($feature in $privacy.features) {
+    $feature.merchantConfirmed = $false
+    if ($feature.id -eq 'location_and_address') {
+        $feature.enabled = [bool]$EnableLocation
+    }
+}
+Write-Utf8 $privacyPath ($privacy | ConvertTo-Json -Depth 10)
 
 $brandPath = Join-Path $root 'uniapp-siam-user\utils\brand-config.js'
 $brand = Read-Utf8 $brandPath
@@ -87,6 +112,7 @@ $brand = $brand -replace "primary:\s*'[^']*'", ("primary: '" + $config.theme.pri
 $brand = $brand -replace "accent:\s*'[^']*'", ("accent: '" + $config.theme.accent + "'")
 $brand = $brand -replace "background:\s*'[^']*'", ("background: '" + $config.theme.background + "'")
 $brand = $brand -replace "surface:\s*'[^']*'", ("surface: '" + $config.theme.surface + "'")
+$brand = $brand -replace 'location:\s*(true|false)', ('location: ' + ([bool]$EnableLocation).ToString().ToLowerInvariant())
 $brand = $brand -replace 'onlinePayment:\s*(true|false)', ('onlinePayment: ' + ([bool]$EnableWechatPay).ToString().ToLowerInvariant())
 Write-Utf8 $brandPath $brand
 
@@ -114,11 +140,18 @@ $global = [regex]::Replace(
     "(?s)(#ifdef APP-PLUS\|\|MP-WEIXIN\|\|MP-ALIPAY.*?static baseUrl = ')[^']*(';)",
     ('$1' + $ApiBaseUrl.TrimEnd('/') + '$2')
 )
+$global = [regex]::Replace(
+    $global,
+    'static defaultShopId = (?:null|\d+);',
+    ('static defaultShopId = ' + $DefaultShopId + ';'),
+    1
+)
 Write-Utf8 $globalPath $global
 
 $mapPath = Join-Path $root 'uniapp-siam-user\utils\gaode-libs\config.js'
 $map = Read-Utf8 $mapPath
-$map = [regex]::Replace($map, 'return\s+"[^"]*"', ('return "' + $MapKey + '"'), 1)
+$effectiveMapKey = $(if ($EnableLocation) { $MapKey } else { '' })
+$map = [regex]::Replace($map, 'return\s+"[^"]*"', ('return "' + $effectiveMapKey + '"'), 1)
 Write-Utf8 $mapPath $map
 
 $summary | ConvertTo-Json

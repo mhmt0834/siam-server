@@ -1,6 +1,41 @@
 {
   "templateBrand": "玉KING智能点餐",
   "templateBrandEn": "YUKING INTELLIGENT",
+  "templatePolicy": {
+    "mode": "reusable",
+    "miniProgramOwner": "merchant",
+    "developerRole": "merchant-authorized-admin",
+    "releaseOperatorAction": "upload-after-merchant-approval",
+    "syncBackRule": "verified-shared-code-only",
+    "placeholderRestaurantName": "品牌门店",
+    "perMerchantFields": [
+      "restaurant.name",
+      "restaurant.logo",
+      "restaurant.phone",
+      "restaurant.address",
+      "restaurant.shopId",
+      "release.dcloudAppId",
+      "release.appId",
+      "release.mapKey",
+      "privacy.merchantConfirmed"
+    ],
+    "conditionalSharedFields": [
+      "release.apiBaseUrl",
+      "release.requestDomain"
+    ],
+    "sharedInfrastructure": {
+      "approvedForTemplate": false,
+      "apiBaseUrl": "",
+      "requestDomain": ""
+    },
+    "neverStore": [
+      "AppSecret",
+      "uploadPrivateKey",
+      "paymentCertificate",
+      "paymentKey",
+      "merchantLicense"
+    ]
+  },
   "theme": {
     "primary": "#111111",
     "accent": "#111111",
@@ -12,17 +47,19 @@
     "slogan": "认真做好每一餐",
     "logo": "",
     "phone": "",
-    "address": ""
+    "address": "",
+    "shopId": null
   },
   "features": {
     "singleStore": true,
-    "selfPickup": true,
-    "delivery": true,
+    "selfPickup": false,
+    "delivery": false,
+    "location": false,
     "onlinePayment": false,
     "pointsMall": false
   },
   "release": {
-    "dcloudAppId": "__UNI__CB4B2E0",
+    "dcloudAppId": "__UNI__TEMPLATE",
     "appId": "",
     "apiBaseUrl": "",
     "requestDomain": "",

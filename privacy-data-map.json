@@ -23,9 +23,9 @@
     {
       "id": "location_and_address",
       "name": "定位与收货地址",
-      "enabled": true,
+      "enabled": false,
       "data": ["位置信息", "收货人姓名", "手机号码", "收货地址"],
-      "purpose": "门店定位、配送范围判断和履约",
+      "purpose": "默认不启用；仅在商家另行确认定位或配送功能后配置",
       "privacyDeclarationRequired": true,
       "merchantConfirmed": false
     },
@@ -34,7 +34,7 @@
       "name": "下单与订单记录",
       "enabled": true,
       "data": ["商品信息", "订单金额", "备注", "履约方式"],
-      "purpose": "生成订单、备餐、配送和售后",
+      "purpose": "生成店内订单、备餐和售后",
       "privacyDeclarationRequired": true,
       "merchantConfirmed": false
     },

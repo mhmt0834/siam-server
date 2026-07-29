@@ -52,12 +52,45 @@ CALL phase1_add_column('tb_order', 'table_no', 'varchar(50) DEFAULT NULL COMMENT
 CALL phase1_add_column('tb_order', 'table_name', 'varchar(50) DEFAULT NULL COMMENT ''Table name snapshot''');
 CALL phase1_add_column('tb_order', 'dining_table_id', 'bigint(20) DEFAULT NULL COMMENT ''Dining table id''');
 CALL phase1_add_column('tb_order', 'is_payment', 'tinyint(1) DEFAULT ''0'' COMMENT ''Payment completed''');
+CALL phase1_add_column('tb_order', 'order_channel', 'int(2) DEFAULT ''1'' COMMENT ''1=WeChat mini program, 2=Alipay mini program, 3=H5, 4=APP, 5=cashier''');
+CALL phase1_add_column('tb_order', 'merchant_id', 'int(11) DEFAULT NULL COMMENT ''Merchant operator id''');
 CALL phase1_add_column('tb_goods', 'printer_id', 'varchar(255) DEFAULT NULL COMMENT ''Bound printer ids''');
 CALL phase1_add_column('tb_goods', 'print_num', 'int(11) DEFAULT ''1'' COMMENT ''Print copies''');
 
 DROP PROCEDURE IF EXISTS `phase1_add_column`;
 
 DROP PROCEDURE IF EXISTS `phase1_add_index`;
+
+-- Phase 2.1: order number uniqueness for concurrent order creation.
+DROP PROCEDURE IF EXISTS `phase2_add_unique_index`;
+DELIMITER $$
+CREATE PROCEDURE `phase2_add_unique_index`(
+  IN table_name_value varchar(64),
+  IN index_name_value varchar(64),
+  IN index_columns_value varchar(500)
+)
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+      FROM information_schema.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = table_name_value
+       AND INDEX_NAME = index_name_value
+  ) THEN
+    SET @phase2_sql = CONCAT(
+      'ALTER TABLE `', table_name_value, '` ADD UNIQUE INDEX `',
+      index_name_value, '` (', index_columns_value, ')'
+    );
+    PREPARE phase2_stmt FROM @phase2_sql;
+    EXECUTE phase2_stmt;
+    DEALLOCATE PREPARE phase2_stmt;
+  END IF;
+END$$
+DELIMITER ;
+
+CALL phase2_add_unique_index('tb_order', 'uk_order_no', '`order_no`');
+
+DROP PROCEDURE IF EXISTS `phase2_add_unique_index`;
 DELIMITER $$
 CREATE PROCEDURE `phase1_add_index`(
   IN table_name_value varchar(64),

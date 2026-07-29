@@ -158,7 +158,7 @@ public class MerchantOrderController {
         Order dbOrder = orderService.getById(param.getId());
         if(dbOrder == null){
             throw new StoneCustomerException("该订单不存在");
-        } else if (loginMerchant.getShopId() != dbOrder.getShopId()){
+        } else if (!Objects.equals(loginMerchant.getShopId(), dbOrder.getShopId())){
             throw new StoneCustomerException("您没有权限操作该订单");
         }
 
@@ -251,14 +251,8 @@ public class MerchantOrderController {
         }
         orderService.updateById(updateOrder);
 
-        //发送短信提醒自提
-        if(status==Quantity.INT_3){
-            // 发送短信提醒自提
-            aliyunSms.sendPickUpOrderCompleteMessage(dbOrder.getContactPhone(), String.valueOf(dbOrder.getQueueNo()), dbOrder.getShopName());
-            //发送微信服务通知
-            wxNotifyService.sendPickUpOrderCompleteMessage(orderMember.getOpenId(), String.valueOf(dbOrder.getQueueNo()), dbOrder.getShopName(), dbOrder.getShopAddress(), dbOrder.getDescription());
-
-        }else if(status==Quantity.INT_5){
+        // 状态3为制作中，不发送“取餐完成”通知。
+        if(status==Quantity.INT_5){
             // 发送短信提醒正在配送中
             aliyunSms.sendTakeOutOrderDeliveryMessage(dbOrder.getContactPhone());
             //发送微信服务通知

@@ -1,4 +1,4 @@
-// 待自取订单
+// 制作中订单
 <template>
 	<section>
 		<!--工具条-->
@@ -70,7 +70,7 @@
 			<el-table-column label="操作" fixed="right">
 				<template slot-scope="scope">
           <el-button size="small" @click="gotoOtherPage('view', scope.row)">查看详情</el-button>          
-					<!-- <el-button size="small" @click="handleEdit(scope.row)">标记完成</el-button> -->
+					<el-button size="small" @click="handleEdit(scope.row)">制作完成</el-button>
           <el-button size="small" @click="handleEdit(scope.row)">自取完成</el-button>
 					<!-- <el-button size="small" v-if="scope.row.status == 4" @click="openDialog(scope.row.id)">申诉处理</el-button> -->
 					<!-- <el-button size="small" v-if="scope.row.status == 4" @click="openDialog(scope.row.id, 1)">退款</el-button> -->
@@ -309,7 +309,7 @@
             return '待处理'
             break;
           case 3:
-            return '待自取'
+            return '制作中'
             break;
           case 4:
               return '待配送'
@@ -361,7 +361,7 @@
 					delete param.createTime;
 				}
 
-        //只查询status=3 待自取
+        //只查询status=3 制作中
         param.shoppingWay=1;        
         param.status=3;
 

@@ -44,7 +44,7 @@ import tabZujianChild4 from './forHereTabsChild4.vue'
         //轮询
         timer: null,
         waitHandleLabel: "待制作订单(0)",
-        waitPickUpLabel: "待自取订单(0)"
+        waitPickUpLabel: "制作中订单(0)"
       };
     },
     methods: {
@@ -94,7 +94,7 @@ import tabZujianChild4 from './forHereTabsChild4.vue'
             // this.$refs.waitPickUpNum.label = "待自取订单(" + waitPickUpNum + ")";
             //变量值一改动，页面上立马生效，所以就不用上面的ref方式了
             this.waitHandleLabel = "待制作订单(" + waitHandleNum + ")";
-            this.waitPickUpLabel = "待自取订单(" + waitPickUpNum + ")";
+            this.waitPickUpLabel = "制作中订单(" + waitPickUpNum + ")";
 					},(error, data)=> {
 						vue.$message({
 							showClose: true,

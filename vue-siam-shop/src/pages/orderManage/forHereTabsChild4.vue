@@ -311,7 +311,7 @@
             return '待处理'
             break;
           case 3:
-            return '待自取'
+            return '制作中'
             break;
           case 4:
               return '待配送'

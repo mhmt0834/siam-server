@@ -4,9 +4,9 @@ const statusText = (status) => {
         case 1:
             return '未付款';
         case 2:
-            return '待处理';
+            return '待接单';
         case 3:
-            return '待自取';
+            return '制作中';
         case 4:
             return '待配送';
         case 5:

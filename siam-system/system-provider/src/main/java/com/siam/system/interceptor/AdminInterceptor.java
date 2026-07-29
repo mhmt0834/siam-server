@@ -27,7 +27,6 @@ public class AdminInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //从header或param里面获取token(暂时这样写，兼容之前前端的写法)
         String token = TokenUtil.getToken();
-        log.debug("\ntoken = " + token);
 
         if(token == null){
             BasicResult basicResult = new BasicResult();

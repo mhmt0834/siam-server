@@ -68,6 +68,7 @@
     <result column="checkout_mode" property="checkoutMode" jdbcType="INTEGER" />
     <result column="table_no" property="tableNo" jdbcType="VARCHAR" />
     <result column="table_name" property="tableName" jdbcType="VARCHAR" />
+    <result column="dining_table_id" property="diningTableId" jdbcType="BIGINT" />
     <result column="is_payment" property="isPayment" jdbcType="BIT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
@@ -139,6 +140,7 @@
     <result column="checkout_mode" property="checkoutMode" jdbcType="INTEGER" />
     <result column="table_no" property="tableNo" jdbcType="VARCHAR" />
     <result column="table_name" property="tableName" jdbcType="VARCHAR" />
+    <result column="dining_table_id" property="diningTableId" jdbcType="BIGINT" />
     <result column="is_payment" property="isPayment" jdbcType="BIT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />

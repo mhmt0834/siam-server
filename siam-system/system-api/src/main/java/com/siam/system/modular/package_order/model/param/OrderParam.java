@@ -33,6 +33,8 @@ public class OrderParam extends Order {
 
     private List<Integer> shoppingCartIdList;
 
+    private String sceneToken;
+
     //页码
     private Integer pageNo = 1;
 

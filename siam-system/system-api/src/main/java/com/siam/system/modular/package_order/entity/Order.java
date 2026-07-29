@@ -180,6 +180,8 @@ public class Order {
 
     private String tableName;
 
+    private Long diningTableId;
+
     private Boolean isPayment;
 
     private Date createTime;

@@ -12,6 +12,10 @@
 				<text class="address-label">就餐门店：</text>
 				<text>{{ shopInfo.shop.name }}</text>
 			</view>
+			<view class="address-info" v-if="orderDetail.tableName">
+				<text class="address-label">桌号：</text>
+				<text>{{ orderDetail.tableName }}</text>
+			</view>
 		</view>
 
 		<!-- 订单内容 -->
@@ -307,13 +311,12 @@
 				var _this = this;
 				toastService.showLoading();
 				var data = {
-					shopId: this.orderDetail.shopId,
-					orderDetailList: JSON.stringify(this.orderDetail.orderDetailList),
+					sceneToken: this.orderDetail.sceneToken,
+					shoppingCartIdList: this.orderDetail.orderDetailList.map((item) => item.id),
+					orderDetailListStr: JSON.stringify(this.orderDetail.orderDetailList),
 					actualPrice: this.orderDetail.actualPrice,
-					remarks: this.remarks,
-					selfOutActiveIndex: 0,
-					deliveryAddressId: '',
-					afterDiscount: this.afterDiscount ? this.afterDiscount.id : ''
+					remark: this.remarks,
+					shoppingWay: 1
 				};
 				if (this.brandConfig.features.onlinePayment) {
 					data.paymentMode = this.paymentModeIndex == 1 ? 'balance' : 'wechat';
@@ -323,7 +326,7 @@
 					if (result.success) {
 						_this.handleOrderCreated(result.data);
 					}
-				});
+				}).catch(() => toastService.hideLoading());
 			},
 			handleOrderCreated(order) {
 				if (this.brandConfig.features.onlinePayment) {

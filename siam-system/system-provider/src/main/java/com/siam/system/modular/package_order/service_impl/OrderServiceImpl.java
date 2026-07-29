@@ -120,6 +120,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private ShoppingCartService shoppingCartService;
 
     @Autowired
+    private DiningTableService diningTableService;
+
+    @Autowired
     private FullReductionRuleService fullReductionRuleService;
 
     @Autowired
@@ -175,20 +178,50 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public Order insert(OrderParam param) throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
         Member loginMember = memberSessionManager.getSession(TokenUtil.getToken());
 
-        //基础校验
-        if (param.getShopId() == null) {
-            throw new StoneCustomerException("店铺id不能为空");
+        if (StringUtils.isBlank(param.getSceneToken())) {
+            throw new StoneCustomerException("桌码不能为空，请重新扫码");
+        }
+        DiningTable diningTable = diningTableService.resolveActiveTable(param.getSceneToken());
+        if (diningTable == null) {
+            throw new StoneCustomerException("二维码无效或餐桌已停用，请重新扫码");
+        }
+        if (param.getShoppingCartIdList() == null || param.getShoppingCartIdList().isEmpty()) {
+            throw new StoneCustomerException("购物车为空，请先选择菜品");
         }
 
-        //如果是从购物车下单的 那么需要校验购物车数据是否存在 以及购物车数据是否属于当前登录用户
-        if (param.getShoppingCartIdList() != null && !param.getShoppingCartIdList().isEmpty()) {
-            int result = shoppingCartService.countByIdListAndMemberId(param.getShoppingCartIdList(), loginMember.getId());
-            if (result != param.getShoppingCartIdList().size()) {
-                throw new StoneCustomerException("购物车数据异常，请刷新页面重新下单");
+        Set<Integer> uniqueCartIds = new HashSet<>(param.getShoppingCartIdList());
+        if (uniqueCartIds.size() != param.getShoppingCartIdList().size()) {
+            throw new StoneCustomerException("购物车数据重复，请刷新后重试");
+        }
+        List<OrderDetail> orderDetailList = new ArrayList<>();
+        for (Integer shoppingCartId : uniqueCartIds) {
+            ShoppingCart shoppingCart = shoppingCartService.selectByPrimaryKey(shoppingCartId);
+            if (shoppingCart == null
+                    || !Objects.equals(shoppingCart.getMemberId(), loginMember.getId())
+                    || !Objects.equals(shoppingCart.getShopId(), diningTable.getShopId())
+                    || !Objects.equals(shoppingCart.getDiningTableId(), diningTable.getId())
+                    || !Boolean.TRUE.equals(shoppingCart.getIsGoodsExists())) {
+                throw new StoneCustomerException("购物车数据不属于当前用户、门店或餐桌，请刷新后重试");
             }
+            if (shoppingCart.getNumber() == null || shoppingCart.getNumber() <= 0 || shoppingCart.getNumber() > 99) {
+                throw new StoneCustomerException("菜品数量必须在1到99之间");
+            }
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setGoodsId(shoppingCart.getGoodsId());
+            orderDetail.setSpecList(StringUtils.defaultIfBlank(shoppingCart.getSpecList(), "{}"));
+            orderDetail.setNumber(shoppingCart.getNumber());
+            orderDetailList.add(orderDetail);
         }
 
-        Shop dbShop = shopService.getById(param.getShopId());
+        param.setShopId(diningTable.getShopId());
+        param.setDiningTableId(diningTable.getId());
+        param.setTableNo(diningTable.getTableNo());
+        param.setTableName(diningTable.getTableName());
+        param.setShoppingWay(Order.SHOPPING_WAY_OF_PICKUP);
+        param.setDeliveryAddressId(null);
+        param.setDeliveryFee(BigDecimal.ZERO);
+
+        Shop dbShop = shopService.getById(diningTable.getShopId());
         if (dbShop == null) {
             throw new StoneCustomerException("该门店信息不存在");
         }
@@ -227,16 +260,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             param.setContactLatitude(dbDeliveryAddress.getLatitude());
         }
 
-        //手动将JSON字符串转化为对象
-        List<OrderDetail> orderDetailList = GsonUtils.toList(param.getOrderDetailListStr(), OrderDetail.class);
-
-        //订单总金额以后端计算为准，前端传递过来的总金额需要进行比对-防止前端计算错误
+        //订单商品、规格、数量和金额全部以后端购物车及商品数据为准
         BigDecimal goodsTotalPrice = BigDecimal.ZERO; //商品总金额
         BigDecimal packingTotalPrice = BigDecimal.ZERO; //包装费
         int goodsTotalQuantity = 0; //商品总数量
         for (OrderDetail orderDetail : orderDetailList) {
             Goods dbGoods = goodsService.getById(orderDetail.getGoodsId());
             if (dbGoods == null) throw new StoneCustomerException("订单商品数据异常，请稍后重试");
+            if (!Objects.equals(dbGoods.getShopId(), diningTable.getShopId())) {
+                throw new StoneCustomerException("菜品不属于当前门店，请刷新后重试");
+            }
+            orderDetail.setGoodsName(dbGoods.getName());
             //判断商品状态是否正确
             if (dbGoods.getStatus() == Quantity.INT_2) {
                 //状态为已上架，正确
@@ -269,7 +303,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             //订单总金额累加
             goodsTotalPrice = goodsTotalPrice.add(goodsPrice);
             goodsTotalQuantity = goodsTotalQuantity + orderDetail.getNumber();
-            packingTotalPrice = packingTotalPrice.add(dbGoods.getPackingCharges().multiply(BigDecimal.valueOf(orderDetail.getNumber())));
+            // 店内就餐不计算包装费。
         }
 
         //计算未使用优惠前的最终价格(商品总价+包装费)
@@ -418,34 +452,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             param.setDeliveryFee(BigDecimal.ZERO);
         }
 
-        //判断前端的最终价格和后端的最终价格是否一致
-        //如果最终价格计算出来是负数，则要手动赋值为0
+        // 最终金额只采用服务端计算结果，不读取或比对前端金额。
         finalPrice = (finalPrice.compareTo(BigDecimal.ZERO) == -1) ? BigDecimal.ZERO : finalPrice.setScale(Quantity.INT_2, BigDecimal.ROUND_HALF_UP);
-        log.debug("前端计算的实付款：" + param.getActualPrice().toString());
         log.debug("后端计算的实付款：" + finalPrice);
-        if (param.getActualPrice().compareTo(finalPrice) != 0) {
-            throw new StoneCustomerException("订单实付款计算错误，请稍后重试");
+
+        if (StringUtils.length(param.getRemark()) > 200) {
+            throw new StoneCustomerException("订单备注不能超过200个字符");
         }
 
-        //计算平台抽取费用等属性
-        BigDecimal platformExtractRatio, platformExtractPrice, platformDeliveryFee, platformIncome, courierIncome, merchantIncome;
-        if (param.getShoppingWay() == Quantity.INT_2) {
-            //配送
-            platformExtractRatio = setting.getOrderSystemExtractionRatio().divide(BigDecimal.valueOf(100), Quantity.INT_2, BigDecimal.ROUND_HALF_UP);
-            platformExtractPrice = finalPrice.multiply(platformExtractRatio).setScale(Quantity.INT_2, BigDecimal.ROUND_HALF_UP);
-            platformDeliveryFee = platformExtractPrice;
-            platformIncome = platformExtractPrice.subtract(platformDeliveryFee);
-            courierIncome = platformDeliveryFee.add(merchantDeliveryFee).add(param.getDeliveryFee());
-            merchantIncome = finalPrice.subtract(platformExtractPrice).subtract(merchantDeliveryFee).subtract(param.getDeliveryFee());
-        } else {
-            //自取
-            platformExtractRatio = setting.getOrderSystemExtractionRatio().divide(BigDecimal.valueOf(100), Quantity.INT_2, BigDecimal.ROUND_HALF_UP);
-            platformExtractPrice = finalPrice.multiply(platformExtractRatio).setScale(Quantity.INT_2, BigDecimal.ROUND_HALF_UP);
-            platformDeliveryFee = BigDecimal.ZERO;
-            platformIncome = BigDecimal.ZERO;
-            courierIncome = BigDecimal.ZERO;
-            merchantIncome = finalPrice.subtract(platformExtractPrice).add(platformExtractPrice);
-        }
+        // 平台不代收、不分账；后续支付由订单 shop_id 对应商户号直接收款。
+        BigDecimal platformExtractRatio = BigDecimal.ZERO;
+        BigDecimal platformExtractPrice = BigDecimal.ZERO;
+        BigDecimal platformDeliveryFee = BigDecimal.ZERO;
+        BigDecimal platformIncome = BigDecimal.ZERO;
+        BigDecimal courierIncome = BigDecimal.ZERO;
+        BigDecimal merchantIncome = finalPrice;
 
         // 获取订单编号
         int i = 0;
@@ -547,6 +568,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         insertOrder.setCheckoutMode(dbShop.getCheckoutMode());
         insertOrder.setTableNo(param.getTableNo());
         insertOrder.setTableName(param.getTableName());
+        insertOrder.setDiningTableId(param.getDiningTableId());
+        insertOrder.setIsPayment(false);
         orderMapper.insert(insertOrder);
 
         Order dbOrder = orderMapper.selectById(insertOrder.getId());
@@ -585,7 +608,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             insertOrderDetail.setPrice(price);
             insertOrderDetail.setNumber(number);
             insertOrderDetail.setSubtotal(subtotal);
-            insertOrderDetail.setPackingCharges(dbGoods.getPackingCharges());
+            insertOrderDetail.setPackingCharges(BigDecimal.ZERO);
             if (orderDetail.getIsUsedCoupons() != null) {
                 insertOrderDetail.setIsUsedCoupons(orderDetail.getIsUsedCoupons());
                 insertOrderDetail.setCouponsDiscountPrice(orderDetail.getCouponsDiscountPrice());

@@ -132,6 +132,18 @@ public interface OrderMapper extends BaseMapper<Order> {
                        @Param("shopId") Integer shopId,
                        @Param("paidAt") Date paidAt);
 
+    @Update("update tb_order set status = #{targetStatus}, update_time = now(), " +
+            "order_completion_time = case when #{targetStatus} = 6 then now() else order_completion_time end " +
+            "where id = #{orderId} and shop_id = #{shopId} and status = #{expectedStatus}")
+    int transitionStatus(@Param("orderId") Integer orderId,
+                         @Param("shopId") Integer shopId,
+                         @Param("expectedStatus") Integer expectedStatus,
+                         @Param("targetStatus") Integer targetStatus);
+
+    @Select("select group_concat(concat(goods_name, '×', number) order by id separator '、') " +
+            "from tb_order_detail where order_id = #{orderId}")
+    String selectGoodsSummary(@Param("orderId") Integer orderId);
+
     //查询超时未支付订单
     @ResultMap("BaseResultMap")
     @Select("select o.* from tb_order o where o.status = 1 and payment_deadline < now()")

@@ -16,6 +16,9 @@
 | `POST /rest/member/order/cancelOrder` | 取消未支付订单（状态 1→10） | 会员 Token + 订单归属 |
 | `POST /rest/merchant/order/list` | 查询当前商家订单 | 商家 Token 推导 `shopId` |
 | `POST /rest/merchant/order/updateStatus` | 接单/制作完成（2→3→6） | 商家 Token + 订单归属 + 合法前置状态 |
+| `POST /rest/merchant/order/accept` | 接单（2→3） | 商家 Token 推导 `shopId` + 条件更新 |
+| `POST /rest/merchant/order/complete` | 完成订单（3→6） | 商家 Token 推导 `shopId` + 条件更新 |
+| `WS /rest/merchant/order/realtime?token=...` | 当前门店订单实时通知 | 商家 Token 握手并绑定服务端 `shopId` |
 | `POST /rest/merchant/diningTable/list` | 当前商家餐桌 | 商家 Token |
 | `POST /rest/merchant/diningTable/insert` | 新增餐桌 | 商家 Token |
 | `POST /rest/merchant/diningTable/update` | 修改餐桌 | 商家 Token + 资源归属 |
@@ -33,3 +36,9 @@
 - `POST /rest/merchant/shopWechatConfig/save`：按登录商家的 `shopId` 保存配置；空白敏感字段表示保留原值。
 
 支付配置不接受前端 `shopId` 决定权限，资金直接进入当前订单所属商家的微信支付商户号。
+
+## Phase 2.3 商家实时接单
+
+- 支付事务提交后向订单所属 `shopId` 推送 `NEW_ORDER`，其他商家不会收到。
+- 接单和完成接口使用数据库条件更新，重复点击或并发操作不会重复流转。
+- 老板端 WebSocket 断开时每 10 秒轮询今日订单，恢复后自动重连。

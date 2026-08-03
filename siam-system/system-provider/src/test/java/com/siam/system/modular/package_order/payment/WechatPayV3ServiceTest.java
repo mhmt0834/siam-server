@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -34,6 +35,9 @@ public class WechatPayV3ServiceTest {
     @Mock
     private WechatPaymentRecordMapper paymentRecordMapper;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private WechatPayV3Service service;
 
     @Before
@@ -41,6 +45,7 @@ public class WechatPayV3ServiceTest {
         service = new WechatPayV3Service();
         ReflectionTestUtils.setField(service, "orderMapper", orderMapper);
         ReflectionTestUtils.setField(service, "paymentRecordMapper", paymentRecordMapper);
+        ReflectionTestUtils.setField(service, "eventPublisher", eventPublisher);
     }
 
     @Test
@@ -56,6 +61,7 @@ public class WechatPayV3ServiceTest {
         verify(orderMapper).markWechatPaid(eq(11), eq(1), any(Date.class));
         verify(paymentRecordMapper).markSuccess(eq(21L), eq(1), eq("wx-transaction-1"),
                 any(Date.class));
+        verify(eventPublisher).publishEvent(any());
     }
 
     @Test
@@ -68,6 +74,7 @@ public class WechatPayV3ServiceTest {
         verify(orderMapper, never()).markWechatPaid(any(Integer.class), any(Integer.class), any(Date.class));
         verify(paymentRecordMapper, never()).markSuccess(any(Long.class), any(Integer.class),
                 any(String.class), any(Date.class));
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -80,6 +87,7 @@ public class WechatPayV3ServiceTest {
         verify(orderMapper, never()).markWechatPaid(any(Integer.class), any(Integer.class), any(Date.class));
         verify(paymentRecordMapper, never()).markSuccess(any(Long.class), any(Integer.class),
                 any(String.class), any(Date.class));
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test

@@ -29,6 +29,7 @@ import com.siam.system.modular.package_order.service.OrderRefundGoodsService;
 import com.siam.system.modular.package_order.service.OrderRefundProcessService;
 import com.siam.system.modular.package_order.service.OrderRefundService;
 import com.siam.system.modular.package_order.service.OrderService;
+import com.siam.system.modular.package_order.service_impl.MerchantOrderWorkflowService;
 import com.siam.system.modular.package_user.auth.cache.MemberSessionManager;
 import com.siam.system.modular.package_user.auth.cache.MerchantSessionManager;
 import com.siam.system.modular.package_user.entity.Member;
@@ -65,6 +66,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MerchantOrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private MerchantOrderWorkflowService merchantOrderWorkflowService;
 
     @Autowired
     private AliyunSms aliyunSms;
@@ -264,6 +268,22 @@ public class MerchantOrderController {
         basicResult.setCode(BasicResultCode.SUCCESS);
         basicResult.setMessage("修改成功");
         return basicResult;
+    }
+
+    @ApiOperation(value = "商家接单")
+    @PostMapping(value = "/accept")
+    public BasicResult accept(@RequestBody OrderParam param) {
+        Merchant loginMerchant = merchantSessionManager.getSession(TokenUtil.getToken());
+        merchantOrderWorkflowService.accept(param.getId(), loginMerchant.getShopId());
+        return BasicResult.success();
+    }
+
+    @ApiOperation(value = "商家完成订单")
+    @PostMapping(value = "/complete")
+    public BasicResult complete(@RequestBody OrderParam param) {
+        Merchant loginMerchant = merchantSessionManager.getSession(TokenUtil.getToken());
+        merchantOrderWorkflowService.complete(param.getId(), loginMerchant.getShopId());
+        return BasicResult.success();
     }
 
     @ApiOperation(value = "查询单个订单信息")

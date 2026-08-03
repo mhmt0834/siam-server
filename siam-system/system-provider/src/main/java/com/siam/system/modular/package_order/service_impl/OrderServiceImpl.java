@@ -1767,6 +1767,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     public Page<Order> getListByTodayOrderWithAsc(OrderParam param) {
         Page<Order> page = orderMapper.getListByTodayOrderWithAsc(new Page<>(param.getPageNo(), param.getPageSize()), param);
+        page.getRecords().forEach(order -> order.setGoodsSummary(orderMapper.selectGoodsSummary(order.getId())));
         return page;
     }
 

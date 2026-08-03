@@ -46,14 +46,19 @@
 			</el-form>
 		</el-col>
 		<!--列表-->
-		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;" :cell-style="cellStyle" :header-cell-style="headerCellStyle">
+		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;" :cell-style="cellStyle" :header-cell-style="headerCellStyle" :row-class-name="tableRowClassName">
 			<!-- <el-table-column type="index" label="序号" width="50">
 				<template scope="scope">
 					<span>{{(searchMsg.pageNo - 1) * searchMsg.pageSize + scope.$index + 1}}</span>
 				</template>		
 			</el-table-column>       -->
-      <el-table-column prop="queueNo" label="取餐号"></el-table-column>
-      <el-table-column prop="description" label="订单描述"></el-table-column>
+      <el-table-column prop="orderNo" label="订单号" width="180"></el-table-column>
+      <el-table-column label="桌号" width="100">
+				<template slot-scope="scope">{{scope.row.tableName || scope.row.tableNo || '-'}}</template>
+			</el-table-column>
+      <el-table-column prop="goodsSummary" label="商品明细" min-width="180">
+				<template slot-scope="scope">{{scope.row.goodsSummary || formatDescription(scope.row)}}</template>
+			</el-table-column>
       <el-table-column prop="goodsTotalPrice" label="订单总额">
 				<template scope="scope">
 					<span>{{scope.row.goodsTotalPrice + scope.row.packingCharges + scope.row.deliveryFee}}元</span>
@@ -85,6 +90,8 @@
 			<el-table-column label="操作" fixed="right">
 				<template slot-scope="scope">
           <el-button size="small" @click="gotoOtherPage('view', scope.row)">查看详情</el-button>
+					<el-button type="primary" size="small" v-if="scope.row.status == 2" :loading="operatingOrderId === scope.row.id" @click="acceptOrder(scope.row)">接单</el-button>
+					<el-button type="success" size="small" v-if="scope.row.status == 3" :loading="operatingOrderId === scope.row.id" @click="completeOrder(scope.row)">完成订单</el-button>
 					<!-- <el-button size="small" v-if="scope.row.status == 0" @click="handleEdit(scope.row)">配送</el-button> -->
 					<!-- <el-button size="small" v-if="scope.row.status == 4" @click="openDialog(scope.row.id)">申诉处理</el-button> -->
 					<!-- <el-button size="small" v-if="scope.row.status == 4" @click="openDialog(scope.row.id, 1)">退款</el-button> -->
@@ -208,11 +215,20 @@
         dealtype: '',
         dealId: '',
         dialogTitle: '申诉处理',
-        //轮询
-        timer: null
+				// 实时通知与断线轮询
+				timer: null,
+				websocket: null,
+				websocketConnected: false,
+				reconnectTimer: null,
+				heartbeatTimer: null,
+				highlightOrderId: null,
+				operatingOrderId: null
 			}
 		},
 		methods: {
+      tableRowClassName({row}) {
+        return row.id === this.highlightOrderId ? 'new-order-row' : '';
+      },
       cellStyle({row, column, rowIndex, columnIndex}){
         return "text-align:center";
       },
@@ -327,10 +343,10 @@
             return '未付款'
             break;
           case 2:
-            return '待处理'
+            return '待接单'
             break;
           case 3:
-            return '待自取'
+            return '制作中'
             break;
           case 4:
               return '待配送'
@@ -399,6 +415,93 @@
 					}
 				)
 			},
+			acceptOrder(row) {
+				this.transitionOrder(row, '/rest/merchant/order/accept', '接单成功');
+			},
+			completeOrder(row) {
+				this.transitionOrder(row, '/rest/merchant/order/complete', '订单已完成');
+			},
+			transitionOrder(row, url, successMessage) {
+				if (this.operatingOrderId) return;
+				let vue = this;
+				vue.operatingOrderId = row.id;
+				vue.$http.post(vue, url, {id: row.id},
+					(vue) => {
+						vue.operatingOrderId = null;
+						vue.$message({showClose: true, message: successMessage, type: 'success'});
+						vue.getList();
+					},
+					(error, data) => {
+						vue.operatingOrderId = null;
+						vue.$message({showClose: true, message: data && data.message ? data.message : '操作失败', type: 'error'});
+					}
+				);
+			},
+			connectRealtime() {
+				const token = sessionStorage.getItem('token');
+				if (!token || typeof WebSocket === 'undefined') return;
+				const baseUrl = this.$http.getUrl().replace(/\/$/, '');
+				const websocketUrl = baseUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:') +
+					'/rest/merchant/order/realtime?token=' + encodeURIComponent(token);
+				this.closeRealtime();
+				const vue = this;
+				vue.websocket = new WebSocket(websocketUrl);
+				vue.websocket.onopen = function() {
+					vue.websocketConnected = true;
+					vue.heartbeatTimer = setInterval(() => {
+						if (vue.websocket && vue.websocket.readyState === WebSocket.OPEN) vue.websocket.send('PING');
+					}, 25000);
+				};
+				vue.websocket.onmessage = function(event) {
+					if (event.data === 'PONG') return;
+					try {
+						const message = JSON.parse(event.data);
+						vue.handleRealtimeMessage(message);
+					} catch (ignored) {}
+				};
+				vue.websocket.onerror = function() { vue.websocketConnected = false; };
+				vue.websocket.onclose = function() {
+					vue.websocketConnected = false;
+					clearInterval(vue.heartbeatTimer);
+					vue.reconnectTimer = setTimeout(() => vue.connectRealtime(), 5000);
+				};
+			},
+			handleRealtimeMessage(message) {
+				if (!message || !message.type) return;
+				if (message.type === 'NEW_ORDER') {
+					this.highlightOrderId = message.orderId;
+					this.$notify({title: '新订单', message: '收到新的店内订单，请及时接单', type: 'success', duration: 0});
+					this.playNewOrderSound();
+					setTimeout(() => { this.highlightOrderId = null; }, 30000);
+				}
+				this.getList(1);
+			},
+			playNewOrderSound() {
+				try {
+					const AudioContext = window.AudioContext || window.webkitAudioContext;
+					if (!AudioContext) return;
+					const context = new AudioContext();
+					const oscillator = context.createOscillator();
+					const gain = context.createGain();
+					oscillator.frequency.value = 880;
+					gain.gain.setValueAtTime(0.2, context.currentTime);
+					gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.8);
+					oscillator.connect(gain);
+					gain.connect(context.destination);
+					oscillator.start();
+					oscillator.stop(context.currentTime + 0.8);
+				} catch (ignored) {}
+			},
+			closeRealtime() {
+				clearTimeout(this.reconnectTimer);
+				clearInterval(this.heartbeatTimer);
+				if (this.websocket) {
+					this.websocket.onclose = null;
+					this.websocket.close();
+					this.websocket = null;
+				}
+				this.websocketConnected = false;
+			},
 			handleDel (id) { // 删除
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
@@ -450,14 +553,16 @@
 		},
 		mounted() {
       this.getList();
-      //每隔一分钟轮询一次
-      this.timer = setInterval(this.getList, 60*1000);
-      //开启订单自动打印定时器
-      this.$orderPrint.init();      
+			this.connectRealtime();
+			// WebSocket 断开时每 10 秒轮询，避免漏单
+			this.timer = setInterval(() => {
+				if (!this.websocketConnected) this.getList();
+			}, 10*1000);
     },
     beforeDestroy(){
       //清除定时任务，否则切换到其他页面，这定时任务依旧会执行
       clearInterval(this.timer);
+			this.closeRealtime();
     }
 	}
 
@@ -470,5 +575,8 @@
 }
 .editForm .el-input {
   width: 300px;
+}
+/deep/ .new-order-row td {
+	background: #f2f2f2 !important;
 }
 </style>

@@ -182,6 +182,9 @@ public class Order {
 
     private Long diningTableId;
 
+    @TableField(exist = false)
+    private String goodsSummary;
+
     private Boolean isPayment;
 
     private Date createTime;

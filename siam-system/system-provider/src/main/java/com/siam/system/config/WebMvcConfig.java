@@ -74,6 +74,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/rest/merchant/register")
                 .excludePathPatterns("/rest/merchant/registerByMobile")
                 .excludePathPatterns("/rest/merchant/verification/login")
+                .excludePathPatterns("/rest/merchant/order/realtime")
                 .excludePathPatterns("/rest/merchant/forgetPassword/step1");
     }
 

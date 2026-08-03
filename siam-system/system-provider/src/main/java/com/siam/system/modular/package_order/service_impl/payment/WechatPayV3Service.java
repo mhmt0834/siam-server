@@ -6,6 +6,7 @@ import com.siam.system.modular.package_order.entity.ShopWechatConfig;
 import com.siam.system.modular.package_order.entity.WechatPaymentRecord;
 import com.siam.system.modular.package_order.mapper.OrderMapper;
 import com.siam.system.modular.package_order.mapper.WechatPaymentRecordMapper;
+import com.siam.system.modular.package_order.realtime.MerchantOrderRealtimeEvent;
 import com.siam.system.modular.package_user.entity.Member;
 import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
@@ -18,6 +19,7 @@ import com.wechat.pay.java.service.payments.jsapi.model.PrepayWithRequestPayment
 import com.wechat.pay.java.service.payments.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,9 @@ public class WechatPayV3Service {
 
     @Autowired
     private PaymentSecretCrypto secretCrypto;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Value("${WECHAT_PAY_NOTIFY_BASE_URL:}")
     private String notifyBaseUrl;
@@ -182,6 +187,8 @@ public class WechatPayV3Service {
                 transaction.getTransactionId(), paidAt) != 1) {
             throw new StoneCustomerException("支付记录状态更新失败");
         }
+        eventPublisher.publishEvent(new MerchantOrderRealtimeEvent(this, config.getShopId(), order.getId(),
+                MerchantOrderRealtimeEvent.NEW_ORDER));
     }
 
     private VerifiedNotification parse(ShopWechatConfig config, RequestParam requestParam) {

@@ -61,6 +61,47 @@ DROP PROCEDURE IF EXISTS `phase1_add_column`;
 
 DROP PROCEDURE IF EXISTS `phase1_add_index`;
 
+-- Phase 2.2: merchant-owned WeChat Pay APIv3 configuration and idempotent payment records.
+CREATE TABLE IF NOT EXISTS `tb_shop_wechat_config` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `shop_id` int(11) NOT NULL COMMENT 'Isolated shop id',
+  `appid` varchar(64) NOT NULL,
+  `mchid` varchar(32) NOT NULL,
+  `merchant_serial_no` varchar(128) NOT NULL,
+  `api_v3_key_ciphertext` text NOT NULL COMMENT 'AES-GCM ciphertext',
+  `merchant_private_key_ciphertext` longtext NOT NULL COMMENT 'AES-GCM ciphertext',
+  `wechat_pay_public_key_id` varchar(128) NOT NULL,
+  `wechat_pay_public_key_ciphertext` longtext NOT NULL COMMENT 'AES-GCM ciphertext',
+  `callback_token` varchar(64) NOT NULL COMMENT 'Opaque callback route token',
+  `enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_shop_wechat_config_shop` (`shop_id`),
+  UNIQUE KEY `uk_shop_wechat_config_callback` (`callback_token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Per-shop WeChat Pay APIv3 configuration';
+
+CREATE TABLE IF NOT EXISTS `tb_wechat_payment_record` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `shop_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `order_no` varchar(64) NOT NULL,
+  `appid` varchar(64) NOT NULL,
+  `mchid` varchar(32) NOT NULL,
+  `amount_cent` bigint(20) NOT NULL,
+  `status` int(2) NOT NULL DEFAULT '1' COMMENT '1=initiated, 2=success',
+  `transaction_id` varchar(64) DEFAULT NULL,
+  `prepay_id` varchar(128) DEFAULT NULL,
+  `paid_at` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_wechat_payment_order_id` (`order_id`),
+  UNIQUE KEY `uk_wechat_payment_order_no` (`order_no`),
+  UNIQUE KEY `uk_wechat_payment_transaction` (`transaction_id`),
+  KEY `idx_wechat_payment_shop_status_time` (`shop_id`, `status`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='WeChat Pay APIv3 payment records';
+
 -- Phase 2.1: order number uniqueness for concurrent order creation.
 DROP PROCEDURE IF EXISTS `phase2_add_unique_index`;
 DELIMITER $$

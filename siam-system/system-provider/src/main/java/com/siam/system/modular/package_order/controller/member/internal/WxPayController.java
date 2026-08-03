@@ -54,7 +54,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@RestController
+@Deprecated
 @RequestMapping(value = "/rest/member/wxPay")
 @Transactional(rollbackFor = Exception.class)
 @Api(tags = "微信支付模块相关接口", description = "WxPayController")

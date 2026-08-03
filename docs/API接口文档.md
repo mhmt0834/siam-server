@@ -22,4 +22,14 @@
 | `POST /rest/merchant/diningTable/generateQr` | 获取场景和页面路径 | 商家 Token |
 | `POST /rest/merchant/diningTable/regenerateScene` | 重置场景码 | 商家 Token |
 
-创建订单只接收当前桌购物车 ID、`sceneToken` 和备注；`shopId`、桌号、商品、规格、数量、价格和金额均由服务端解析。微信支付接口不属于 Phase 2.1。
+创建订单只接收当前桌购物车 ID、`sceneToken` 和备注；`shopId`、桌号、商品、规格、数量、价格和金额均由服务端解析。
+
+## Phase 2.2 微信支付 APIv3
+
+- `POST /rest/member/wxPay/toPay4Applet`：会员只提交 `orderNo`。服务端校验订单归属、待支付状态，并根据订单 `shop_id` 读取商家支付配置及重算金额。
+- `POST /rest/member/wxPay/notify/{callbackToken}`：生产支付回调。官方 SDK 验签、AES-GCM 解密并核验 AppID、商户号、订单号和金额；成功后幂等更新为待接单。
+- `POST /rest/member/wxPay/notify`：无路由令牌的兼容回调，生产配置优先使用上一接口。
+- `POST /rest/merchant/shopWechatConfig/detail`：返回是否配置、启用状态和掩码字段，不返回密钥或私钥。
+- `POST /rest/merchant/shopWechatConfig/save`：按登录商家的 `shopId` 保存配置；空白敏感字段表示保留原值。
+
+支付配置不接受前端 `shopId` 决定权限，资金直接进入当前订单所属商家的微信支付商户号。

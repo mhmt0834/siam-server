@@ -330,7 +330,7 @@
 			},
 			handleOrderCreated(order) {
 				if (this.brandConfig.features.onlinePayment) {
-					this.toPay4Applet(order.id, order.orderNo, order.actualPrice);
+					this.toPay4Applet(order.id, order.orderNo);
 					return;
 				}
 				toastService.showSuccess('订单提交成功', true);
@@ -338,11 +338,11 @@
 					uni.redirectTo({ url: '../../order/detail/detail?id=' + order.id });
 				}, 800);
 			},
-			toPay4Applet(id, orderNo, actualPrice) {
+			toPay4Applet(id, orderNo) {
 				toastService.showLoading('正在加载...', true);
 				var _this = this;
-				https.request('/rest/wxPay/jsApiPay', {
-					id: id, orderNo: orderNo, actualPrice: actualPrice, type: 0
+				https.request('/rest/member/wxPay/toPay4Applet', {
+					orderNo: orderNo
 				}).then((result) => {
 					toastService.hideLoading();
 					if (result.success) {

@@ -61,6 +61,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/rest/member/verification/login")
                 .excludePathPatterns("/rest/member/weChat/login")
                 .excludePathPatterns("/rest/member/wxPay/notify")
+                .excludePathPatterns("/rest/member/wxPay/notify/**")
                 .excludePathPatterns("/rest/member/wxPay/refundSuccessNotify");
 
         //商户拦截器

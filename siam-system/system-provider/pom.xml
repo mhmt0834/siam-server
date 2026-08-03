@@ -35,6 +35,13 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- WeChat Pay APIv3 official Java SDK -->
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-java</artifactId>
+            <version>0.2.17</version>
+        </dependency>
+
         <!-- 引入redis配置模块API -->
         <!--<dependency>-->
         <!--<groupId>com.siam</groupId>-->

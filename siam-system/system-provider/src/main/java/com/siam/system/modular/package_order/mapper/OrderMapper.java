@@ -125,6 +125,13 @@ public interface OrderMapper extends BaseMapper<Order> {
     @Select("select o.* from tb_order o where o.order_no = #{orderNo}")
     Order selectByOrderNo(@Param("orderNo") String orderNo);
 
+    @Update("update tb_order set status = 2, is_payment = 1, payment_success_time = #{paidAt}, " +
+            "update_time = #{paidAt} where id = #{orderId} and shop_id = #{shopId} " +
+            "and status = 1 and (is_payment = 0 or is_payment is null)")
+    int markWechatPaid(@Param("orderId") Integer orderId,
+                       @Param("shopId") Integer shopId,
+                       @Param("paidAt") Date paidAt);
+
     //查询超时未支付订单
     @ResultMap("BaseResultMap")
     @Select("select o.* from tb_order o where o.status = 1 and payment_deadline < now()")

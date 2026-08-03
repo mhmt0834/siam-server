@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.siam.package_common.annoation.MerchantPermission;
 import com.siam.package_common.exception.StoneCustomerException;
 import com.siam.system.modular.package_goods.service.*;
+import com.siam.system.modular.package_goods.service_impl.MerchantGoodsBatchService;
 import com.siam.package_common.entity.BasicData;
 import com.siam.package_common.entity.BasicResult;
 import com.siam.package_common.constant.BasicResultCode;
 import com.siam.package_common.constant.Quantity;
 import com.siam.package_common.util.OSSUtils;
 import com.siam.system.modular.package_goods.model.dto.GoodsMenuDto;
+import com.siam.system.modular.package_goods.model.param.MerchantGoodsBatchParam;
 import com.siam.system.modular.package_goods.model.example.MenuGoodsRelationExample;
 import com.siam.system.modular.package_goods.model.example.PictureUploadRecordExample;
 import com.siam.system.modular.package_user.auth.cache.MerchantSessionManager;
@@ -80,6 +82,9 @@ public class MerchantGoodsController {
 
     @Autowired
     private MerchantSessionManager merchantSessionManager;
+
+    @Autowired
+    private MerchantGoodsBatchService merchantGoodsBatchService;
 
     @ApiOperation(value = "商品列表")
     @ApiImplicitParams({
@@ -153,6 +158,13 @@ public class MerchantGoodsController {
     public BasicResult insert(@RequestBody @Validated(value = {}) Goods goods, HttpServletRequest request){
         goodsService.insert(goods);
         return BasicResult.success();
+    }
+
+    @MerchantPermission
+    @ApiOperation(value = "批量新增菜品")
+    @PostMapping(value = "/batchInsert")
+    public BasicResult batchInsert(@RequestBody MerchantGoodsBatchParam param) {
+        return BasicResult.success(merchantGoodsBatchService.insert(param));
     }
 
     @MerchantPermission
@@ -301,32 +313,34 @@ public class MerchantGoodsController {
         return basicResult;
     }
 
+    @MerchantPermission
     @ApiOperation(value = "导入商品Excel报表")
     @PostMapping(value = "/import")
     public BasicResult importGoods(@RequestParam(value = "file", required = true) MultipartFile file){
-        //获取当前登录用户绑定的门店编号
-        Merchant loginMerchant = merchantSessionManager.getSession(TokenUtil.getToken());
-
         if(file==null || file.getSize()==0){
             throw new StoneCustomerException("上传文件不能为空");
         }
-
-        if(!file.getOriginalFilename().endsWith(".xls") && !file.getOriginalFilename().endsWith(".xlsx")){
-            throw new StoneCustomerException("请上传Excel文件");
+        if(file.getSize() > 10 * 1024 * 1024){
+            throw new StoneCustomerException("Excel文件不能超过10MB");
+        }
+        String fileName = StringUtils.lowerCase(file.getOriginalFilename());
+        if(StringUtils.isBlank(fileName) || !fileName.endsWith(".xlsx")){
+            throw new StoneCustomerException("请上传xlsx格式Excel文件");
         }
 
-        try {
-            InputStream inputStream = file.getInputStream();
-            //List<Goods> goodsList = goodsService.parseExcel(inputStream);
+        try (InputStream inputStream = file.getInputStream()) {
             List<Goods> goodsList = goodsService.parseExcel_plus(inputStream);
-            goodsList.forEach(goods -> {
-                goodsService.insert(goods);
-            });
+            if(goodsList.isEmpty()){
+                throw new StoneCustomerException("Excel中没有可导入的菜品");
+            }
+            if(goodsList.size() > 500){
+                throw new StoneCustomerException("单次最多导入500个菜品");
+            }
+            goodsList.forEach(goodsService::insert);
+            return BasicResult.success(java.util.Collections.singletonMap("importedCount", goodsList.size()));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new StoneCustomerException("Excel读取失败");
         }
-
-        return BasicResult.success();
     }
 
     @ApiOperation(value = "导出商品Excel报表")

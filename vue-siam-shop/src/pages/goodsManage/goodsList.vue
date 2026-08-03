@@ -23,6 +23,9 @@
 				<el-form-item>
 					<el-button type="primary" @click="gotoAdd('add')">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button @click="$router.push({path: '/goodsBatchImport'})">批量添加</el-button>
+				</el-form-item>
 				<!-- <el-form-item>
           <el-button type="primary" @click="printOrderLabel">打印</el-button>          
 				</el-form-item> -->

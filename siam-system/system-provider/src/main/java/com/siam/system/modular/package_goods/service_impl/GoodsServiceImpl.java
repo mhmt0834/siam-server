@@ -204,6 +204,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             if(lastRowNum == 0){
                 throw new RuntimeException("模板为空");
             }
+            if(lastRowNum > 500){
+                throw new StoneCustomerException("单次最多导入500个菜品");
+            }
 
             // 检测模板列数是否正确
             XSSFRow firstRow = sheet.getRow(0);
@@ -267,10 +270,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
             // 关闭资源
             workbook.close();
-            inputStream.close();
-
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new StoneCustomerException("Excel文件读取失败");
         }
         return list;
     }
@@ -333,6 +334,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             if(lastRowNum == 0){
                 throw new RuntimeException("模板为空");
             }
+            if(lastRowNum > 500){
+                throw new StoneCustomerException("单次最多导入500个菜品");
+            }
 
             // 检测模板列数是否正确
             XSSFRow firstRow = sheet.getRow(0);
@@ -368,11 +372,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
             // 解析Excel中的内容
             for(int i = 1; i <= lastRowNum; i++){
-                if(i == 5){
-                    return list;
-                }
                 Goods goods = new Goods();
                 XSSFRow xssfRow = sheet.getRow(i);
+                if(xssfRow == null){
+                    continue;
+                }
                 XSSFCell xssfCell = null;
 
                 xssfCell = xssfRow.getCell(map.get("商品名称"));
@@ -386,6 +390,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
                 xssfCell = xssfRow.getCell(map.get("状态"));
                 goods.setStatus(convertStatus(xssfCell, loginMerchant));
+                if(goods.getStatus() == null){
+                    throw new StoneCustomerException("第" + (i + 1) + "行状态不正确");
+                }
 
                 xssfCell = xssfRow.getCell(map.get("一口价"));
                 goods.setPrice(BigDecimal.valueOf((double) getValue(xssfCell, Cell.CELL_TYPE_NUMERIC, true)));
@@ -410,10 +417,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
             // 关闭资源
             workbook.close();
-            inputStream.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new StoneCustomerException("Excel文件读取失败");
         }
         return list;
     }
@@ -422,6 +428,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         //                xssfCell = xssfRow.getCell(map.get("介绍图片"));
         String mapKey = xssfRow.getRowNum() + "-" + map.get("介绍图片");//指定行和列
         XSSFPictureData xssfPictureData= pictureMap.get(mapKey);
+        if(xssfPictureData == null){
+            throw new StoneCustomerException("第" + (xssfRow.getRowNum() + 1) + "行缺少介绍图片");
+        }
         byte[] data = xssfPictureData.getData();
         InputStream pictureInputStream = new ByteArrayInputStream(data);
 
@@ -443,6 +452,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public static Map<String, XSSFPictureData> getPictures(XSSFSheet xssfSheet){
 
         Map<String,XSSFPictureData> map=new HashMap<>();
+        if(xssfSheet.getDrawingPatriarch() == null){
+            return map;
+        }
         List<XSSFShape> list=xssfSheet.getDrawingPatriarch().getShapes();
 
         for (XSSFShape shape:list){

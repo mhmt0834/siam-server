@@ -4,6 +4,8 @@ param(
     [string]$HBuilderCli = $env:HBUILDERX_CLI,
     [string]$NpmCommand = 'npm.cmd',
     [string]$NodeBin = '',
+    [string]$AdminNodeBin = '',
+    [string]$MerchantNodeBin = '',
     [switch]$RunPreflight
 )
 
@@ -12,10 +14,14 @@ if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
 }
 $root = [System.IO.Path]::GetFullPath($ProjectRoot)
 $adminRoot = Join-Path $root 'vue-siam-admin'
+$merchantRoot = Join-Path $root 'vue-siam-shop'
 $miniProgramRoot = Join-Path $root 'uniapp-siam-user'
 
 if (-not (Test-Path -LiteralPath (Join-Path $adminRoot 'package.json'))) {
     throw 'Admin project not found.'
+}
+if (-not (Test-Path -LiteralPath (Join-Path $merchantRoot 'package.json'))) {
+    throw 'Merchant project not found.'
 }
 if (-not (Test-Path -LiteralPath (Join-Path $miniProgramRoot 'manifest.json'))) {
     throw 'Mini-program project not found.'
@@ -31,36 +37,59 @@ if ([string]::IsNullOrWhiteSpace($HBuilderCli) -or -not (Test-Path -LiteralPath 
     throw 'HBuilderX cli.exe not found. Set HBUILDERX_CLI or pass -HBuilderCli.'
 }
 
-$previousNodeOptions = $env:NODE_OPTIONS
-$previousPath = $env:Path
-try {
-    if ([string]::IsNullOrWhiteSpace($NodeBin)) {
-        $bundledNode = Join-Path (Split-Path -Parent $HBuilderCli) 'plugins\node'
-        if (Test-Path -LiteralPath (Join-Path $bundledNode 'node.exe') -PathType Leaf) {
-            $NodeBin = $bundledNode
+if ([string]::IsNullOrWhiteSpace($AdminNodeBin)) {
+    $bundledNode = Join-Path (Split-Path -Parent $HBuilderCli) 'plugins\node'
+    if (Test-Path -LiteralPath (Join-Path $bundledNode 'node.exe') -PathType Leaf) {
+        $AdminNodeBin = $bundledNode
+    } else {
+        $AdminNodeBin = $NodeBin
+    }
+}
+if ([string]::IsNullOrWhiteSpace($MerchantNodeBin)) {
+    $MerchantNodeBin = $NodeBin
+}
+
+function Invoke-FrontendBuild {
+    param(
+        [string]$FrontendRoot,
+        [string]$RuntimeBin,
+        [string]$DisplayName
+    )
+
+    $nodeExecutable = 'node'
+    if (-not [string]::IsNullOrWhiteSpace($RuntimeBin)) {
+        $candidate = Join-Path $RuntimeBin 'node.exe'
+        if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            throw "$DisplayName Node runtime not found: $candidate"
         }
+        $nodeExecutable = $candidate
     }
-    if (-not [string]::IsNullOrWhiteSpace($NodeBin)) {
-        $env:Path = $NodeBin + [System.IO.Path]::PathSeparator + $env:Path
-    }
-    $env:NODE_OPTIONS = '--openssl-legacy-provider'
-    Push-Location $adminRoot
+
+    $previousNodeOptions = $env:NODE_OPTIONS
+    $nodeVersion = (& $nodeExecutable --version).TrimStart('v')
+    $nodeMajor = [int]($nodeVersion.Split('.')[0])
     try {
-        & $NpmCommand run build
+        $env:NODE_OPTIONS = $(if ($nodeMajor -ge 17) { '--openssl-legacy-provider' } else { $null })
+        Push-Location $FrontendRoot
+        & $nodeExecutable (Join-Path $PSScriptRoot 'run-webpack-build.js')
         if ($LASTEXITCODE -ne 0) {
-            throw 'Admin production build failed.'
+            throw "$DisplayName production build failed."
         }
     } finally {
         Pop-Location
+        $env:NODE_OPTIONS = $previousNodeOptions
     }
+}
 
-    & $HBuilderCli launch mp-weixin --project $miniProgramRoot --compile true --continue-on-error false
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Mini-program build failed.'
-    }
-} finally {
-    $env:NODE_OPTIONS = $previousNodeOptions
-    $env:Path = $previousPath
+Invoke-FrontendBuild -FrontendRoot $adminRoot -RuntimeBin $AdminNodeBin -DisplayName 'Admin'
+Invoke-FrontendBuild -FrontendRoot $merchantRoot -RuntimeBin $MerchantNodeBin -DisplayName 'Merchant'
+
+$hbuilderOutput = & $HBuilderCli launch mp-weixin --project $miniProgramRoot --compile true --continue-on-error false 2>&1
+$hbuilderExitCode = $LASTEXITCODE
+$hbuilderOutput | ForEach-Object { Write-Host $_ }
+$hbuilderText = $hbuilderOutput -join [Environment]::NewLine
+if ($hbuilderExitCode -ne 0 -or $hbuilderText -match '未检测到已打开的HBuilderX') {
+    throw 'Mini-program build failed.'
 }
 
 if ($RunPreflight) {
@@ -68,4 +97,4 @@ if ($RunPreflight) {
     exit $LASTEXITCODE
 }
 
-Write-Host 'Admin and mini-program builds completed.' -ForegroundColor Green
+Write-Host 'Admin, merchant, and mini-program builds completed.' -ForegroundColor Green

@@ -2,7 +2,9 @@ package com.siam.system.modular.package_goods.controller.merchant;
 
 import com.siam.package_common.annoation.MerchantPermission;
 import com.siam.system.modular.package_goods.entity.Setting;
+import com.siam.system.modular.package_goods.model.param.ShopBasicConfigParam;
 import com.siam.system.modular.package_goods.service.SettingService;
+import com.siam.system.modular.package_goods.service_impl.MerchantShopBasicConfigService;
 import com.siam.package_common.entity.BasicData;
 import com.siam.package_common.entity.BasicResult;
 import com.siam.package_common.constant.BasicResultCode;
@@ -51,6 +53,23 @@ public class MerchantShopController {
 
     @Autowired
     private SettingService settingService;
+
+    @Autowired
+    private MerchantShopBasicConfigService shopBasicConfigService;
+
+    @MerchantPermission
+    @ApiOperation(value = "获取店铺基础配置")
+    @PostMapping(value = "/basicConfig")
+    public BasicResult basicConfig() {
+        return BasicResult.success(shopBasicConfigService.get());
+    }
+
+    @MerchantPermission
+    @ApiOperation(value = "修改店铺基础配置")
+    @PostMapping(value = "/updateBasicConfig")
+    public BasicResult updateBasicConfig(@RequestBody ShopBasicConfigParam param) {
+        return BasicResult.success(shopBasicConfigService.update(param));
+    }
 
     @ApiOperation(value = "申请开店-提交门店信息")
     @ApiImplicitParams({

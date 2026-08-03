@@ -37,6 +37,7 @@ const vipRechargeRecord = () => import('./pages/promotionManage/internal/vipRech
 const memberWithdrawRecord = () => import('./pages/promotionManage/memberWithdrawRecord.vue')
 //门店管理
 const shopList = () => import('./pages/shopManage/shopList.vue')
+const merchantInitialize = () => import('./pages/shopManage/merchantInitialize.vue')
 const shopListOfApplySettled = () => import('./pages/shopManage/shopListOfApplySettled.vue')
 const merchantWithdrawRecord = () => import('./pages/shopManage/merchantWithdrawRecord.vue')
 const shopListOfApplyChangeData = () => import('./pages/shopManage/shopListOfApplyChangeData.vue')
@@ -197,6 +198,13 @@ let routes = [
     name: '门店管理',
     iconCls: 'el-icon-house',
     children: [
+      {
+        path: '/merchantInitialize', component: merchantInitialize, name: '创建商家',
+        leaf: true,
+        children: [
+          { path: '/merchantInitialize', component: merchantInitialize, name: '创建商家' },
+        ]
+      },
       {
         path: '/shopList', component: shopList, name: '门店资料',
         leaf: true,//只有一个节点

@@ -1,6 +1,30 @@
 <template>
   <section>
     <el-form :model="editForm" label-width="150px" class="editForm" style="width: 80%;" :rules="editFormRules" ref="editForm">
+				<el-form-item label="店铺名称" prop="name">
+					<el-input v-model="editForm.name"></el-input>
+				</el-form-item>
+
+				<el-form-item label="店铺Logo" prop="shopLogoImgFile">
+					<el-upload
+						class="avatar-uploader"
+						action=""
+						accept=".png,.jpg,.jpeg"
+						name="shopLogoImgUpload"
+						:list-type="'picture-card'"
+						:file-list="editForm.shopLogoImgFile"
+						:limit="1"
+						:on-remove="handleRemoveShopLogoImg"
+						:before-upload="beforeAvatarUpload"
+						:http-request="upload">
+						<i class="el-icon-plus avatar-uploader-icon"></i>
+					</el-upload>
+				</el-form-item>
+
+				<el-form-item label="联系方式" prop="contactPhone">
+					<el-input v-model="editForm.contactPhone"></el-input>
+				</el-form-item>
+
 				<el-form-item label="店铺是否营业" prop="isOperating">
 					<el-radio-group v-model="editForm.isOperating" size="medium">
 						<el-radio-button label="正常营业" value="true"></el-radio-button>
@@ -94,6 +118,7 @@
         },
         editFormRules: {
           name: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
+					contactPhone: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],
 					selectedOptions:[{ type: 'array', required: true, message: '请选择所在城市', trigger: 'change' }],          
           street: [{ required: true, message: '请输入门店地址', trigger: 'blur' }],
           managePrimary: [{ required: true, message: '请选择主营类目', trigger: 'blur' }],
@@ -133,11 +158,18 @@
           if (valid) {
             let vue = this
 
-            let param = Object.assign({}, this.editForm);
-            delete param.createTime
-            delete param.updateTime
-
-						param.isOperating = (param.isOperating == '正常营业') ? true : false;
+            let param = {
+              name: this.editForm.name,
+              shopLogoImg: this.getIdByArr(this.editForm.shopLogoImgFile),
+              contactPhone: this.editForm.contactPhone,
+              isOperating: this.editForm.isOperating == '正常营业',
+              startTime: this.editForm.startTime,
+              endTime: this.editForm.endTime,
+              announcement: this.editForm.announcement,
+              reducedDeliveryPrice: this.editForm.reducedDeliveryPrice,
+              kitchenTotalOrderPrinterId: this.editForm.kitchenTotalOrderPrinterId,
+              checkoutPrinterId: this.editForm.checkoutPrinterId
+            };
 
 						//正则表达式校验店铺营业开始时间、店铺营业结束时间
 						let regEn = /^([1]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -160,9 +192,7 @@
 
             delete param.auditTime;
 
-            let url = ''
-            param.id ? url = '/rest/merchant/shop/update' : url = '/rest/merchant/shop/insert'
-            vue.$http.post( vue, url, param,
+            vue.$http.post( vue, '/rest/merchant/shop/updateBasicConfig', param,
               (vue, data) => {
                 vue.$message({
                   showClose: true,
@@ -207,7 +237,7 @@
       },
       getDetail(id) { // 获取商品详情
           let vue = this
-          vue.$http.post(vue, '/rest/merchant/shop/getLoginMerchantShopInfo', {id},
+          vue.$http.post(vue, '/rest/merchant/shop/basicConfig', {},
             (vue, data) => {
               let obj = data.data
               obj.shopLogoImgFile = vue.resetImg(obj, 'shopLogoImg')
@@ -216,8 +246,7 @@
               obj.idCardFrontSideFile = vue.resetImg(obj, 'idCardFrontSide')      
               obj.idCardBackSideFile = vue.resetImg(obj, 'idCardBackSide')                    
               vue.editForm = Object.assign({}, obj)
-              this.editForm.selectedOptions = [obj.province, obj.city, obj.area];	
-					    this.editForm.isOperating = obj.isOperating==true ? '正常营业' : '暂不营业';	              
+              this.editForm.isOperating = obj.isOperating==true ? '正常营业' : '暂不营业';
             },(error, data)=> {
               vue.$message({
                 showClose: true,

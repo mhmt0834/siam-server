@@ -51,3 +51,25 @@
 - `POST /rest/merchant/statistics/goodsAnalysis`：返回热销、普通、低销量菜品分类。
 
 以上接口均从商家 Token 会话获取 `shopId`，不接收前端 `shopId`。金额仅统计状态 `6` 且按 `order_completion_time` 落入查询区间的真实订单。
+
+## Phase 3 商业化交付
+
+### 管理员创建商家
+
+- `POST /rest/admin/merchant/initialize`
+- 管理员权限；参数：`ownerUsername`、`ownerMobile`、`initialPassword`、`shopName`、`logo`、`startTime`、`endTime`、`announcement`、`contactPhone`。
+- 同一事务创建老板账号、店铺和绑定关系；返回 `merchantId`、`shopId`、账号及店名，不返回密码或密码散列。
+- 新店默认休息中，支付配置不自动创建或启用。
+
+### 老板店铺基础配置
+
+- `POST /rest/merchant/shop/basicConfig`
+- `POST /rest/merchant/shop/updateBasicConfig`
+- 从登录 Token 获取店铺，只允许维护店名、Logo、营业时间、公告、联系方式、营业状态及原有打印设置。
+
+### 菜品快速导入
+
+- `POST /rest/merchant/goods/batchInsert`
+- JSON 参数 `items`，单次最多 500 条；每条包含 `name`、`image`、`menuId/categoryName`、`price`、`status`、`description`。
+- 分类 ID 必须属于当前店铺；分类名称不存在时只在当前店铺创建。
+- `POST /rest/merchant/goods/import` 保留 `.xlsx` 导入能力，单次最多 500 条。

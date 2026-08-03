@@ -19,6 +19,7 @@ const emptyList = () => import( './pages/basicModule/emptyList.vue')
 //商品管理
 const menuList = () => import( './pages/goodsManage/menuList.vue')
 const goodsList = () => import( './pages/goodsManage/goodsList.vue')
+const goodsBatchImport = () => import( './pages/goodsManage/goodsBatchImport.vue')
 const addGoods = () => import( './pages/goodsManage/addGoods.vue')
 const editGoods = () => import( './pages/goodsManage/editGoods.vue')
 const goodsAccessoriesList = () => import( './pages/goodsManage/goodsAccessoriesList.vue')
@@ -149,6 +150,7 @@ let routes = [
       children: [
           { path: '/menuList', component: menuList, name: '分类管理' },
           { path: '/goodsList', component: goodsList, name: '商品列表' },
+          { path: '/goodsBatchImport', component: goodsBatchImport, name: '批量添加菜品', hidden: true },
           { path: '/addGoods', component: addGoods, name: '新增商品', hidden: true },
           { path: '/editGoods', component: editGoods, name: '编辑商品', hidden: true },
           { path: '/recommendGoods', component: recommendGoods, name: '商家推荐' },

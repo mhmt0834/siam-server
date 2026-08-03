@@ -18,4 +18,7 @@ public class StatisticsParam {
     //结束日期
     private Date endCreateTime;
 
+    // 经营统计时间范围：today / 7d / 30d
+    private String range;
+
 }

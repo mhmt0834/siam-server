@@ -61,6 +61,7 @@ const advertisementList = () => import( './pages/shopDecoration/advertisementLis
 
 //数据中心
 const statisticGraph = () => import( './pages/basicModule/statisticGraph.vue')
+const businessOverview = () => import( './pages/basicModule/businessOverview.vue')
 
 //财务报表
 const accountInfo = () => import( './pages/accountModule/accountInfo.vue')
@@ -111,8 +112,9 @@ let routes = [
       component: Home,
       name: '数据中心',
       iconCls: 'el-icon-user',
-      leaf: true,//只有一个节点
+      leaf: false,
       children: [
+          { path: '/businessOverview', component: businessOverview, name: '经营概览' },
           // { path: '/emptyList', component: emptyList, name: '每日数据' },
           { path: '/statisticGraph', component: statisticGraph, name: '数据中心' },
       ]

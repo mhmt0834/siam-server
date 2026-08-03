@@ -42,3 +42,12 @@
 - 支付事务提交后向订单所属 `shopId` 推送 `NEW_ORDER`，其他商家不会收到。
 - 接单和完成接口使用数据库条件更新，重复点击或并发操作不会重复流转。
 - 老板端 WebSocket 断开时每 10 秒轮询今日订单，恢复后自动重连。
+
+## Phase 2.4 营业统计
+
+- `POST /rest/merchant/statistics/today`：返回今日营业额、已完成订单数、客单价和营业状态。
+- `POST /rest/merchant/statistics/trend`：请求体 `range` 支持 `today`、`7d`、`30d`，返回逐日营业额和订单数。
+- `POST /rest/merchant/statistics/hotGoods`：按已完成订单明细返回销量、销售额 TOP 10。
+- `POST /rest/merchant/statistics/goodsAnalysis`：返回热销、普通、低销量菜品分类。
+
+以上接口均从商家 Token 会话获取 `shopId`，不接收前端 `shopId`。金额仅统计状态 `6` 且按 `order_completion_time` 落入查询区间的真实订单。

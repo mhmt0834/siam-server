@@ -233,7 +233,7 @@ public class MemberServiceImpl implements MemberService {
     public String getNextVipNo() {
         String vipNo= memberMapper.findMaxVipNo();
         Integer noNum = 1;
-        if (vipNo != null) {
+        if (!StringUtils.isEmpty(vipNo)) {
             noNum = Integer.parseInt(vipNo)+1;
         }
         String result = String.format("%010d", noNum);

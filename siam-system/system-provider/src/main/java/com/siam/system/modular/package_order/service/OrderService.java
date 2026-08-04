@@ -51,6 +51,8 @@ public interface OrderService extends IService<Order> {
 
     int batchUpdateIsPrintedTrue(List<Integer> idList);
 
+    int batchUpdateIsPrintedTrueForShop(List<Integer> idList, Integer shopId);
+
     Integer getNextQueueNo();
 
     /**

@@ -165,6 +165,10 @@ public class MerchantOrderController {
         } else if (!Objects.equals(loginMerchant.getShopId(), dbOrder.getShopId())){
             throw new StoneCustomerException("您没有权限操作该订单");
         }
+        if (param.getFlag() == null
+                || (param.getFlag() != Quantity.INT_1 && param.getFlag() != Quantity.INT_2)) {
+            throw new StoneCustomerException("店内订单仅支持接单和完成订单");
+        }
 
         //获取该订单的对应用户
         Member orderMember = memberService.selectByPrimaryKey(dbOrder.getMemberId());
@@ -173,25 +177,13 @@ public class MerchantOrderController {
         switch (param.getFlag()){
             //处理订单
             case Quantity.INT_1:
-                if(dbOrder.getStatus() != Order.STATUS_OF_WAIT_HANDLE){
-                    throw new StoneCustomerException("该订单状态非待处理，不允许修改");
-                }
-                //自取订单，将状态改为 待自取(已处理)；配送订单，将状态改为 待配送(已处理)
-                if(dbOrder.getShoppingWay() == Quantity.INT_1){
-                    status = Order.STATUS_OF_WAIT_PICKUP;
-                }else if(dbOrder.getShoppingWay() == Quantity.INT_2){
-                    status = Order.STATUS_OF_WAIT_DELIVERY;
-                }
-                break;
+                merchantOrderWorkflowService.accept(dbOrder.getId(), loginMerchant.getShopId());
+                return BasicResult.success();
 
             //标记完成(自取订单)
             case Quantity.INT_2:
-                if(dbOrder.getStatus() != Order.STATUS_OF_WAIT_PICKUP){
-                    throw new StoneCustomerException("该订单状态非待自取，不允许修改");
-                }
-                //将状态改为 已完成
-                status = Order.STATUS_OF_COMPLETED;
-                break;
+                merchantOrderWorkflowService.complete(dbOrder.getId(), loginMerchant.getShopId());
+                return BasicResult.success();
 
             //标记配送
             case Quantity.INT_3:
@@ -303,7 +295,7 @@ public class MerchantOrderController {
             basicResult.setCode(BasicResultCode.ERR);
             basicResult.setMessage("该订单不存在");
             return basicResult;
-        } else if (loginMerchant.getShopId() != dbOrder.getShopId()){
+        } else if (!Objects.equals(loginMerchant.getShopId(), dbOrder.getShopId())){
             throw new StoneCustomerException("您没有权限操作该菜单");
         }
 
@@ -327,7 +319,7 @@ public class MerchantOrderController {
 
         List<Integer> idList = GsonUtils.toList(param.getIdListStr(), Integer.class);
         if(idList!=null && idList.size()>0){
-            orderService.batchUpdateIsPrintedTrue(idList);
+            orderService.batchUpdateIsPrintedTrueForShop(idList, loginMerchant.getShopId());
         }
 
         basicResult.setSuccess(true);

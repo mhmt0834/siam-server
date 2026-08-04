@@ -154,6 +154,13 @@ public interface OrderMapper extends BaseMapper<Order> {
             "</script>")
     int batchUpdateIsPrintedTrue(@Param("idList") List<Integer> idList);
 
+    @Update("<script>update tb_order o set is_printed = 1 " +
+            "where o.shop_id = #{shopId} and o.id in " +
+            "<foreach collection=\"idList\" item=\"item\" open=\"(\" separator=\",\" close=\")\">#{item}</foreach>" +
+            "</script>")
+    int batchUpdateIsPrintedTrueForShop(@Param("idList") List<Integer> idList,
+                                        @Param("shopId") Integer shopId);
+
     @Select("select max(queue_no) from tb_order where to_days(create_time) = to_days(now())")
     Integer findMaxQueueNo();
 

@@ -106,9 +106,13 @@ public class ShoppingCartController {
             throw new StoneCustomerException("加入数量必须在1到99之间");
         }
         if(dbShoppingCart != null){
+            int actualNumber = dbShoppingCart.getNumber() + requestedNumber;
+            if(actualNumber > 99){
+                throw new StoneCustomerException("购物车单项数量不能超过99");
+            }
             ShoppingCart updateShoppingCart = new ShoppingCart();
             updateShoppingCart.setId(dbShoppingCart.getId());
-            updateShoppingCart.setNumber(dbShoppingCart.getNumber() + requestedNumber);
+            updateShoppingCart.setNumber(actualNumber);
             updateShoppingCart.setUpdateTime(now);
             shoppingCartService.updateByPrimaryKeySelective(updateShoppingCart);
         }else{
@@ -142,6 +146,9 @@ public class ShoppingCartController {
                 : dbShoppingCart.getNumber() + shoppingCart.getNumber();
         if(actualNumber < Quantity.INT_0){
             throw new StoneCustomerException("修改后的购买数量不能小于0");
+        }
+        if(actualNumber > 99){
+            throw new StoneCustomerException("购物车单项数量不能超过99");
         }
         if(actualNumber == Quantity.INT_0){
             shoppingCartService.deleteByPrimaryKey(dbShoppingCart.getId());

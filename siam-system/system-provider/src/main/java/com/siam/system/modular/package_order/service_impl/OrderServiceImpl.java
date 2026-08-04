@@ -1759,6 +1759,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
+    public int batchUpdateIsPrintedTrueForShop(List<Integer> idList, Integer shopId) {
+        return orderMapper.batchUpdateIsPrintedTrueForShop(idList, shopId);
+    }
+
+    @Override
     public Integer getNextQueueNo() {
         Integer maxQueueNo = orderMapper.findMaxQueueNo();
         Integer queueNo = maxQueueNo == null ? 1 : maxQueueNo + 1;

@@ -1,0 +1,9 @@
+/opt/restaurant-saas/deploy/data/nginx/logs/*.log /opt/restaurant-saas/deploy/data/backend/logs/**/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

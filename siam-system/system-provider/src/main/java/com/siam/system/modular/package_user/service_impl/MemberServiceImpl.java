@@ -596,8 +596,6 @@ public class MemberServiceImpl implements MemberService {
 //        if (wxSession.getOpenid() == null) {
 //            throw new StoneCustomerException("用户唯一标识获取失败");
 //        }
-        log.debug("\n\n自动注册获取的openid：" + wxSession.getOpenid());
-
         // 判断是否已经注册
         Member dbMember = memberMapper.selectByMobile(param.getMobile());
         if (dbMember != null) {

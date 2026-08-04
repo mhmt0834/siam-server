@@ -1,0 +1,147 @@
+server:
+  port: ${SERVER_PORT:9200}
+  servlet:
+    context-path: /siam-server
+  use-forward-headers: true
+  tomcat:
+    max-threads: ${SERVER_MAX_THREADS:200}
+    accept-count: ${SERVER_ACCEPT_COUNT:100}
+
+spring:
+  application:
+    name: siam-server
+  datasource:
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:siam_db}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: 30000
+      validation-timeout: 5000
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    timeout: 5000ms
+    jedis:
+      pool:
+        max-active: ${REDIS_POOL_MAX_ACTIVE:32}
+        max-idle: ${REDIS_POOL_MAX_IDLE:16}
+        min-idle: ${REDIS_POOL_MIN_IDLE:2}
+        max-wait: 3000ms
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+  thymeleaf:
+    mode: LEGACYHTML5
+    encoding: UTF-8
+    cache: true
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    date-format: yyyy/MM/dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: ${UPLOAD_MAX_FILE_SIZE:10MB}
+      max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:20MB}
+
+wxlogin:
+  appId: ${WECHAT_APP_ID:}
+  secret: ${WECHAT_APP_SECRET:}
+
+wxPublicPlatform:
+  appId: ${WECHAT_OPEN_APP_ID:}
+  secret: ${WECHAT_OPEN_APP_SECRET:}
+
+wxpay:
+  appId: ${WECHAT_PAY_APP_ID:}
+  mchId: ${WECHAT_PAY_MCH_ID:}
+  mchKey: ${WECHAT_PAY_MCH_KEY:}
+  signType: MD5
+  tradeType: JSAPI
+  payUrl: https://api.mch.weixin.qq.com/pay/unifiedorder
+  notifyUrl: ${WECHAT_PAY_NOTIFY_URL:}
+  refundUrl: https://api.mch.weixin.qq.com/secapi/pay/refund
+  refundSuccessNotifyUrl: ${WECHAT_REFUND_NOTIFY_URL:}
+  payToBalanceUrl: https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers
+
+aliyun:
+  dysms:
+    accessKeyId: ${ALIYUN_SMS_ACCESS_KEY_ID:}
+    secret: ${ALIYUN_SMS_ACCESS_KEY_SECRET:}
+    signName: ${ALIYUN_SMS_SIGN_NAME:}
+    templateCode: ${ALIYUN_SMS_TEMPLATE_CODE:}
+    templateCode_verificationCode: ${ALIYUN_SMS_TEMPLATE_VERIFICATION:}
+    templateCode_fatalError: ${ALIYUN_SMS_TEMPLATE_FATAL_ERROR:}
+    templateCode_pickUpOrderComplete: ${ALIYUN_SMS_TEMPLATE_PICKUP:}
+    templateCode_takeOutOrderDelivery: ${ALIYUN_SMS_TEMPLATE_DELIVERY:}
+    templateCode_couponsDistributeReminder: ${ALIYUN_SMS_TEMPLATE_COUPON_DISTRIBUTE:}
+    templateCode_couponsOverdueReminder: ${ALIYUN_SMS_TEMPLATE_COUPON_OVERDUE:}
+  oss:
+    accessKeyId: ${ALIYUN_OSS_ACCESS_KEY_ID:}
+    secret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:}
+    endpoint: ${ALIYUN_OSS_ENDPOINT:}
+    bucketName: ${ALIYUN_OSS_BUCKET:}
+  express:
+    appCode: ${ALIYUN_EXPRESS_APP_CODE:}
+
+baidu:
+  map:
+    ak: ${BAIDU_MAP_AK:}
+
+mybatis-plus:
+  mapper-locations: classpath*:com/siam/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+rocketmq:
+  switch: false
+  name-server: ${ROCKETMQ_NAME_SERVER:127.0.0.1:9876}
+  producer:
+    group: orderProducerGroup
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: NEVER
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  health:
+    mail:
+      enabled: false
+    rabbit:
+      enabled: false
+    elasticsearch:
+      enabled: false
+
+xinyeyun:
+  user: ${XINYEYUN_USER:}
+  key: ${XINYEYUN_KEY:}
+  domain: https://open.xpyun.net/api/openapi/
+  api_url:
+    addPrinters: ${xinyeyun.domain}/xprinter/addPrinters
+    setVoiceType: ${xinyeyun.domain}/xprinter/setVoiceType
+    print: ${xinyeyun.domain}/xprinter/print
+
+logging:
+  file:
+    name: /app/logs/siam-server/log_info.log
+  level:
+    root: INFO
+    com.siam: INFO
+
+path:
+  log: /app/logs/siam-server/

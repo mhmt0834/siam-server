@@ -9,15 +9,8 @@ import java.util.Random;
 import com.siam.package_weixin_pay.entity.ResultEntity;
 import com.siam.package_weixin_pay.entity.TransfersDto;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
-
 public class WechatpayUtil
 {
-    private static final Log LOG = LogFactory.getLog(WechatpayUtil.class);
-    
     private static final String TRANS_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
 
     // 微信商户appkey
@@ -59,19 +52,16 @@ public class WechatpayUtil
             reqXmlStr.append("<spbill_create_ip>" + model.getSpbill_create_ip() + "</spbill_create_ip>");
             reqXmlStr.append("</xml>");
 
-            LOG.info("request xml = " + reqXmlStr);
             // 3.加载证书请求接口
             String result = HttpRequestHandler.httpsRequest(TRANS_URL, reqXmlStr.toString(),
                 model, CERT_PATH);
-            LOG.info(("response xml = " + result));
             if(result.contains("CDATA[FAIL]")){
                 return new ResultEntity(false, "调用微信接口失败, 具体信息请查看访问日志");
             }
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            return new ResultEntity(false, e.getMessage());
+            return new ResultEntity(false, "调用微信接口失败");
         }
         return new ResultEntity(true);
     }

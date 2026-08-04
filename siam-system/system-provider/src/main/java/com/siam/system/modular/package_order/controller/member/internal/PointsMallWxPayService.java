@@ -163,7 +163,6 @@ public class PointsMallWxPayService {
 
             //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
             String xmlStr = postData(wxPayConfig.getRefundUrl(), PayUtil.GetMapToXML(data)); //支付结果通知的xml格式数据
-            System.out.println(xmlStr);
             Map notifyMap = PayUtil.doXMLParse(xmlStr);
             if ("SUCCESS".equals(notifyMap.get("return_code"))) {
                 if("SUCCESS".equals(notifyMap.get("result_code"))) {
@@ -204,8 +203,7 @@ public class PointsMallWxPayService {
                 return false;
             }
         }catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.toString(), e);
+            log.error("积分商城微信退款请求失败", e);
 
             String errorMsg = out_trade_no+"订单退款失败，catch Exception : " + e.toString();
             //微信公众号消息通知管理员

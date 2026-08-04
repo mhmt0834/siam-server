@@ -1,0 +1,173 @@
+name: ${COMPOSE_PROJECT_NAME:-yuking-restaurant-saas}
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      MYSQL_DATABASE: ${DB_NAME:?DB_NAME is required}
+      MYSQL_USER: ${DB_APP_USER:?DB_APP_USER is required}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+      - --slow-query-log=ON
+      - --long-query-time=1
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - data
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    command:
+      - sh
+      - -c
+      - exec redis-server --appendonly yes --appendfsync everysec --save 900 1 --save 300 10 --save 60 10000 --requirepass "$$REDIS_PASSWORD"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - data
+
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is required}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD is required}
+      MONGO_APP_DATABASE: ${MONGO_APP_DATABASE:?MONGO_APP_DATABASE is required}
+      MONGO_APP_USER: ${MONGO_APP_USER:?MONGO_APP_USER is required}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?MONGO_APP_PASSWORD is required}
+    volumes:
+      - mongo-data:/data/db
+      - ./mongodb/init/01-create-app-user.js:/docker-entrypoint-initdb.d/01-create-app-user.js:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --host 127.0.0.1 --username $$MONGO_INITDB_ROOT_USERNAME --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval 'quit(db.adminCommand({ping:1}).ok ? 0 : 2)'"]
+      interval: 15s
+      timeout: 8s
+      retries: 12
+      start_period: 30s
+    networks:
+      - data
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+    image: ${BACKEND_IMAGE:-yuking/restaurant-saas:1.6.0}
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:?DB_NAME is required}
+      DB_USERNAME: ${DB_APP_USER:?DB_APP_USER is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      MONGODB_URI: ${MONGODB_URI:?MONGODB_URI is required}
+      PAYMENT_CONFIG_MASTER_KEY: ${PAYMENT_CONFIG_MASTER_KEY:-}
+      WECHAT_PAY_NOTIFY_BASE_URL: ${WECHAT_PAY_NOTIFY_BASE_URL:-}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:-}
+      WECHAT_APP_SECRET: ${WECHAT_APP_SECRET:-}
+      WECHAT_OPEN_APP_ID: ${WECHAT_OPEN_APP_ID:-}
+      WECHAT_OPEN_APP_SECRET: ${WECHAT_OPEN_APP_SECRET:-}
+      MERCHANT_WEBSOCKET_ALLOWED_ORIGINS: ${MERCHANT_WEBSOCKET_ALLOWED_ORIGINS:?MERCHANT_WEBSOCKET_ALLOWED_ORIGINS is required}
+      ALIYUN_OSS_ACCESS_KEY_ID: ${ALIYUN_OSS_ACCESS_KEY_ID:-}
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
+      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:-}
+      ALIYUN_OSS_BUCKET: ${ALIYUN_OSS_BUCKET:-}
+      BAIDU_MAP_AK: ${BAIDU_MAP_AK:-}
+      XINYEYUN_USER: ${XINYEYUN_USER:-}
+      XINYEYUN_KEY: ${XINYEYUN_KEY:-}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m -XX:+UseG1GC}
+    volumes:
+      - ./../siam-system/system-provider/src/main/resources/application-prod.yml.template:/app/config/application-prod.yml:ro
+      - ./data/backend/logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9200/siam-server/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 20s
+      timeout: 8s
+      retries: 15
+      start_period: 60s
+    networks:
+      - app
+      - data
+
+  nginx:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
+      BACKEND_UPSTREAM: backend:9200
+      NGINX_ENVSUBST_FILTER: ^(PUBLIC_DOMAIN|BACKEND_UPSTREAM)$$
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/templates/${NGINX_TEMPLATE:-api-http.conf.template}:/etc/nginx/templates/default.conf.template:ro
+      - ./data/certbot/conf:/etc/letsencrypt:ro
+      - ./data/certbot/www:/var/www/certbot:ro
+      - ./data/nginx/logs:/var/log/nginx
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/nginx-health | grep -q ok"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    networks:
+      - edge
+      - app
+
+  certbot:
+    image: certbot/certbot:v2.11.0
+    profiles: ["tls"]
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: certbot
+    networks:
+      - edge
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:
+
+networks:
+  edge:
+  app:
+    internal: true
+  data:
+    internal: true

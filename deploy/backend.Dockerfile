@@ -1,0 +1,16 @@
+FROM eclipse-temurin:8-jre-jammy
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system siam \
+    && useradd --system --gid siam --home-dir /app --shell /usr/sbin/nologin siam
+
+WORKDIR /app
+COPY siam-system/system-provider/target/siam-server.jar /app/siam-server.jar
+RUN mkdir -p /app/logs && chown -R siam:siam /app
+
+USER siam
+EXPOSE 9200
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/siam-server.jar"]

@@ -113,11 +113,8 @@ public class WxPayService {
             /*reqXmlStr.append("<spbill_create_ip>" + model.getSpbill_create_ip() + "</spbill_create_ip>");*/
             reqXmlStr.append("</xml>");
 
-            log.info("request xml = " + reqXmlStr);
-
             // 3.加载证书请求接口
             String result = httpsRequest(wxPayConfig.getPayToBalanceUrl(), reqXmlStr.toString());
-            log.info(("response xml = " + result));
 
             Map notifyMap = PayUtil.doXMLParse(result);
             if ("SUCCESS".equals(notifyMap.get("return_code"))) {
@@ -147,8 +144,7 @@ public class WxPayService {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
-            log.error(e.toString(), e);
+            log.error("企业付款到零钱请求失败", e);
 
             String errorMsg = model.getPartner_trade_no()+"订单企业付款到零钱失败，catch Exception : " + e.toString();
             //微信公众号消息通知管理员
@@ -245,7 +241,6 @@ public class WxPayService {
 
             //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
             String xmlStr = postData(wxPayConfig.getRefundUrl(), PayUtil.GetMapToXML(data)); //支付结果通知的xml格式数据
-            System.out.println(xmlStr);
             Map notifyMap = PayUtil.doXMLParse(xmlStr);
             if ("SUCCESS".equals(notifyMap.get("return_code"))) {
                 if("SUCCESS".equals(notifyMap.get("result_code"))) {
@@ -286,8 +281,7 @@ public class WxPayService {
                 return false;
             }
         }catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.toString(), e);
+            log.error("微信退款请求失败", e);
 
             String errorMsg = out_trade_no+"订单退款失败，catch Exception : " + e.toString();
             //微信公众号消息通知管理员

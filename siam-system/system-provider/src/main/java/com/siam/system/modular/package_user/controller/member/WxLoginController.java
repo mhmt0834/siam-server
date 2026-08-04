@@ -57,11 +57,9 @@ public class WxLoginController {
         if (responseEntity != null) {
             //获取到openid:用户唯一标识,session_key:会话密钥,unionid:用户在开放平台的唯一标识符,在满足 UnionID 下发条件的情况下会返回
             String sessionData = responseEntity.getBody();
-            log.debug("-------------------------" + sessionData);
             Gson gson = new Gson();
             // 解析从微信服务器获得的openid和session_key;
             WxSession wsSession = gson.fromJson(sessionData, WxSession.class);
-            log.debug(wsSession.getSession_key());
             return wsSession;
         }
         return null;
@@ -77,16 +75,13 @@ public class WxLoginController {
      **/
     public WxEncrypted getWxUserInfo(String code, String iv, String encryptedData) throws Exception {
         WxSession wsSession = getSessionKeyFromWxByCode(code);
-        log.debug(encryptedData);
         //通过session_key和encryptedData解密微信用户信息
         String str = WxdecodeUtils.decryptData(encryptedData, wsSession.getSession_key(), iv);
-        log.debug(str + "------");
         if (str != null) {
             Gson gson = new Gson();
             //解析从微信服务器获得的手机号码及其他;
             WxEncrypted wxEncrypted = gson.fromJson(str, WxEncrypted.class);
             wxEncrypted.setOpenid(wsSession.getOpenid());
-            log.debug(wxEncrypted.getPurePhoneNumber());
             return wxEncrypted;
         }
         return null;

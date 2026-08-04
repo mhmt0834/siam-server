@@ -58,6 +58,8 @@ siam-system/system-provider/src/main/resources/application-local.yml
 .env
 .env.local
 deploy/.env
+deploy/.env.production
+deploy/data/
 *.key
 *.pem
 *.p12

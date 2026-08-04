@@ -1,5 +1,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
+var apiBaseUrl = process.env.SAAS_API_BASE_URL || 'http://localhost:9200/siam-server'
 
 module.exports = {
   build: {
@@ -30,9 +31,9 @@ module.exports = {
       //developmentBaseUrl: 'https://api.show.siamit.cn/siam-server', // development
       //cashierBaseUrl: 'https://spa.show.siamit.cn/server-cashier' // cashier
 
-      baseUrl: 'http://localhost:9200/siam-server', // production
-      baseUrl4Test: 'http://localhost:9200/siam-server', // production_test
-      developmentBaseUrl: 'http://localhost:9200/siam-server', // development
+      baseUrl: apiBaseUrl, // production
+      baseUrl4Test: apiBaseUrl, // production_test
+      developmentBaseUrl: apiBaseUrl, // development
       cashierBaseUrl: 'http://127.0.0.1:5174'
     },
     oss:{

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Restaurant SaaS health every five minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=restaurant-saas-health.service
+
+[Install]
+WantedBy=timers.target

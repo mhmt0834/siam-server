@@ -72,3 +72,4 @@ for migration in update.sql yuking_template.sql; do
 done
 
 "${DOCKER_DIR}/scripts/verify-production.sh" "${ENV_FILE}"
+"${DOCKER_DIR}/scripts/install-operations.sh"

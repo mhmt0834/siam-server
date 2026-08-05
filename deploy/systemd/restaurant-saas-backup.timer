@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Restaurant SaaS backup daily
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=restaurant-saas-backup.service
+
+[Install]
+WantedBy=timers.target

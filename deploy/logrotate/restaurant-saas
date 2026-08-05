@@ -1,4 +1,4 @@
-/opt/restaurant-saas/deploy/data/nginx/logs/*.log /opt/restaurant-saas/deploy/data/backend/logs/**/*.log {
+__DEPLOY_ROOT__/logs/nginx/*.log __DEPLOY_ROOT__/logs/backend/*/*.log {
     daily
     rotate 14
     compress

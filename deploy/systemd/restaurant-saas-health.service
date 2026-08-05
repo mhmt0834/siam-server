@@ -1,0 +1,13 @@
+[Unit]
+Description=Restaurant SaaS production health check
+Requires=docker.service
+After=docker.service
+ConditionPathExists=__DEPLOY_ROOT__/docker/.env.production
+
+[Service]
+Type=oneshot
+Environment=ENV_FILE=__DEPLOY_ROOT__/docker/.env.production
+ExecStart=__DEPLOY_ROOT__/docker/scripts/health-check.sh
+User=root
+Group=root
+TimeoutStartSec=2min

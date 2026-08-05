@@ -30,21 +30,34 @@ if [[ ! "${DB_NAME}" =~ ^[A-Za-z0-9_]+$ || ! "${MONGO_APP_DATABASE}" =~ ^[A-Za-z
 fi
 
 COMPOSE=(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_DIR}/docker-compose.production.yml")
+
+verify_backup() {
+  local backup="$1"
+  local directory checksum_file basename_value
+  directory="$(dirname "${backup}")"
+  checksum_file="${directory}/SHA256SUMS"
+  basename_value="$(basename "${backup}")"
+  if [[ -f "${checksum_file}" ]]; then
+    (cd "${directory}" && grep -F "  ${basename_value}" SHA256SUMS | sha256sum -c -)
+  fi
+}
+
+[[ -z "${MYSQL_BACKUP}" ]] || verify_backup "${MYSQL_BACKUP}"
+[[ -z "${MONGO_BACKUP}" ]] || verify_backup "${MONGO_BACKUP}"
 "${COMPOSE[@]}" stop backend
 trap '"${COMPOSE[@]}" start backend' EXIT
 
 if [[ -n "${MYSQL_BACKUP}" ]]; then
   test -f "${MYSQL_BACKUP}"
-  "${COMPOSE[@]}" exec -T -e MYSQL_PWD="${DB_ROOT_PASSWORD}" mysql \
-    mysql -uroot -e "DROP DATABASE IF EXISTS \`${DB_NAME}\`; CREATE DATABASE \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_APP_USER}'@'%';"
-  gzip -dc "${MYSQL_BACKUP}" | "${COMPOSE[@]}" exec -T -e MYSQL_PWD="${DB_PASSWORD}" mysql mysql -u"${DB_APP_USER}" "${DB_NAME}"
+  "${COMPOSE[@]}" exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e "DROP DATABASE IF EXISTS \`$MYSQL_DATABASE\`; CREATE DATABASE \`$MYSQL_DATABASE\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; GRANT ALL PRIVILEGES ON \`$MYSQL_DATABASE\`.* TO '\''$MYSQL_USER'\''@'\''%'\'';"'
+  gzip -dc "${MYSQL_BACKUP}" | "${COMPOSE[@]}" exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" exec mysql -u"$MYSQL_USER" "$MYSQL_DATABASE"'
 fi
 
 if [[ -n "${MONGO_BACKUP}" ]]; then
   test -f "${MONGO_BACKUP}"
-  "${COMPOSE[@]}" exec -T mongodb mongorestore --quiet --drop --archive --gzip \
-    --username "${MONGO_APP_USER}" --password "${MONGO_APP_PASSWORD}" \
-    --authenticationDatabase "${MONGO_APP_DATABASE}" < "${MONGO_BACKUP}"
+  "${COMPOSE[@]}" exec -T mongodb sh -c \
+    'exec mongorestore --quiet --drop --archive --gzip --username "$MONGO_APP_USER" --password "$MONGO_APP_PASSWORD" --authenticationDatabase "$MONGO_APP_DATABASE"' \
+    < "${MONGO_BACKUP}"
 fi
 
 echo "Restore completed. Verify data before ending the maintenance window."

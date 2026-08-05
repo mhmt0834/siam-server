@@ -3,47 +3,60 @@ set -Eeuo pipefail
 
 DEPLOY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ENV_FILE:-${DEPLOY_DIR}/.env.production}"
-BACKUP_DIR="${BACKUP_DIR:-/var/backups/restaurant-saas}"
 RETENTION_DAYS="${RETENTION_DAYS:-14}"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing environment file: ${ENV_FILE}" >&2
   exit 1
 fi
+set -a
+source "${ENV_FILE}"
+set +a
+BACKUP_DIR="${BACKUP_DIR:-${DEPLOY_ROOT:-/opt/restaurant-saas}/backup}"
 if [[ "${BACKUP_DIR}" == "/" || ${#BACKUP_DIR} -lt 10 ]]; then
   echo "Unsafe BACKUP_DIR: ${BACKUP_DIR}" >&2
   exit 1
 fi
 
-set -a
-source "${ENV_FILE}"
-set +a
-
 COMPOSE=(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_DIR}/docker-compose.production.yml")
 STAMP="$(date +%Y%m%d-%H%M%S)"
 TARGET="${BACKUP_DIR}/${STAMP}"
-mkdir -p "${TARGET}"
+PARTIAL="${BACKUP_DIR}/.${STAMP}.partial"
+umask 077
+install -d -m 0700 "${BACKUP_DIR}"
+exec 9>"${BACKUP_DIR}/.backup.lock"
+flock -n 9 || {
+  echo "Another backup is already running." >&2
+  exit 1
+}
+trap 'rm -rf -- "${PARTIAL}"' ERR
+install -d -m 0700 "${PARTIAL}"
 
-"${COMPOSE[@]}" exec -T -e MYSQL_PWD="${DB_PASSWORD}" mysql \
-  mysqldump --single-transaction --routines --triggers --events \
-  --set-gtid-purged=OFF -u"${DB_APP_USER}" "${DB_NAME}" \
-  | gzip -9 > "${TARGET}/mysql-${DB_NAME}.sql.gz"
+"${COMPOSE[@]}" exec -T mysql sh -c \
+  'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --set-gtid-purged=OFF -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
+  | gzip -9 > "${PARTIAL}/mysql-${DB_NAME}.sql.gz"
 
-"${COMPOSE[@]}" exec -T mongodb \
-  mongodump --quiet --archive --gzip --db "${MONGO_APP_DATABASE}" \
-  --username "${MONGO_APP_USER}" --password "${MONGO_APP_PASSWORD}" \
-  --authenticationDatabase "${MONGO_APP_DATABASE}" \
-  > "${TARGET}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
+"${COMPOSE[@]}" exec -T mongodb sh -c \
+  'exec mongodump --quiet --archive --gzip --db "$MONGO_APP_DATABASE" --username "$MONGO_APP_USER" --password "$MONGO_APP_PASSWORD" --authenticationDatabase "$MONGO_APP_DATABASE"' \
+  > "${PARTIAL}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
 
-"${COMPOSE[@]}" exec -T -e REDISCLI_AUTH="${REDIS_PASSWORD}" redis redis-cli BGSAVE >/dev/null
+"${COMPOSE[@]}" exec -T redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli BGSAVE' >/dev/null
 for _ in {1..30}; do
-  if [[ "$("${COMPOSE[@]}" exec -T -e REDISCLI_AUTH="${REDIS_PASSWORD}" redis redis-cli --raw INFO persistence | tr -d '\r' | awk -F: '/rdb_bgsave_in_progress/{print $2}')" == "0" ]]; then
+  if [[ "$("${COMPOSE[@]}" exec -T redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --raw INFO persistence' | tr -d '\r' | awk -F: '/rdb_bgsave_in_progress/{print $2}')" == "0" ]]; then
     break
   fi
   sleep 1
 done
-"${COMPOSE[@]}" cp redis:/data/dump.rdb "${TARGET}/redis-dump.rdb"
+redis_persistence="$("${COMPOSE[@]}" exec -T redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --raw INFO persistence' | tr -d '\r')"
+grep -q '^rdb_bgsave_in_progress:0$' <<<"${redis_persistence}"
+grep -q '^rdb_last_bgsave_status:ok$' <<<"${redis_persistence}"
+"${COMPOSE[@]}" cp redis:/data/dump.rdb "${PARTIAL}/redis-dump.rdb"
 
-sha256sum "${TARGET}"/* > "${TARGET}/SHA256SUMS"
+test -s "${PARTIAL}/mysql-${DB_NAME}.sql.gz"
+test -s "${PARTIAL}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
+test -s "${PARTIAL}/redis-dump.rdb"
+gzip -t "${PARTIAL}/mysql-${DB_NAME}.sql.gz" "${PARTIAL}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
+sha256sum "${PARTIAL}"/* > "${PARTIAL}/SHA256SUMS"
+mv "${PARTIAL}" "${TARGET}"
 find "${BACKUP_DIR}" -mindepth 1 -maxdepth 1 -type d -mtime "+${RETENTION_DAYS}" -exec rm -rf -- {} +
 echo "Backup completed: ${TARGET}"

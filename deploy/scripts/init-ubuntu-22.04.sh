@@ -33,13 +33,14 @@ install -d -m 0750 \
   "${DEPLOY_ROOT}/backend/source" \
   "${DEPLOY_ROOT}/docker" \
   "${DEPLOY_ROOT}/nginx/certbot/conf" \
-  "${DEPLOY_ROOT}/nginx/certbot/www" \
   "${DEPLOY_ROOT}/mysql/data" \
   "${DEPLOY_ROOT}/redis/data" \
   "${DEPLOY_ROOT}/mongo/data" \
   "${DEPLOY_ROOT}/logs/backend" \
   "${DEPLOY_ROOT}/logs/nginx" \
   "${DEPLOY_ROOT}/backup"
+# Nginx workers must traverse this webroot for ACME HTTP-01 challenges.
+install -d -m 0755 "${DEPLOY_ROOT}/nginx/certbot/www"
 chown -R 10001:10001 "${DEPLOY_ROOT}/logs/backend"
 
 if ! swapon --show=NAME --noheadings | grep -q .; then

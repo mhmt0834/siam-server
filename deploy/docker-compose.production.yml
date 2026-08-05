@@ -1,9 +1,20 @@
 name: ${COMPOSE_PROJECT_NAME:-yuking-restaurant-saas}
 
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: ${DOCKER_LOG_MAX_SIZE:-10m}
+      max-file: ${DOCKER_LOG_MAX_FILES:-3}
+
 services:
   mysql:
+    <<: *service-defaults
     image: mysql:8.4
-    restart: unless-stopped
+    mem_limit: ${MYSQL_MEMORY_LIMIT:-512m}
+    cpus: ${MYSQL_CPU_LIMIT:-0.75}
+    pids_limit: 256
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       MYSQL_DATABASE: ${DB_NAME:?DB_NAME is required}
@@ -16,8 +27,18 @@ services:
       - --default-time-zone=+08:00
       - --slow-query-log=ON
       - --long-query-time=1
+      - --innodb-buffer-pool-size=${MYSQL_INNODB_BUFFER_POOL_SIZE:-256M}
+      - --innodb-log-buffer-size=16M
+      - --max-connections=${MYSQL_MAX_CONNECTIONS:-60}
+      - --table-open-cache=400
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --performance-schema=OFF
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/mysql/data:/var/lib/mysql
+      - ${PROJECT_SOURCE:-..}/docs/phase1-acceptance/schema-phase1.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ${PROJECT_SOURCE:-..}/sql/mysql/update.sql:/docker-entrypoint-initdb.d/02-migrations.sql:ro
+      - ${PROJECT_SOURCE:-..}/sql/mysql/yuking_template.sql:/docker-entrypoint-initdb.d/03-template-defaults.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER --silent"]
       interval: 10s
@@ -28,17 +49,20 @@ services:
       - data
 
   redis:
+    <<: *service-defaults
     image: redis:7.4-alpine
-    restart: unless-stopped
+    mem_limit: ${REDIS_MEMORY_LIMIT:-160m}
+    cpus: ${REDIS_CPU_LIMIT:-0.25}
+    pids_limit: 128
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command:
       - sh
       - -c
-      - exec redis-server --appendonly yes --appendfsync everysec --save 900 1 --save 300 10 --save 60 10000 --requirepass "$$REDIS_PASSWORD"
+      - exec redis-server --appendonly yes --appendfsync everysec --save 900 1 --save 300 10 --save 60 10000 --maxmemory ${REDIS_MAXMEMORY:-128mb} --maxmemory-policy noeviction --requirepass "$$REDIS_PASSWORD"
     volumes:
-      - redis-data:/data
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/redis/data:/data
     healthcheck:
       test: ["CMD-SHELL", "REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep -q PONG"]
       interval: 10s
@@ -48,8 +72,11 @@ services:
       - data
 
   mongodb:
+    <<: *service-defaults
     image: mongo:8.0
-    restart: unless-stopped
+    mem_limit: ${MONGO_MEMORY_LIMIT:-384m}
+    cpus: ${MONGO_CPU_LIMIT:-0.50}
+    pids_limit: 256
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is required}
@@ -57,8 +84,15 @@ services:
       MONGO_APP_DATABASE: ${MONGO_APP_DATABASE:?MONGO_APP_DATABASE is required}
       MONGO_APP_USER: ${MONGO_APP_USER:?MONGO_APP_USER is required}
       MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?MONGO_APP_PASSWORD is required}
+    command:
+      - mongod
+      - --bind_ip_all
+      - --wiredTigerCacheSizeGB
+      - ${MONGO_WIREDTIGER_CACHE_GB:-0.25}
+      - --setParameter
+      - diagnosticDataCollectionEnabled=false
     volumes:
-      - mongo-data:/data/db
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/mongo/data:/data/db
       - ./mongodb/init/01-create-app-user.js:/docker-entrypoint-initdb.d/01-create-app-user.js:ro
     healthcheck:
       test: ["CMD-SHELL", "mongosh --quiet --host 127.0.0.1 --username $$MONGO_INITDB_ROOT_USERNAME --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval 'quit(db.adminCommand({ping:1}).ok ? 0 : 2)'"]
@@ -70,11 +104,15 @@ services:
       - data
 
   backend:
+    <<: *service-defaults
     build:
-      context: ..
+      context: ${PROJECT_SOURCE:-..}
       dockerfile: deploy/backend.Dockerfile
     image: ${BACKEND_IMAGE:-yuking/restaurant-saas:1.6.0}
-    restart: unless-stopped
+    mem_limit: ${BACKEND_MEMORY_LIMIT:-768m}
+    cpus: ${BACKEND_CPU_LIMIT:-1.25}
+    pids_limit: 256
+    stop_grace_period: 45s
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       SPRING_PROFILES_ACTIVE: prod
@@ -101,10 +139,17 @@ services:
       BAIDU_MAP_AK: ${BAIDU_MAP_AK:-}
       XINYEYUN_USER: ${XINYEYUN_USER:-}
       XINYEYUN_KEY: ${XINYEYUN_KEY:-}
-      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m -XX:+UseG1GC}
+      SERVER_MAX_THREADS: ${SERVER_MAX_THREADS:-80}
+      SERVER_ACCEPT_COUNT: ${SERVER_ACCEPT_COUNT:-50}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-8}
+      DB_POOL_MIN_IDLE: ${DB_POOL_MIN_IDLE:-2}
+      REDIS_POOL_MAX_ACTIVE: ${REDIS_POOL_MAX_ACTIVE:-12}
+      REDIS_POOL_MAX_IDLE: ${REDIS_POOL_MAX_IDLE:-4}
+      REDIS_POOL_MIN_IDLE: ${REDIS_POOL_MIN_IDLE:-1}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m -XX:MaxMetaspaceSize=160m -XX:MaxDirectMemorySize=64m -XX:+UseSerialGC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs}
     volumes:
-      - ./../siam-system/system-provider/src/main/resources/application-prod.yml.template:/app/config/application-prod.yml:ro
-      - ./data/backend/logs:/app/logs
+      - ${PROJECT_SOURCE:-..}/siam-system/system-provider/src/main/resources/application-prod.yml.template:/app/config/application-prod.yml:ro
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/logs/backend:/app/logs
     depends_on:
       mysql:
         condition: service_healthy
@@ -123,8 +168,11 @@ services:
       - data
 
   nginx:
+    <<: *service-defaults
     image: nginx:1.28-alpine
-    restart: unless-stopped
+    mem_limit: ${NGINX_MEMORY_LIMIT:-96m}
+    cpus: ${NGINX_CPU_LIMIT:-0.25}
+    pids_limit: 128
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
@@ -135,9 +183,9 @@ services:
       - "443:443"
     volumes:
       - ./nginx/templates/${NGINX_TEMPLATE:-api-http.conf.template}:/etc/nginx/templates/default.conf.template:ro
-      - ./data/certbot/conf:/etc/letsencrypt:ro
-      - ./data/certbot/www:/var/www/certbot:ro
-      - ./data/nginx/logs:/var/log/nginx
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/nginx/certbot/conf:/etc/letsencrypt:ro
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/nginx/certbot/www:/var/www/certbot:ro
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/logs/nginx:/var/log/nginx
     depends_on:
       backend:
         condition: service_healthy
@@ -154,16 +202,11 @@ services:
     image: certbot/certbot:v2.11.0
     profiles: ["tls"]
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/nginx/certbot/conf:/etc/letsencrypt
+      - ${DEPLOY_ROOT:-/opt/restaurant-saas}/nginx/certbot/www:/var/www/certbot
     entrypoint: certbot
     networks:
       - edge
-
-volumes:
-  mysql-data:
-  redis-data:
-  mongo-data:
 
 networks:
   edge:

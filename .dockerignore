@@ -1,0 +1,16 @@
+.git
+.github
+**/node_modules
+**/dist
+**/unpackage
+vue-siam-admin
+vue-siam-shop
+uniapp-siam-admin
+uniapp-siam-user
+siam-generator
+docs
+sql
+deploy/data
+deploy/.env.production
+**/*.log
+**/*.tmp

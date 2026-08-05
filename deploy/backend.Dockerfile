@@ -1,4 +1,5 @@
-FROM eclipse-temurin:8-jre-jammy
+ARG RUNTIME_IMAGE=eclipse-temurin:8-jre-jammy
+FROM ${RUNTIME_IMAGE}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \

@@ -11,7 +11,7 @@ x-service-defaults: &service-defaults
 services:
   mysql:
     <<: *service-defaults
-    image: mysql:8.4
+    image: ${MYSQL_IMAGE:-mysql:8.4}
     mem_limit: ${MYSQL_MEMORY_LIMIT:-512m}
     cpus: ${MYSQL_CPU_LIMIT:-0.75}
     pids_limit: 256
@@ -50,7 +50,7 @@ services:
 
   redis:
     <<: *service-defaults
-    image: redis:7.4-alpine
+    image: ${REDIS_IMAGE:-redis:7.4-alpine}
     mem_limit: ${REDIS_MEMORY_LIMIT:-160m}
     cpus: ${REDIS_CPU_LIMIT:-0.25}
     pids_limit: 128
@@ -73,7 +73,7 @@ services:
 
   mongodb:
     <<: *service-defaults
-    image: mongo:8.0
+    image: ${MONGO_IMAGE:-mongo:8.0}
     mem_limit: ${MONGO_MEMORY_LIMIT:-384m}
     cpus: ${MONGO_CPU_LIMIT:-0.50}
     pids_limit: 256
@@ -108,6 +108,8 @@ services:
     build:
       context: ${PROJECT_SOURCE:-..}
       dockerfile: deploy/backend.Dockerfile
+      args:
+        RUNTIME_IMAGE: ${BACKEND_RUNTIME_IMAGE:-eclipse-temurin:8-jre-jammy}
     image: ${BACKEND_IMAGE:-yuking/restaurant-saas:1.6.0}
     mem_limit: ${BACKEND_MEMORY_LIMIT:-768m}
     cpus: ${BACKEND_CPU_LIMIT:-1.25}
@@ -125,6 +127,8 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       MONGODB_URI: ${MONGODB_URI:?MONGODB_URI is required}
+      SPRING_MAIL_HOST: ${MAIL_HOST:-localhost}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-25}
       PAYMENT_CONFIG_MASTER_KEY: ${PAYMENT_CONFIG_MASTER_KEY:-}
       WECHAT_PAY_NOTIFY_BASE_URL: ${WECHAT_PAY_NOTIFY_BASE_URL:-}
       WECHAT_APP_ID: ${WECHAT_APP_ID:-}
@@ -169,7 +173,7 @@ services:
 
   nginx:
     <<: *service-defaults
-    image: nginx:1.28-alpine
+    image: ${NGINX_IMAGE:-nginx:1.28-alpine}
     mem_limit: ${NGINX_MEMORY_LIMIT:-96m}
     cpus: ${NGINX_CPU_LIMIT:-0.25}
     pids_limit: 128

@@ -38,6 +38,12 @@ PUBLIC_DOMAIN=${PUBLIC_DOMAIN}
 TLS_EMAIL=
 NGINX_TEMPLATE=api-http.conf.template
 BACKEND_IMAGE=yuking/restaurant-saas:1.6.3
+BACKEND_RUNTIME_IMAGE=eclipse-temurin:8-jre-jammy
+MAVEN_BUILD_IMAGE=maven:3.9.11-eclipse-temurin-8
+MYSQL_IMAGE=mysql:8.4
+REDIS_IMAGE=redis:7.4-alpine
+MONGO_IMAGE=mongo:8.0
+NGINX_IMAGE=nginx:1.28-alpine
 JAVA_OPTS="-Xms256m -Xmx512m -XX:MaxMetaspaceSize=160m -XX:MaxDirectMemorySize=64m -XX:+UseSerialGC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs -Djava.security.egd=file:/dev/./urandom"
 MERCHANT_WEBSOCKET_ALLOWED_ORIGINS=${MERCHANT_ORIGIN}
 
@@ -78,6 +84,8 @@ MONGO_APP_DATABASE=siam_db
 MONGO_APP_USER=siam_app
 MONGO_APP_PASSWORD=${mongo_app_password}
 MONGODB_URI=mongodb://siam_app:${mongo_app_password}@mongodb:27017/siam_db?authSource=siam_db
+MAIL_HOST=localhost
+MAIL_PORT=25
 
 PAYMENT_CONFIG_MASTER_KEY=${payment_master_key}
 WECHAT_PAY_NOTIFY_BASE_URL=https://${PUBLIC_DOMAIN}

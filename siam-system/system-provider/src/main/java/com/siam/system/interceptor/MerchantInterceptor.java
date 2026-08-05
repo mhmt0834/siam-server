@@ -25,6 +25,8 @@ public class MerchantInterceptor extends HandlerInterceptorAdapter {
     private MerchantSessionManager merchantSessionManager;
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
         //从header或param里面获取token(暂时这样写，兼容之前前端的写法)
         String token = TokenUtil.getToken();
 

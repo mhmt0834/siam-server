@@ -6,6 +6,7 @@ PROJECT_SOURCE="${PROJECT_SOURCE:-${DEPLOY_ROOT}/backend/source}"
 DOCKER_DIR="${DEPLOY_ROOT}/docker"
 ENV_FILE="${ENV_FILE:-${DOCKER_DIR}/.env.production}"
 COMPOSE_FILE="${DOCKER_DIR}/docker-compose.production.yml"
+MAVEN_BUILD_IMAGE="${MAVEN_BUILD_IMAGE:-maven:3.9.11-eclipse-temurin-8}"
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Run this script as root." >&2
@@ -35,7 +36,7 @@ if [[ "${BUILD_JAR:-true}" == "true" ]]; then
     -v "${PROJECT_SOURCE}:/workspace" \
     -v restaurant-maven-cache:/root/.m2 \
     -w /workspace \
-    maven:3.9.11-eclipse-temurin-8 \
+    "${MAVEN_BUILD_IMAGE}" \
     mvn -Pprod -pl siam-system/system-provider -am clean package -DskipTests
 fi
 

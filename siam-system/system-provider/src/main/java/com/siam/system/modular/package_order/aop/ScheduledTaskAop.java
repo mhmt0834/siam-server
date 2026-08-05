@@ -56,7 +56,7 @@ public class ScheduledTaskAop {
 
         ScheduledTask dbScheduledTask = scheduledTaskService.selectByCode(code);
         if(dbScheduledTask == null){
-            log.error("定时任务代码不存在，执行失败");
+            log.debug("定时任务未启用，跳过执行：{}", code);
             return;
         }
 

@@ -67,7 +67,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //商户拦截器
         registry.addInterceptor(merchantInterceptor)
 //                .addPathPatterns("/api-member/rest/member/**")
-                .addPathPatterns("/*/rest/merchant/**")
+                .addPathPatterns("/rest/merchant/**")
                 .excludePathPatterns("/rest/merchant/login")
                 .excludePathPatterns("/rest/merchant/loginByMobile")
                 .excludePathPatterns("/rest/merchant/logout")

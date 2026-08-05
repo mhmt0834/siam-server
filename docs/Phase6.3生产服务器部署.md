@@ -5,6 +5,7 @@
 - Ubuntu 22.04 LTS，2 vCPU / 2 GiB / 40 GiB ESSD。
 - 部署根目录：`/opt/restaurant-saas`。
 - 对外仅开放 `22`、`80`、`443`；MySQL、Redis、MongoDB 和后端端口只在 Docker 内部网络可见。
+- SSH 使用独立 Ed25519 密钥；确认公钥已安装后关闭密码登录，并启用 Fail2ban。
 - 当前阶段使用 HTTP 验证，HTTPS、DNS 和微信合法域名在 Phase 6.4 完成。
 
 ## 目录

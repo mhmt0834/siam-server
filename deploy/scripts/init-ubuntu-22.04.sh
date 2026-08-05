@@ -12,7 +12,7 @@ fi
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get upgrade -y
-apt-get install -y ca-certificates curl gnupg git jq openssl ufw unattended-upgrades
+apt-get install -y ca-certificates curl fail2ban gnupg git jq openssl ufw unattended-upgrades
 
 if ! command -v docker >/dev/null 2>&1; then
   apt-get remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc || true
@@ -77,6 +77,15 @@ fi
 
 sshd -t
 systemctl reload ssh
+
+cat >/etc/fail2ban/jail.d/restaurant-saas-sshd.local <<'EOF'
+[sshd]
+enabled = true
+maxretry = 4
+findtime = 10m
+bantime = 1h
+EOF
+systemctl enable --now fail2ban
 
 ufw default deny incoming
 ufw default allow outgoing

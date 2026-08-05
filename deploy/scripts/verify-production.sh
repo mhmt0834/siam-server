@@ -7,11 +7,15 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 1
 fi
 
-set -a
-# shellcheck disable=SC1090
-source "${ENV_FILE}"
-set +a
-DEPLOY_ROOT="${DEPLOY_ROOT:-/opt/restaurant-saas}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/env-file.sh
+source "${SCRIPT_DIR}/lib/env-file.sh"
+DEPLOY_ROOT="$(env_file_value_or_default "${ENV_FILE}" DEPLOY_ROOT "/opt/restaurant-saas")"
+PUBLIC_DOMAIN="$(env_file_value_or_default "${ENV_FILE}" PUBLIC_DOMAIN "")"
+if [[ -z "${PUBLIC_DOMAIN}" ]]; then
+  echo "PUBLIC_DOMAIN is required." >&2
+  exit 1
+fi
 COMPOSE_FILE="${DEPLOY_ROOT}/docker/docker-compose.production.yml"
 
 compose=(docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}")
@@ -21,9 +25,8 @@ compose=(docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}")
   sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin ping -h 127.0.0.1 -u"$MYSQL_USER" --silent'
 "${compose[@]}" exec -T redis \
   sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ping' | grep -q '^PONG$'
-"${compose[@]}" exec -T mongodb \
-  mongosh --quiet --host 127.0.0.1 --username "${MONGO_ROOT_USERNAME}" --password "${MONGO_ROOT_PASSWORD}" \
-  --authenticationDatabase admin --eval 'quit(db.adminCommand({ping:1}).ok ? 0 : 2)'
+"${compose[@]}" exec -T mongodb sh -c \
+  'exec mongosh --quiet --host 127.0.0.1 --username "$MONGO_ROOT_USERNAME" --password "$MONGO_ROOT_PASSWORD" --authenticationDatabase admin --eval '\''quit(db.adminCommand({ping:1}).ok ? 0 : 2)'\'''
 
 schema_result=$("${compose[@]}" exec -T mysql sh -c \
   'MYSQL_PWD="$MYSQL_PASSWORD" mysql -N -B -u"$MYSQL_USER" "$MYSQL_DATABASE" -e "

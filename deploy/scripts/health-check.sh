@@ -7,9 +7,15 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing environment file: ${ENV_FILE}" >&2
   exit 1
 fi
-set -a
-source "${ENV_FILE}"
-set +a
+# shellcheck source=lib/env-file.sh
+source "${DEPLOY_DIR}/scripts/lib/env-file.sh"
+PUBLIC_DOMAIN="$(env_file_value_or_default "${ENV_FILE}" PUBLIC_DOMAIN "")"
+NGINX_TEMPLATE="$(env_file_value_or_default "${ENV_FILE}" NGINX_TEMPLATE "api-http.conf.template")"
+HEALTH_CHECK_URL="${HEALTH_CHECK_URL:-$(env_file_value_or_default "${ENV_FILE}" HEALTH_CHECK_URL "")}"
+if [[ -z "${PUBLIC_DOMAIN}" && -z "${HEALTH_CHECK_URL}" ]]; then
+  echo "PUBLIC_DOMAIN or HEALTH_CHECK_URL is required." >&2
+  exit 1
+fi
 
 COMPOSE=(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_DIR}/docker-compose.production.yml")
 FAILED=0

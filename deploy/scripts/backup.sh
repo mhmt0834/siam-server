@@ -9,10 +9,16 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing environment file: ${ENV_FILE}" >&2
   exit 1
 fi
-set -a
-source "${ENV_FILE}"
-set +a
-BACKUP_DIR="${BACKUP_DIR:-${DEPLOY_ROOT:-/opt/restaurant-saas}/backup}"
+# shellcheck source=lib/env-file.sh
+source "${DEPLOY_DIR}/scripts/lib/env-file.sh"
+DEPLOY_ROOT="$(env_file_value_or_default "${ENV_FILE}" DEPLOY_ROOT "/opt/restaurant-saas")"
+DB_NAME="$(env_file_value_or_default "${ENV_FILE}" DB_NAME "")"
+MONGO_APP_DATABASE="$(env_file_value_or_default "${ENV_FILE}" MONGO_APP_DATABASE "")"
+if [[ ! "${DB_NAME}" =~ ^[A-Za-z0-9_]+$ || ! "${MONGO_APP_DATABASE}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+  echo "Unsafe database name." >&2
+  exit 1
+fi
+BACKUP_DIR="${BACKUP_DIR:-${DEPLOY_ROOT}/backup}"
 if [[ "${BACKUP_DIR}" == "/" || ${#BACKUP_DIR} -lt 10 ]]; then
   echo "Unsafe BACKUP_DIR: ${BACKUP_DIR}" >&2
   exit 1

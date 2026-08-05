@@ -20,13 +20,15 @@ if [[ ! -f "${PROJECT_SOURCE}/pom.xml" ]]; then
   echo "Missing project source at ${PROJECT_SOURCE}." >&2
   exit 1
 fi
-if [[ -e "${PROJECT_SOURCE}/deploy/.env.production" ]]; then
-  echo "Refusing deployment: merchant instance environment file must not exist inside project source." >&2
+install -d -m 0750 "${DOCKER_DIR}" "${DEPLOY_ROOT}/backup" "${DEPLOY_ROOT}/logs/backend" "${DEPLOY_ROOT}/logs/nginx"
+env_checksum_before="$(sha256sum "${ENV_FILE}" | awk '{print $1}')"
+tar --exclude='./.env.production' --exclude='.env.production' -C "${PROJECT_SOURCE}/deploy" -cf - . \
+  | tar --no-same-owner -C "${DOCKER_DIR}" -xf -
+env_checksum_after="$(sha256sum "${ENV_FILE}" | awk '{print $1}')"
+if [[ "${env_checksum_before}" != "${env_checksum_after}" ]]; then
+  echo "Deployment aborted: protected production environment file changed during sync." >&2
   exit 1
 fi
-
-install -d -m 0750 "${DOCKER_DIR}" "${DEPLOY_ROOT}/backup" "${DEPLOY_ROOT}/logs/backend" "${DEPLOY_ROOT}/logs/nginx"
-cp -a "${PROJECT_SOURCE}/deploy/." "${DOCKER_DIR}/"
 chmod 600 "${ENV_FILE}"
 chown -R 10001:10001 "${DEPLOY_ROOT}/logs/backend"
 
@@ -47,11 +49,6 @@ fi
 
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --build
-
-set -a
-# shellcheck disable=SC1090
-source "${ENV_FILE}"
-set +a
 
 for attempt in $(seq 1 36); do
   if docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" exec -T mysql \

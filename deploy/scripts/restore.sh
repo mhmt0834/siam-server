@@ -20,9 +20,10 @@ if [[ -z "${MYSQL_BACKUP}" && -z "${MONGO_BACKUP}" ]]; then
   exit 1
 fi
 
-set -a
-source "${ENV_FILE}"
-set +a
+# shellcheck source=lib/env-file.sh
+source "${DEPLOY_DIR}/scripts/lib/env-file.sh"
+DB_NAME="$(env_file_value_or_default "${ENV_FILE}" DB_NAME "")"
+MONGO_APP_DATABASE="$(env_file_value_or_default "${ENV_FILE}" MONGO_APP_DATABASE "")"
 
 if [[ ! "${DB_NAME}" =~ ^[A-Za-z0-9_]+$ || ! "${MONGO_APP_DATABASE}" =~ ^[A-Za-z0-9_-]+$ ]]; then
   echo "Unsafe database name." >&2

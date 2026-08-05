@@ -33,7 +33,7 @@ trap 'rm -rf -- "${PARTIAL}"' ERR
 install -d -m 0700 "${PARTIAL}"
 
 "${COMPOSE[@]}" exec -T mysql sh -c \
-  'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --set-gtid-purged=OFF -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
+  'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --no-tablespaces --set-gtid-purged=OFF -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
   | gzip -9 > "${PARTIAL}/mysql-${DB_NAME}.sql.gz"
 
 "${COMPOSE[@]}" exec -T mongodb sh -c \

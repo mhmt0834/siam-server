@@ -56,7 +56,7 @@ test -s "${PARTIAL}/mysql-${DB_NAME}.sql.gz"
 test -s "${PARTIAL}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
 test -s "${PARTIAL}/redis-dump.rdb"
 gzip -t "${PARTIAL}/mysql-${DB_NAME}.sql.gz" "${PARTIAL}/mongodb-${MONGO_APP_DATABASE}.archive.gz"
-sha256sum "${PARTIAL}"/* > "${PARTIAL}/SHA256SUMS"
+(cd "${PARTIAL}" && sha256sum * > SHA256SUMS)
 mv "${PARTIAL}" "${TARGET}"
 find "${BACKUP_DIR}" -mindepth 1 -maxdepth 1 -type d -mtime "+${RETENTION_DAYS}" -exec rm -rf -- {} +
 echo "Backup completed: ${TARGET}"

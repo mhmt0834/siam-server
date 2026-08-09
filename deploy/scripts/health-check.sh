@@ -42,9 +42,55 @@ done < <("${COMPOSE[@]}" ps --format '{{.Service}}|{{.State}}|{{.Health}}')
 
 DISK_USED="$(df -P / | awk 'NR==2 {gsub(/%/, "", $5); print $5}')"
 echo "disk_used=${DISK_USED}%"
+if (( DISK_USED >= 75 )); then
+  echo "WARN: Disk usage is at or above 75%." >&2
+fi
 if (( DISK_USED >= 85 )); then
   echo "Disk usage is above the 85% threshold." >&2
   FAILED=1
 fi
-free -m | awk '/^Mem:/ {print "memory_available_mb=" $7}'
+
+MEM_AVAILABLE_MB="$(free -m | awk '/^Mem:/ {print $7}')"
+echo "memory_available_mb=${MEM_AVAILABLE_MB}"
+if (( MEM_AVAILABLE_MB < 400 )); then
+  echo "WARN: Available memory is below 400MB." >&2
+fi
+if (( MEM_AVAILABLE_MB < 250 )); then
+  echo "Available memory is below the 250MB critical threshold." >&2
+  FAILED=1
+fi
+
+read -r SWAP_TOTAL_MB SWAP_USED_MB < <(free -m | awk '/^Swap:/ {print $2, $3}')
+SWAP_USED_PERCENT=0
+if (( SWAP_TOTAL_MB > 0 )); then
+  SWAP_USED_PERCENT=$((SWAP_USED_MB * 100 / SWAP_TOTAL_MB))
+fi
+echo "swap_used=${SWAP_USED_MB}MB (${SWAP_USED_PERCENT}%)"
+if (( SWAP_USED_PERCENT >= 25 )); then
+  echo "WARN: Swap usage is at or above 25%." >&2
+fi
+if (( SWAP_USED_PERCENT >= 50 )); then
+  echo "Swap usage is at or above the 50% critical threshold." >&2
+  FAILED=1
+fi
+
+LOAD_15="$(awk '{print $3}' /proc/loadavg)"
+echo "load_average_15m=${LOAD_15}"
+awk -v value="${LOAD_15}" 'BEGIN {exit !(value >= 1.4)}' && echo "WARN: 15-minute load is at or above 1.4." >&2 || true
+if awk -v value="${LOAD_15}" 'BEGIN {exit !(value >= 1.8)}'; then
+  echo "15-minute load is at or above the 1.8 critical threshold." >&2
+  FAILED=1
+fi
+
+while IFS='|' read -r container memory_percent; do
+  [[ -n "${container}" ]] || continue
+  memory_value="${memory_percent%%%}"
+  echo "container_memory=${container}:${memory_percent}"
+  awk -v value="${memory_value}" 'BEGIN {exit !(value >= 80)}' && echo "WARN: ${container} memory is at or above 80%." >&2 || true
+  if awk -v value="${memory_value}" 'BEGIN {exit !(value >= 90)}'; then
+    echo "${container} memory is at or above the 90% critical threshold." >&2
+    FAILED=1
+  fi
+done < <(docker stats --no-stream --format '{{.Name}}|{{.MemPerc}}')
+
 exit "${FAILED}"

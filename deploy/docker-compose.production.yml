@@ -76,7 +76,8 @@ services:
     image: ${MONGO_IMAGE:-mongo:8.0}
     mem_limit: ${MONGO_MEMORY_LIMIT:-384m}
     cpus: ${MONGO_CPU_LIMIT:-0.50}
-    pids_limit: 256
+    # MongoDB 8 keeps roughly 246 threads on this host; leave room for mongosh health checks.
+    pids_limit: ${MONGO_PIDS_LIMIT:-384}
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is required}

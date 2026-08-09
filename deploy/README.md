@@ -17,6 +17,7 @@ Ubuntu 22.04 / 2C2G 首次部署：
 6. 部署完成后会自动安装每日备份、每 5 分钟健康检查和日志轮转；用 `systemctl list-timers 'restaurant-saas-*'` 查看计划。
 7. 空闲维护窗口执行 `sudo /opt/restaurant-saas/docker/scripts/production-db-acceptance.sh`，在临时数据库中验证 MySQL 备份恢复、索引与并发读写；脚本不修改生产业务库。
 8. 执行 `sudo /opt/restaurant-saas/docker/scripts/production-restore-acceptance.sh`，在隔离的 MongoDB 临时库和 Redis 临时容器中验证恢复，成功后自动清理。
+9. Phase 6.4.3 维护窗口依次执行 `production-index-acceptance.sh`、`production-business-acceptance.sh`、`production-gateway-acceptance.sh` 和 `production-api-load-acceptance.sh`，分别验收统计索引、全业务链路、网关限流/WebSocket 与 API 稳态负载；脚本均不得写入生产业务库。
 
 Phase 6.3 使用 HTTP 模板验证内网与公网 IP；Phase 6.4 证书签发后将 `NGINX_TEMPLATE` 切换为 `api-https.conf.template`。
 

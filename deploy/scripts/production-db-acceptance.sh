@@ -53,6 +53,12 @@ test -s "${MYSQL_BACKUP}"
 gzip -dc "${MYSQL_BACKUP}" | "${COMPOSE[@]}" exec -T -e QA_DB="${QA_DB}" mysql sh -c \
   'MYSQL_PWD="$MYSQL_PASSWORD" exec mysql -u"$MYSQL_USER" "$QA_DB"'
 
+for run in 1 2; do
+  "${COMPOSE[@]}" exec -T -e QA_DB="${QA_DB}" mysql sh -c \
+    'MYSQL_PWD="$MYSQL_PASSWORD" mysql -u"$MYSQL_USER" "$QA_DB" < /docker-entrypoint-initdb.d/02-migrations.sql'
+  echo "isolated_migration_run_${run}=OK"
+done
+
 RESTORE_SQL='SELECT CONCAT("restored_tables=", COUNT(*)) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE(); SELECT CONCAT("restored_orders=", COUNT(*)) FROM tb_order;'
 "${COMPOSE[@]}" exec -T -e QA_DB="${QA_DB}" -e QA_SQL="${RESTORE_SQL}" mysql sh -c \
   'MYSQL_PWD="$MYSQL_PASSWORD" mysql -N -B -u"$MYSQL_USER" "$QA_DB" -e "$QA_SQL"'
@@ -61,14 +67,15 @@ read -r -d '' SEED_SQL <<SQL || true
 INSERT INTO tb_order
   (member_id, order_no, goods_total_quantity, goods_total_price, actual_price,
    shopping_way, status, is_deleted, shop_id, shop_name, create_time, update_time,
-   checkout_mode, table_no, is_payment, order_channel)
+   order_completion_time, checkout_mode, table_no, is_payment, order_channel)
 SELECT
   MOD(n, 10000) + 1,
   CONCAT('QA642', LPAD(n, 10, '0')),
   1, 68.00, 68.00, 1,
   CASE MOD(n, 3) WHEN 0 THEN 2 WHEN 1 THEN 3 ELSE 6 END,
   0, MOD(n, 50) + 1, 'QA Shop',
-  NOW() - INTERVAL MOD(n, 30) DAY, NOW(), 1,
+  NOW() - INTERVAL MOD(FLOOR(n / 50), 30) DAY, NOW(),
+  CASE WHEN MOD(n, 3) = 2 THEN NOW() - INTERVAL MOD(FLOOR(n / 50), 30) DAY ELSE NULL END, 1,
   CONCAT('T', MOD(n, 100)), IF(MOD(n, 3) = 2, 1, 0), 1
 FROM (
   SELECT d0.n + 10*d1.n + 100*d2.n + 1000*d3.n + 10000*d4.n AS n

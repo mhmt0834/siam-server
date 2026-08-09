@@ -160,6 +160,9 @@ DELIMITER ;
 CALL phase1_add_index('tb_shopping_cart', 'idx_cart_member_shop_table', '`member_id`, `shop_id`, `dining_table_id`');
 CALL phase1_add_index('tb_order', 'idx_order_shop_status_time', '`shop_id`, `status`, `create_time`');
 CALL phase1_add_index('tb_order', 'idx_order_member_shop_time', '`member_id`, `shop_id`, `create_time`');
+-- Phase 6.4.3: plans for revenue/trend/hot-goods use completion time, then join details by order id.
+CALL phase1_add_index('tb_order', 'idx_order_shop_status_completion', '`shop_id`, `status`, `order_completion_time`');
+CALL phase1_add_index('tb_order_detail', 'idx_order_detail_order_id', '`order_id`');
 CALL phase1_add_index('tb_goods', 'idx_goods_shop_status_sort', '`shop_id`, `status`, `sort_number`');
 CALL phase1_add_index('tb_menu', 'idx_menu_shop_sort', '`shop_id`, `sort_number`');
 

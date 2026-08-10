@@ -128,9 +128,9 @@ export default class WXHttp {
 								}
                                 if (res.data.code != 2) {
                                     handleError(errObj);
-                                    reject(errObj);
-                                    fulfill(body);
                                 }
+                                fulfill(body);
+                                return;
                             }
                             fulfill(body); //返回数据，在调用函数后面加.then
                         } catch (ex) {
@@ -140,8 +140,6 @@ export default class WXHttp {
                             errObj.message = res.errMsg;
                             handleError(errObj);
                             reject(errObj);
-                        } finally {
-                            fulfill(body); //返回数据，在调用函数后面加.then
                         }
                     },
 

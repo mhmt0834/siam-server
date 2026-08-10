@@ -10,7 +10,9 @@
 - Console 修复前 / 后：
 - Network 修复前 / 后：
 - 后端日志结果：
+- 数据库/Redis/MongoDB状态与阻塞证据：
 - Computer Use 状态：可操作 / 内部错误 / 未提供
+- 可见 GUI 回退路径与截图证据：
 - Developer Tools CLI/automator 补充证据：
 - 真机验证状态：已验证 / 未验证 / 需手机操作
 - 尚需人工操作：
@@ -18,5 +20,6 @@
 - 数据与 shopId 隔离：
 - `manifest.json` 保护校验：
 - `git diff` 摘要：
+- 证据文件路径（不含敏感信息）：
 - 结论：PASS / FAIL / BLOCKED
 - 是否建议 commit：

@@ -1,4 +1,7 @@
 import GlobalConfig from './global-config';
+let loadingTimer = null;
+let loadingVisible = false;
+
 export default {
 	showToast: function(title = '', duration) {
 		uni.showToast({
@@ -43,19 +46,35 @@ export default {
 	 * 显示加载
 	 */
 	showLoading: function(title = '正在加载...', mask = true) {
+		if (loadingTimer) {
+			clearTimeout(loadingTimer);
+		}
+		if (loadingVisible) {
+			uni.hideLoading();
+		}
 		uni.showLoading({
 			title: title,
 			mask: mask
 		});
-		setTimeout(function () {
+		loadingVisible = true;
+		loadingTimer = setTimeout(function () {
 			uni.hideLoading();
+			loadingVisible = false;
+			loadingTimer = null;
 		}, 3000);
 	},
 	/**
 	 * 隐藏加载
 	 */
 	hideLoading: function() {
-		uni.hideLoading();
+		if (loadingTimer) {
+			clearTimeout(loadingTimer);
+			loadingTimer = null;
+		}
+		if (loadingVisible) {
+			uni.hideLoading();
+			loadingVisible = false;
+		}
 	},
 	/**
 	 * 显示模态窗口

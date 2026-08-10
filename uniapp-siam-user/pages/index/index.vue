@@ -274,6 +274,8 @@ export default {
 						mainImage: item.mainImage ? GlobalConfig.ossUrl + item.mainImage : ''
 					}));
 				}
+			}).catch(() => {
+				this.isLoading = false;
 			});
 		},
 		openSpecifications(item) {

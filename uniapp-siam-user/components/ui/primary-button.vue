@@ -1,5 +1,5 @@
 <template>
-	<view class="primary-button" :class="{ 'primary-button--disabled': disabled }" @tap="handleTap">
+	<view class="primary-button" :class="{ 'primary-button--disabled': disabled }" @tap.stop="handleTap">
 		<slot>{{ text }}</slot>
 	</view>
 </template>

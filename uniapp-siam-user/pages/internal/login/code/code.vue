@@ -217,7 +217,6 @@
 			},
 
 			loginTap() {
-				console.log(this.phone, this.code);
 				// 发送 res.code 到后台换取 openId, sessionKey, unionId
 				toastService.showLoading('正在登录...', true);
 				let phone = this.phone;
@@ -263,6 +262,7 @@
 					code: code,
 					inviterId: this.inviterId ? this.inviterId : ''
 				}).then((result) => {
+					toastService.hideLoading();
 					if (result.success) {
 						authService.setToken(result.data.token);
 						authService.setOpenId(result.data.openId);
@@ -271,7 +271,6 @@
 						this.setData({
 							disabled: true
 						});
-						toastService.hideLoading();
 						toastService.showSuccess('登录成功');
 						let timeout = setTimeout(() => {
 							//如果是邀请链接直接跳转到首页，如果是进入用户后退一页
@@ -285,7 +284,7 @@
 							clearTimeout(timeout);
 						}, 1000);
 					}
-				});
+				}).catch(() => toastService.hideLoading());
 			}
 		}
 	};

@@ -30,7 +30,6 @@
 			// #ifdef MP-WEIXIN||MP-ALIPAY
 			uni.login({
 				success: (res) => {
-					console.log(res)
 					// 发送 res.code 到后台换取 openId, sessionKey, unionId
 					this.globalData.code = res.code;
 				}

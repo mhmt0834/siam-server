@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信小程序调试闭环"
+  short_description: "通过开发者工具与真机完成小程序问题定位、修复和回归闭环"
+  default_prompt: "使用 $wechat-miniapp-debug-loop 在微信开发者工具中复现、修复并回归验证当前小程序问题。"

@@ -1,0 +1,22 @@
+# 微信小程序调试闭环报告
+
+- 测试功能：
+- 实际操作路径：
+- 初始 commit / 回滚分支：
+- 发现的问题：
+- 证据链：UI → Console/Network → 请求 → 后端日志 → 代码 → 根因
+- 根因：
+- 修改文件：
+- Console 修复前 / 后：
+- Network 修复前 / 后：
+- 后端日志结果：
+- Computer Use 状态：可操作 / 内部错误 / 未提供
+- Developer Tools CLI/automator 补充证据：
+- 真机验证状态：已验证 / 未验证 / 需手机操作
+- 尚需人工操作：
+- 回归测试：首页、桌码、菜单、详情、购物车、下单、我的、登录状态、受影响老板端
+- 数据与 shopId 隔离：
+- `manifest.json` 保护校验：
+- `git diff` 摘要：
+- 结论：PASS / FAIL / BLOCKED
+- 是否建议 commit：

@@ -180,7 +180,7 @@ HBuilderX `--runtime-log true` 曾注入开发调试 WebSocket，导致工具自
 - 用户 `manifest.json` 改动保留且排除提交。
 - 本次提交范围：6 个产品修复文件、Skill 及本报告。
 - 未移动 `restaurant-saas-v1.7-rc1` 标签，未创建新生产标签。
-- commit：提交完成后回填于 Git 历史；本报告所在提交即 Phase 6.4.4 修复提交。
+- commit：`f8f31cb`（Phase 6.4.4 修复与验收提交；若后续仅回填报告而 amend，最终完整 hash 以 Git 历史为准）。
 
 ## 最终未完成但仍可继续的项目
 

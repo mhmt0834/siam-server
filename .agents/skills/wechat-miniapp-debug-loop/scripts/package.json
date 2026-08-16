@@ -1,0 +1,8 @@
+{
+  "name": "wechat-miniapp-debug-loop-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "miniprogram-automator": "0.12.1"
+  }
+}

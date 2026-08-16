@@ -1,109 +1,155 @@
 ---
 name: wechat-miniapp-debug-loop
-description: "Run an evidence-based WeChat mini-program debug loop with Computer Use: reproduce in WeChat Developer Tools or visible real-device debugging, inspect Console and Network, correlate backend logs and code, apply the smallest safe fix, rebuild, repeat the same UI actions, and regress affected flows. Use for login failures, unresponsive buttons, blank pages, real-device errors, red Console errors, failed requests, WeChat Developer Tools errors, API failures, or requests to make or verify a mini-program feature end to end."
+description: "Run an evidence-based WeChat mini-program debug loop through miniprogram-automator and WeChat Developer Tools CLI first, with Computer Use reserved for visual confirmation. Reproduce real page interactions, capture runtime requests/Console, correlate backend and database evidence, apply the smallest safe fix, rebuild, and repeat. Use for login failures, unresponsive buttons, blank pages, real-device errors, red Console errors, failed requests, Developer Tools errors, API failures, or end-to-end mini-program verification."
 ---
 
 # 微信小程序调试闭环
 
-Use Computer Use as the primary runtime evidence source. Never declare success from source review or compilation alone.
+Use this runtime priority and do not reorder it:
 
-## 1. Establish the boundary
+1. `miniprogram-automator` over the Developer Tools automation WebSocket.
+2. WeChat Developer Tools CLI and any available CLI agent capability.
+3. Computer Use for final visual, Console, and Network assistance only.
+4. Ask the user only for a physical-phone-exclusive action.
 
-1. Resolve the Git root and read [references/project-map.md](references/project-map.md) when working in this repository.
-2. Run `scripts/preflight.ps1` before changing anything. Record HEAD, branch, dirty files, service state, Developer Tools state, and the protected manifest hash.
-3. Treat every pre-existing dirty file as user-owned. Never stage, overwrite, revert, format, or auto-fix `uniapp-siam-user/manifest.json`.
-4. Treat `restaurant-saas-v1.7-rc1` as frozen. Do not modify production, payment core, authentication, authorization, or shopId isolation unless the current request explicitly authorizes that exact scope.
-5. Before the first code/config edit, invoke the safe code-change workflow: scan secrets and push a secret-safe rollback branch at the recorded commit. Never include merchant instance secrets or the protected manifest in that backup.
-6. Do not deploy, upload, enable payment, or change production data. Use local development/test data only.
-7. Before any HBuilderX/CLI build, save the manifest's exact bytes and SHA-256 outside the repository. Some HBuilderX CLI versions rewrite a valid `mp-weixin.appid` to `null`. After the build, compare hashes and restore only the tool-induced mutation from that exact snapshot; never restore across a concurrent user edit.
+Do not repeatedly inject mouse input into an NW.js window after one confirmed window-ownership failure. A blocked Computer Use visual check does not invalidate an Automator E2E that has complete runtime evidence.
 
-## 2. Start and verify the development environment
+## 1. Protect the test boundary
 
-1. Identify the mini-program source, generated `mp-weixin` directory, Spring Boot provider, build workflow, MySQL, Redis, and MongoDB from the repository rather than assuming paths.
-2. Check ports and health before starting duplicates. Start only missing services with the project's existing commands.
-3. Compile the backend and mini-program. A successful build is only a prerequisite, not PASS.
-4. Launch HBuilderX and WeChat Developer Tools with Computer Use. Open the generated `unpackage/dist/dev/mp-weixin` project, not a source directory with a stale or empty `project.config.json`.
-5. Confirm the generated project has a configured AppID without printing secrets. Do not edit the protected source manifest to fix a local Developer Tools import problem.
-   - When manifest AppID is configured but the ignored generated `project.config.json` is empty, run `scripts/sync-generated-appid.ps1`. It updates only the generated artifact and verifies the protected manifest hash is unchanged.
-6. If MySQL, MongoDB, or another required local service is not installed, do not install system software or point tests at production without authorization. Report the exact environment block.
-7. For this repository, an existing backend jar needs the external local config passed with `--spring.config.additional-location=file:<application-local.yml>`; do not infer a healthy database merely because port 9200 is listening.
-8. The merchant client uses legacy `node-sass`; when the system Node ABI is incompatible, build with a temporary Node 12 runtime outside the repository instead of changing dependencies.
+1. Read [references/project-map.md](references/project-map.md), then run `scripts/preflight.ps1` before changing anything.
+2. Record HEAD, branch, dirty files, services, Developer Tools state, and the exact SHA-256 of `uniapp-siam-user/manifest.json`.
+3. Treat every pre-existing dirty file as user-owned. Never stage, overwrite, revert, format, or auto-fix `manifest.json`.
+4. Keep `restaurant-saas-v1.7-rc1` frozen. Do not change production config, payment core, authentication, authorization, or shopId isolation unless the request explicitly authorizes that exact scope.
+5. Before the first code/config edit, run the safe code-change workflow and push a secret-safe rollback branch. Exclude secrets, generated builds, dependency directories, and the protected manifest.
+6. Never deploy, upload, enable payment, change production data, weaken security, fake a token/Storage value, or replace UI E2E with a direct backend request.
+7. Before and after HBuilderX builds, byte-compare the protected manifest. Restore only a tool-induced mutation from the same-run snapshot; never restore across a concurrent user edit.
 
-## 3. Reproduce through the UI first
+## 2. Establish the automation channel
 
-1. Use Computer Use to activate the exact WeChat Developer Tools window, refresh/recompile, and perform the user's operation from its real entry point.
-2. Record the visible page state before and after every meaningful click.
-3. Open Console and Network in Developer Tools. Capture relevant errors and requests; filter noise only after preserving evidence.
-4. For login, execute: launch → login entry → login click → page result → Console → Network → request URL/status/response → `wx.login` result → backend log.
-5. Do not infer that a button works because its handler exists. Do not call an API directly as a substitute for UI validation.
+Use the Skill-local Node project in `scripts/`; never install `miniprogram-automator` into a business frontend or production dependency tree.
 
-If Computer Use can list the NW.js window but cannot read/click it, close duplicate Developer Tools windows once, reopen the generated project, and retry once. If the same internal window-ownership error repeats, preserve that exact error and use this visible-GUI fallback chain:
+1. Verify Developer Tools is installed and logged in with CLI `islogin`.
+2. Verify Developer Tools `设置 → 安全设置 → 服务端口` is enabled. A CLI connection failure is evidence to inspect this setting; do not change business code.
+3. Compile/open the generated `uniapp-siam-user/unpackage/dist/dev/mp-weixin` project, not the source directory.
+4. Start automation through the installed package's real `Launcher` behavior: spawn `cli auto --auto-port 9420 --project <generated-project> --trust-project` and attempt the WebSocket connection concurrently. Do not wait for a standalone CLI command to finish before connecting; the automation port may be short-lived without a client.
+   - Prefer the official stable sequence: `cli open --project <generated-project>` → wait for project load → `cli auto --auto-port 9420 --project <generated-project>` → connect immediately.
+   - verify TCP 9420 is listening
+   - connect and execute an Automator protocol call such as `currentPage()`
+5. Treat a listening port without a successful protocol call as FAIL. If port 9420 hosts the IDE HTTP service instead of Automator WebSocket, quit the IDE once and relaunch with the sequence above.
+6. Run `node scripts/devtools-connect.mjs --project <generated-project>` for the repeatable connection check.
+7. Retry CLI open/auto/connect up to three clean rounds. Preserve the actual error after the third failure.
 
-1. Open the generated project with `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/open-wechat-devtools.ps1` and the official Developer Tools automation port.
-2. Use `miniprogram-automator` only for route reset, Console/exception collection, and visible remote-debug entry. Redact phone numbers, login codes, tokens, and authorization values from collected logs.
-3. Use DPI-aware OS-level mouse/keyboard input against the visible Developer Tools window for actual clicks and typing; capture before/after screenshots.
-4. Inspect the visible Console and Network panels in Developer Tools. Do not treat API-only calls or source review as UI evidence.
+The CLI service port and `--auto-port` are different roles even if both can be assigned 9420 at different times. Never occupy the Automator port with `cli --port 9420` during an Automator run.
 
-This fallback can satisfy the actual UI gate when real clicks, visible Console, and visible Network are all evidenced. Report the Computer Use API as internally blocked. Mark the whole run `BLOCKED` only when the visible UI/Console/Network gate remains inaccessible.
+## 3. Capture runtime evidence
 
-## 4. Build an evidence chain
+Use `scripts/collect-runtime.mjs` from the E2E driver to instrument, not mock, real `wx.request` and `wx.login` calls. The wrapper must call the original API and preserve callbacks.
 
-For every failure, record:
+Capture and redact:
 
-`UI symptom → Console/Network evidence → request → backend log → code path → root cause`
+- page route and selected visible text;
+- request URL, method, status code, and sanitized response shape;
+- `wx.login` success as `hasCode: true/false`, never the code;
+- Console error-level records and runtime exceptions;
+- Storage presence as booleans, never token/openId/phone values;
+- screenshots and a JSON evidence file outside Git.
 
-Check at minimum: red Console entries, unhandled rejections, JS runtime errors, `request:fail`, domain/HTTPS/SSL failures, 401/403/404/500, `wx.login` or code2Session failures, AppID mismatch/missing, token problems, missing/cross-tenant shopId, WebSocket errors, database errors, blank pages, inert controls, and API field mismatches.
+Never persist authorization headers, cookies, codes, session keys, access tokens, AppSecret, SMS codes, payment material, or full phone numbers.
 
-For every side-effect button, compare one physical click with the Network request count. In uni-app custom components, a root native `tap` plus `$emit('tap')` can invoke the parent twice unless native propagation is stopped. Treat duplicate cart/order/payment requests as a real defect even when the backend is idempotent.
+For each failure, build:
 
-For HTTP 200 business failures, verify whether the shared request wrapper resolves the response to existing `result.success` checks. A wrapper that rejects and resolves the same response can create unhandled Promise errors, indefinite loading states, and misleading blank pages. Preserve network failures as rejected promises; do not fabricate business success.
+`UI symptom → Automator page action → runtime request/response → Console → backend log → database evidence → code path → root cause`
 
-Treat Developer Tools errors such as `webviewId ... not found` as tool failures only after their timestamp, stack, clean restart, and repeat behavior distinguish them from app runtime failures.
+## 4. Drive real UI interaction
 
-Do not silence the symptom with an empty catch, log suppression, disabled validation, fabricated success response, bypassed authentication, weakened payment checks, or hard-coded shopId.
+Use Automator element actions (`page.$`, `page.$$`, `element.tap`, `element.input`) from the real user entry route. Do not call a page login method, synthesize Storage, or call the login API directly.
 
-## 5. Apply the smallest fix
+When Automator connects but `Page.getElement`/`Page.getElements` times out, do not fall back to Computer Use. Diagnose in this fixed order:
 
-1. Trace only the failing UI handler, request wrapper, backend endpoint, log source, and shared dependency required by the evidence.
-2. Patch the minimum files and preserve the existing architecture/UI.
+`currentPage → route/query/pageStack → page load state → actual generated WXML → wx:if → custom-component boundary → stable id/class selector → conditional wait → element.tap`
+
+Rules for this failure mode:
+
+1. Run `node scripts/inspect-page-elements.mjs` and record the current route, query, page stack, page data readiness, selector counts, and node types. Do not guess selectors from visible text.
+2. Inspect the source Vue/WXML and generated WXML. Confirm whether the real clickable node is conditionally rendered, slotted, covered, or implemented as a custom component.
+3. Prefer a stable `id` on the existing real clickable node. Adding an id is allowed only when it changes neither style nor business behavior.
+4. For a custom component, locate the host first; use its real `CustomElement` query scope only when the installed typings/API support it. Tapping a host with the original `bindtap` is valid UI interaction; `page.callMethod()` is not.
+5. Wait for the expected route and selector to exist; never replace a condition wait with a longer blind sleep.
+6. If `currentPage()` itself fails or Page protocol calls never respond, treat this as a Developer Tools/project-loading channel failure before changing selectors. Check the exact installed `miniprogram-automator` API and Developer Tools protocol response.
+7. If `pageStack()` is empty, use one normal mini-program `reLaunch` to the configured home route and condition-wait for page metadata. This repairs first-launch registration without calling business methods. If the stack stays empty, inspect Developer Tools logs for `routeTo appLaunch timeout`, `isMiniAppProject=false`, and an empty internal `appid` before touching selectors.
+8. On Windows, if the Developer Tools CLI persists a Chinese project path as mojibake, use a Skill-local physical copy of the generated build for testing. Verify `isMiniAppProject` and internal AppID in the tool log; an ASCII junction alone can be misclassified by some Developer Tools builds. Never copy or modify business source.
+9. Developer Tools `2.02.2607271` may return `Tool.getInfo.version` without legacy `SDKVersion` and may misclassify a valid generated mini-program as `isMiniAppProject=false`. Keep compatibility adapters inside this Skill; verify with a stable Developer Tools build before changing application code.
+10. Keep the installed package/API sequence fixed after transport connects:
+
+`currentPage/pageStack → route/load readiness → generated WXML → wx:if → component host → stable selector → condition wait → element.tap`
+
+Never fall back to Computer Use merely because `getElement` timed out.
+
+For login, run `node scripts/login-e2e.mjs` with test credentials supplied only through process environment:
+
+- `WECHAT_E2E_PHONE`
+- `WECHAT_E2E_SMS_CODE`
+- optional `WECHAT_BACKEND_LOG`
+
+The script must execute real `element.tap()` calls for each login entry:
+
+`我的 → 登录/注册 → 手机号验证码登录 → 输入 → 点击确定 → wx.login → code2Session → backend login → MySQL → token → Storage → /me → logged-in UI → reload → persisted login`
+
+If the selected flow requires a real phone authorization, SMS, QR scan, camera, OS permission, or payment confirmation that Automator cannot perform, stop exactly there and say `请在手机完成 XXX，完成后告诉我继续。` Never bypass that step.
+
+Use `scripts/ui-regression.mjs` for a non-destructive route/visibility regression after the focused fix. Do not expand a narrowly scoped task into unrelated functional acceptance.
+
+## 5. Diagnose and fix
+
+Check red Console errors, unhandled rejections, JS runtime errors, `request:fail`, domain/HTTPS/SSL failures, 401/403/404/500, `wx.login` or code2Session failures, AppID mismatch/missing, token/session problems, missing/cross-tenant shopId, WebSocket failures, database errors, blank pages, inert controls, duplicate requests, and API field mismatches.
+
+1. Trace only the failing handler, request wrapper, backend endpoint, log source, and required shared dependency.
+2. Apply the smallest compatible patch while preserving architecture and UI.
 3. Keep authorization and shopId derivation server-side. Never trust a client-supplied shopId for access control.
-4. Re-check the protected manifest hash immediately after editing. Stop and restore only the skill-created change if it differs; never discard the user's original dirty content.
-5. Never print or persist `wx.login` codes, SMS verification codes, session keys, access tokens, payment material, or unmasked phone numbers in Console, reports, or automation artifacts.
+4. Never hide an error with an empty catch, log suppression, disabled validation, fabricated success, hard-coded shopId, or weakened payment/authentication checks.
+5. Re-check the protected manifest hash after every edit and build.
 
-## 6. Rebuild and repeat until clean
+## 6. Rebuild and repeat
 
 After every patch:
 
 1. Recompile the affected module.
-2. Restart only required services.
-3. Refresh/reopen the mini-program through Computer Use.
-4. Repeat the identical UI route from the user entry point.
-5. Reinspect Console, Network, backend logs, and resulting data.
-6. Continue `locate → patch → build → UI retest → log check` until the feature works, relevant Console errors are absent, requests match expectations, backend logs are clean, and no new regression appears.
-7. Restart Developer Tools after a generated-code refresh if the simulator is blank and the Console contains a stale internal WebView route error. Re-run from the entry route after restart.
-8. Prefer HBuilderX `launch mp-weixin --runtime-log false` for acceptance. `--runtime-log true` injects an HBuilder debug WebSocket; its `closeSocket 1006` errors are tooling noise, not the application's merchant WebSocket. If used, remove it with a clean rebuild/restart before the final Console gate.
+2. Restart only required local services.
+3. Start a fresh Automator session through CLI.
+4. Repeat the identical UI route and actions.
+5. Reinspect captured requests, Storage presence, Console, backend logs, and database state.
+6. Continue `locate → patch → build → Automator UI retest → evidence check` until the target works without related errors or regressions.
 
-Do not label a pre-existing unrelated warning as fixed. Separate it from task-related failures.
+Compilation or source review alone is never PASS.
 
-## 7. Real-device debugging
+## 7. Separate the three evidence gates
 
-When Developer Tools exposes computer-visible real-device/remote debugging, enter it with Computer Use and repeat the Console/Network loop. If a physical action is required, stop exactly there and say: `请在手机完成 XXX，完成后告诉我继续。` Never pretend to scan, authorize, grant OS permission, use a camera, or confirm payment on the user's phone.
+After Automator E2E, use Computer Use once for final visible page state and Developer Tools Console/Network when available. If the NW.js window remains inaccessible, record it separately and stop mouse-injection retries.
 
-## 8. Regression and PASS gate
+Always report:
 
-Test the changed path plus, where reachable without real payment: home, table-scene parsing, menu, food details, cart, order confirmation/submission in a safe test environment, profile, login/session state, and affected merchant functions.
+- `AUTOMATOR E2E: PASS/FAIL`
+- `VISUAL COMPUTER USE: PASS/BLOCKED`
+- `PHYSICAL DEVICE: PASS/BLOCKED`
 
-Report PASS only when all are true:
+An Automator-proven business flow may pass when visual Computer Use is blocked. Physical-device PASS requires an actual device run; never infer it from the simulator.
 
-- Actual UI clicks pass.
-- Relevant Console has no red error.
-- Network requests have expected URL, status, and response.
-- Backend logs contain no related ERROR.
-- Data and authorization/shopId isolation are correct.
-- No obvious affected-flow regression exists.
+## 8. LOGIN AUTOMATION PASS gate
 
-Otherwise report `BLOCKED` or `FAIL`, name the exact unverified gate, and do not weaken acceptance criteria.
+Report `LOGIN AUTOMATION PASS` only when all are true:
 
-## 9. Final report
+- Automator triggers login from the UI page entry.
+- WeChat code2Session succeeds.
+- A real token is generated without being exposed.
+- Token Storage presence is confirmed from the running mini program.
+- `/me` succeeds and identifies the current user.
+- The UI changes to logged-in state.
+- Reload preserves login state.
+- Backend related ERROR count is zero.
+- Application-related Console red-error count is zero.
 
-Use [references/report-template.md](references/report-template.md). Include the pre/post Console, Network, backend logs, real-device status, manual phone step, regression result, `git diff`, protected manifest verification, rollback branch/commit, and whether a commit is recommended. Do not auto-commit unless the user asks.
+Otherwise report the single earliest failing gate and its evidence. Do not convert an NW.js Computer Use limitation into a business login failure when the Automator evidence is complete.
+
+## 9. Report
+
+Use [references/report-template.md](references/report-template.md). Include the manifest hash check, rollback branch/SHA, evidence directory, final diff, and whether a commit is recommended. Do not auto-commit unless requested.

@@ -11,10 +11,12 @@
 - Network 修复前 / 后：
 - 后端日志结果：
 - 数据库/Redis/MongoDB状态与阻塞证据：
-- Computer Use 状态：可操作 / 内部错误 / 未提供
-- 可见 GUI 回退路径与截图证据：
-- Developer Tools CLI/automator 补充证据：
-- 真机验证状态：已验证 / 未验证 / 需手机操作
+- 9420 Automator WebSocket：监听 / 协议失败 / 未监听
+- AUTOMATOR E2E：PASS / FAIL
+- Developer Tools CLI：PASS / FAIL
+- VISUAL COMPUTER USE：PASS / BLOCKED
+- PHYSICAL DEVICE：PASS / BLOCKED
+- Automator 页面操作、Storage、请求与截图证据：
 - 尚需人工操作：
 - 回归测试：首页、桌码、菜单、详情、购物车、下单、我的、登录状态、受影响老板端
 - 数据与 shopId 隔离：
